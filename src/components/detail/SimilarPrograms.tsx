@@ -61,90 +61,119 @@ export function SimilarPrograms({ programs }: SimilarProgramsProps) {
           overflow: 'hidden',
         }}
       >
-        {programs.map(({ program }, idx) => {
+        {programs.map(({ program, score }, idx) => {
           const deadline = formatDeadline(program.deadline)
           const typeColor = TYPE_COLORS[program.type] ?? { bg: 'var(--cream-dark)', color: 'var(--ink-3)' }
           const label = program.type.charAt(0).toUpperCase() + program.type.slice(1)
+          const matchPercent = Math.round(score * 100)
 
           return (
             <Link
               key={program.id}
               href={`/programs/${program.slug}`}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '14px',
-                padding: '14px 18px',
+                display: 'block',
+                padding: '16px 18px',
                 borderTop: idx > 0 ? '1px solid var(--cream-border)' : 'none',
                 textDecoration: 'none',
                 background: 'var(--white)',
-                transition: 'background 0.12s ease',
+                transition: 'all 0.12s ease',
               }}
               className="similar-program-row"
             >
-              {/* Type badge */}
-              <span
+              {/* Top Row: Title + Match */}
+              <div
                 style={{
-                  display: 'inline-block',
-                  fontFamily: 'DM Sans, sans-serif',
-                  fontSize: '10px',
-                  fontWeight: 500,
-                  color: typeColor.color,
-                  background: typeColor.bg,
-                  borderRadius: '4px',
-                  padding: '2px 7px',
-                  flexShrink: 0,
-                  textTransform: 'capitalize',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'baseline',
+                  marginBottom: '8px',
+                  gap: '12px',
                 }}
               >
-                {label}
-              </span>
-
-              {/* Title */}
-              <span
-                style={{
-                  fontFamily: 'DM Serif Display, serif',
-                  fontSize: '14px',
-                  fontWeight: 400,
-                  color: 'var(--ink)',
-                  flex: 1,
-                  minWidth: 0,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-                className="similar-program-title"
-              >
-                {program.title}
-              </span>
-
-              {/* Deadline */}
-              <span
-                style={{
-                  fontFamily: 'DM Sans, sans-serif',
-                  fontSize: '12px',
-                  fontWeight: 400,
-                  color: deadline.color,
-                  flexShrink: 0,
-                }}
-              >
-                {deadline.label}
-              </span>
-
-              {/* Amount */}
-              {program.amount_display && (
                 <span
                   style={{
                     fontFamily: 'DM Serif Display, serif',
-                    fontSize: '13px',
+                    fontSize: '16px',
                     fontWeight: 400,
                     color: 'var(--ink)',
+                    lineHeight: 1.3,
+                  }}
+                  className="similar-program-title"
+                >
+                  {program.title}
+                </span>
+                <span
+                  style={{
+                    fontFamily: 'DM Sans, sans-serif',
+                    fontSize: '11.5px',
+                    fontWeight: 600,
+                    color: '#2A6620', // Greenish for match
+                    background: '#EDF5EA',
+                    padding: '2px 8px',
+                    borderRadius: '12px',
                     flexShrink: 0,
                   }}
                 >
-                  {program.amount_display}
+                  {matchPercent}% match
                 </span>
-              )}
+              </div>
+
+              {/* Bottom Row: Meta Information */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  flexWrap: 'wrap',
+                }}
+              >
+                {/* Type badge */}
+                <span
+                  style={{
+                    fontFamily: 'DM Sans, sans-serif',
+                    fontSize: '10px',
+                    fontWeight: 500,
+                    color: typeColor.color,
+                    background: typeColor.bg,
+                    borderRadius: '4px',
+                    padding: '2px 7px',
+                    textTransform: 'capitalize',
+                  }}
+                >
+                  {label}
+                </span>
+
+                {/* Deadline */}
+                <span
+                  style={{
+                    fontFamily: 'DM Sans, sans-serif',
+                    fontSize: '12px',
+                    color: deadline.color,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <span style={{ color: 'var(--ink-4)', fontSize: '10px' }}>Deadline:</span> {deadline.label}
+                </span>
+
+                {/* Amount */}
+                {program.amount_display && (
+                  <span
+                    style={{
+                      fontFamily: 'DM Sans, sans-serif',
+                      fontSize: '12px',
+                      color: 'var(--ink-3)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    <span style={{ color: 'var(--ink-4)', fontSize: '10px' }}>Value:</span> {program.amount_display}
+                  </span>
+                )}
+              </div>
             </Link>
           )
         })}

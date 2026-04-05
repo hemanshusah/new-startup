@@ -10,14 +10,13 @@ function daysUntil(dateStr: string): number {
 }
 
 function formatDeadline(dateStr: string) {
-  const days = daysUntil(dateStr)
   const formatted = new Date(dateStr).toLocaleDateString('en-IN', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
   })
-  const color = days <= 1 ? '#E03E2D' : days <= 7 ? '#D4820E' : 'var(--ink)'
-  return { label: formatted, color }
+  // Force it to be red as requested by user
+  return { label: formatted, color: '#E03E2D' }
 }
 
 interface DetailSidebarProps {
@@ -192,12 +191,12 @@ export function DetailSidebar({
                   >
                     <p
                       style={{
-                        fontFamily: 'DM Serif Display, serif',
-                        fontSize: '13.5px',
-                        fontWeight: 400,
+                        fontFamily: 'DM Sans, sans-serif',
+                        fontSize: '14px',
+                        fontWeight: 500,
                         color: 'var(--ink)',
                         margin: '0 0 3px',
-                        lineHeight: 1.3,
+                        lineHeight: 1.4,
                       }}
                     >
                       {p.title}
