@@ -65,7 +65,8 @@ export function SimilarPrograms({ programs }: SimilarProgramsProps) {
           const deadline = formatDeadline(program.deadline)
           const typeColor = TYPE_COLORS[program.type] ?? { bg: 'var(--cream-dark)', color: 'var(--ink-3)' }
           const label = program.type.charAt(0).toUpperCase() + program.type.slice(1)
-          const matchPercent = Math.round(score * 100)
+          // Score is raw points (context.md §12), max possible ≈ 205. Normalize to 0-100% for display.
+          const matchPercent = Math.min(100, Math.round((score / 205) * 100))
 
           return (
             <Link
