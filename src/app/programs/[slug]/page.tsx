@@ -147,9 +147,6 @@ export default async function ProgramDetailPage({ params }: Props) {
         {/* Header: breadcrumb, badges, H1, org, Apply button */}
         <ProgramHeader program={program as Program} />
 
-        {/* Meta strip: Deadline, Funding, Equity, Mode, Stage */}
-        <MetaStrip program={program as Program} />
-
         {/* Two-column layout */}
         <div
           style={{
@@ -160,6 +157,9 @@ export default async function ProgramDetailPage({ params }: Props) {
         >
           {/* ── Main content column ── */}
           <div style={{ flex: 1, minWidth: 0 }}>
+            {/* Meta strip: Deadline, Funding, Equity, Mode, Stage */}
+            <MetaStrip program={program as Program} />
+
             {/* About section */}
             {program.about && (
               <section

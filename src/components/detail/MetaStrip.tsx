@@ -79,7 +79,7 @@ export function MetaStrip({ program }: MetaStripProps) {
           role="listitem"
           style={{
             flex: 1,
-            padding: '14px 16px',
+            padding: '10px 16px',
             borderLeft: i === 0 ? 'none' : '1px solid var(--cream-border)',
             minWidth: 0,
           }}
