@@ -40,9 +40,9 @@ export function FilterBar({
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '16px',
+        gap: '24px',
         flexWrap: 'wrap',
-        marginBottom: '20px',
+        marginBottom: '32px',
       }}
     >
       {/* ── National / International scope toggle ── */}
@@ -52,7 +52,7 @@ export function FilterBar({
           border: '1px solid var(--cream-border)',
           borderRadius: '20px',
           background: 'var(--white)',
-          overflow: 'hidden',
+          padding: '2px', // Slight padding for segment feel
           flexShrink: 0,
         }}
         role="group"
@@ -67,12 +67,14 @@ export function FilterBar({
             style={{
               fontFamily: 'DM Sans, sans-serif',
               fontSize: '12px',
-              fontWeight: scope === s ? 500 : 400,
-              color: scope === s ? 'var(--cream)' : 'var(--ink-3)',
+              fontWeight: 500,
+              color: scope === s ? 'var(--white)' : 'var(--ink-4)',
               background: scope === s ? 'var(--ink)' : 'transparent',
-              padding: '6px 16px',
+              padding: '6px 18px',
               border: 'none',
+              borderRadius: '18px',
               cursor: 'pointer',
+              transition: 'all 0.15s ease',
             }}
             aria-pressed={scope === s}
           >
@@ -81,12 +83,48 @@ export function FilterBar({
         ))}
       </div>
 
+      {/* ── Search input (Pill shape) ── */}
+      <div style={{ position: 'relative', flexShrink: 0 }}>
+        <span
+          style={{
+            position: 'absolute',
+            left: '12px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            color: 'var(--ink-4)',
+            fontSize: '14px',
+          }}
+        >
+          ⌕
+        </span>
+        <input
+          id="program-search"
+          type="search"
+          placeholder="Search programs, orgs..."
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+          style={{
+            fontFamily: 'DM Sans, sans-serif',
+            fontSize: '12.5px',
+            fontWeight: 400,
+            color: 'var(--ink)',
+            background: 'var(--white)',
+            border: '1px solid var(--cream-border)',
+            borderRadius: '20px', // Pill shape
+            padding: '7px 12px 7px 32px', // Extra left padding for icon
+            width: '260px',
+            outline: 'none',
+          }}
+          aria-label="Search programs"
+        />
+      </div>
+
       {/* ── Type filter tabs ── */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '4px',
+          gap: '8px',
           flex: 1,
         }}
         role="group"
@@ -102,14 +140,14 @@ export function FilterBar({
               style={{
                 fontFamily: 'DM Sans, sans-serif',
                 fontSize: '12px',
-                fontWeight: isActive ? 500 : 400,
-                color: isActive ? 'var(--ink)' : 'var(--ink-3)',
-                background: isActive ? 'var(--cream-dark)' : 'transparent',
-                border: isActive ? '1px solid var(--cream-border)' : '1px solid transparent',
+                fontWeight: 500,
+                color: isActive ? 'var(--white)' : 'var(--ink-4)',
+                background: isActive ? 'var(--ink)' : 'var(--white)',
+                border: '1px solid var(--cream-border)',
                 borderRadius: '20px',
-                padding: '5px 14px',
+                padding: '6px 18px',
                 cursor: 'pointer',
-                transition: 'background 0.15s ease, color 0.15s ease',
+                transition: 'all 0.15s ease',
                 whiteSpace: 'nowrap',
               }}
               aria-pressed={isActive}
@@ -120,36 +158,13 @@ export function FilterBar({
         })}
       </div>
 
-      {/* ── Search input ── */}
-      <input
-        id="program-search"
-        type="search"
-        placeholder="Search programs…"
-        value={search}
-        onChange={(e) => onSearchChange(e.target.value)}
-        style={{
-          fontFamily: 'DM Sans, sans-serif',
-          fontSize: '12.5px',
-          fontWeight: 400,
-          color: 'var(--ink)',
-          background: 'var(--white)',
-          border: '1px solid var(--cream-border)',
-          borderRadius: '6px',
-          padding: '6px 12px',
-          width: '250px',
-          outline: 'none',
-          flexShrink: 0,
-        }}
-        aria-label="Search programs"
-      />
-
       {/* ── Result count (right-aligned) ── */}
       <div
         style={{
           fontFamily: 'DM Sans, sans-serif',
           fontSize: '12px',
           fontWeight: 400,
-          color: 'var(--ink-3)',
+          color: 'var(--ink-4)',
           whiteSpace: 'nowrap',
           marginLeft: 'auto',
           flexShrink: 0,
@@ -157,8 +172,7 @@ export function FilterBar({
         aria-live="polite"
         aria-atomic="true"
       >
-        {totalShown} of {totalFiltered}{' '}
-        {totalFiltered === 1 ? 'program' : 'programs'}
+        Showing {totalShown} of {totalFiltered} programs
       </div>
     </div>
   )

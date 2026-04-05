@@ -103,7 +103,8 @@ export function GrantsGrid({ programs }: GrantsGridProps) {
               gridTemplateColumns: 'repeat(3, 1fr)',
               gap: '1px',
               background: 'var(--cream-border)',
-              borderRadius: '14px',
+              border: '1px solid var(--cream-border)', // Outer container border
+              borderRadius: '12px',
               overflow: 'hidden',
             }}
           >

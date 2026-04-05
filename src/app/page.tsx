@@ -76,7 +76,7 @@ export default async function ListingPage() {
             maxWidth: '680px',
           }}
         >
-          Grants &amp; Funding for Indian Startups
+          Grants &amp; funding programs for <span style={{ color: 'var(--accent)' }}>Indian founders</span>
         </h1>
 
         {/* Subtitle */}
@@ -85,15 +85,25 @@ export default async function ListingPage() {
             fontFamily: 'DM Sans, sans-serif',
             fontSize: '15px',
             fontWeight: 300,
-            color: 'var(--ink-2)',
+            color: 'var(--ink-3)',
             lineHeight: 1.6,
             maxWidth: '520px',
           }}
         >
-          The most complete directory of government grants, private accelerators,
-          incubation programs, and funding contests — updated weekly.
+          Curated government and private sector opportunities — updated weekly so you
+          never miss a deadline.
         </p>
       </header>
+
+      {/* Horizontal Line — Aesthetic Refresh */}
+      <div
+        style={{
+          height: '1px',
+          background: 'var(--cream-border)',
+          width: '100%',
+          marginBottom: '40px',
+        }}
+      />
 
       {/* Error state — shown if DB hasn't been seeded yet */}
       {error && (

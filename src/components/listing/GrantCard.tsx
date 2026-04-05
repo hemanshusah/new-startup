@@ -64,12 +64,13 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
         background: 'var(--white)',
         padding: '26px 24px 22px',
         minHeight: '220px',
-        borderRadius: 0, // Outer radius is on the grid wrapper (14px)
+        borderRadius: 0,
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         position: 'relative',
+        transition: 'background 0.1s ease',
       }}
       aria-label={`${program.title} by ${program.organisation}`}
     >
