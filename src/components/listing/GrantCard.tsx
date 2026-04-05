@@ -55,9 +55,9 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
       className="grant-card"
       style={{
         background: 'var(--white)',
-        padding: '26px 24px 22px',
-        minHeight: '220px',
-        borderRadius: 0,
+        padding: '32px 28px 28px',
+        minHeight: '240px',
+        borderRadius: 0, 
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
@@ -73,7 +73,7 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
         <p
           style={{
             fontFamily: 'DM Sans, sans-serif',
-            fontSize: '12px',
+            fontSize: '11px',
             fontWeight: 500,
             color: 'var(--ink-4)',
             textTransform: 'uppercase',
@@ -88,10 +88,10 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
         <h3
           style={{
             fontFamily: 'DM Serif Display, serif',
-            fontSize: '18px',
+            fontSize: '15.5px',
             fontWeight: 400,
             color: 'var(--ink)',
-            lineHeight: 1.3,
+            lineHeight: 1.35,
             marginBottom: '10px',
           }}
         >
@@ -103,10 +103,10 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
           className="line-clamp-2"
           style={{
             fontFamily: 'DM Sans, sans-serif',
-            fontSize: '14.5px',
+            fontSize: '13px',
             fontWeight: 300,
             color: 'var(--ink-2)',
-            lineHeight: 1.6,
+            lineHeight: 1.55,
           }}
         >
           {program.description_short}
@@ -128,14 +128,15 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
           <span
             style={{
               fontFamily: 'DM Sans, sans-serif',
-              fontSize: '10.5px',
-              fontWeight: 600,
+              fontSize: '10px',
+              fontWeight: 500,
               borderRadius: '4px',
-              padding: '3px 8px',
+              padding: '3px 9px',
               display: 'inline-block',
               background: typeStyle.bg,
               color: typeStyle.color,
               textTransform: 'uppercase',
+              letterSpacing: '0.04em',
               lineHeight: 1,
             }}
           >
@@ -157,7 +158,7 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
             <span
               style={{
                 fontFamily: 'DM Sans, sans-serif',
-                fontSize: '12px',
+                fontSize: '11px',
                 fontWeight: 500,
                 color: deadline.color,
               }}
