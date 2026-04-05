@@ -1,0 +1,169 @@
+@import "tailwindcss";
+
+/* ============================================================
+   GRANTSINDIA — Design Tokens (CONTEXT.md §2 & §3)
+   ============================================================ */
+
+:root {
+  /* Colour tokens */
+  --cream:        #F5F2EB;
+  --cream-dark:   #EDE9DF;
+  --cream-border: #DAD6CC;
+  --cream-hover:  #EAE5D9;
+  --ink:          #1C1A16;
+  --ink-2:        #4A4640;
+  --ink-3:        #8A857C;
+  --ink-4:        #C0BAB0;
+  --accent:       #B8460A;
+  --accent-light: #FDF0EA;
+  --white:        #FDFCF9;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+/* ============================================================
+   GRANT CARD — hover states (can't express these in inline styles)
+   ============================================================ */
+
+.grant-card {
+  transition: background 0.15s ease;
+}
+
+.grant-card:hover {
+  background: var(--cream-hover) !important;
+}
+
+.grant-card .hover-arrow {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.grant-card:hover .hover-arrow {
+  opacity: 1;
+}
+
+/* ============================================================
+   FILTER BAR — scope toggle transition
+   ============================================================ */
+
+.scope-segment {
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+/* ============================================================
+   COMING SOON BADGE
+   ============================================================ */
+
+.coming-soon-badge {
+  display: inline-block;
+  background: var(--accent-light);
+  color: var(--accent);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 9.5px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 2px 6px;
+  border-radius: 20px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   GRANTS GRID RESPONSIVE BREAKPOINTS (PROGRESS.md 2.5)
+   ============================================================ */
+
+/* Tablet: ≤ 1024px → 2 columns */
+@media (max-width: 1024px) {
+  #grants-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Mobile: ≤ 640px → 1 column */
+@media (max-width: 640px) {
+  #grants-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.serif {
+  font-family: 'DM Serif Display', Georgia, serif;
+}
+
+.sans {
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+/* ============================================================
+   DETAIL PAGE — PHASE 4
+   ============================================================ */
+
+/* Sidebar hidden below 1024px (PROGRESS.md 4.6) */
+@media (max-width: 1024px) {
+  .detail-sidebar {
+    display: none !important;
+  }
+}
+
+/* Similar programs — title accent on row hover (PROGRESS.md 4.7) */
+.similar-program-row:hover {
+  background: var(--cream-hover) !important;
+}
+.similar-program-row:hover .similar-program-title {
+  color: var(--accent) !important;
+}
+
+/* Inline ad hover */
+.inline-ad-link:hover {
+  background: var(--cream) !important;
+}
+
