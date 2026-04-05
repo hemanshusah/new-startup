@@ -5,6 +5,7 @@ import { AuthProvider } from '@/components/auth/AuthProvider'
 import { AuthModal } from '@/components/auth/AuthModal'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: {
     default: 'GrantsIndia — Top 2026 Grants & Funding for Indian Startups',
     template: '%s — GrantsIndia',
