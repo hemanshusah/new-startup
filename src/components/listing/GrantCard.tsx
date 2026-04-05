@@ -13,16 +13,7 @@ function getDeadlineInfo(deadline: string) {
   )
 
   if (diffDays < 0) {
-    return { label: 'Closed', color: 'var(--ink-4)', dot: 'var(--ink-4)' }
-  }
-  if (diffDays === 0) {
-    return { label: 'Closes today', color: '#E03E2D', dot: '#E03E2D' }
-  }
-  if (diffDays === 1) {
-    return { label: '1 day left', color: '#E03E2D', dot: '#E03E2D' }
-  }
-  if (diffDays <= 7) {
-    return { label: `${diffDays} days left`, color: '#D4820E', dot: '#D4820E' }
+    return { label: 'CLOSED', color: 'var(--ink-4)', dot: 'var(--ink-4)' }
   }
 
   const label = new Date(deadline).toLocaleDateString('en-IN', {
@@ -30,7 +21,9 @@ function getDeadlineInfo(deadline: string) {
     month: 'short',
     year: 'numeric',
   })
-  return { label, color: 'var(--ink-4)', dot: 'var(--ink-4)' }
+  
+  // Force deadlines to RED as requested
+  return { label, color: '#E03E2D', dot: '#E03E2D' }
 }
 
 /** Type badge colours (editorial palette, not from spec — fills gap spec doesn't detail) */
@@ -80,12 +73,12 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
         <p
           style={{
             fontFamily: 'DM Sans, sans-serif',
-            fontSize: '11px',
+            fontSize: '12px',
             fontWeight: 500,
             color: 'var(--ink-4)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
-            marginBottom: '6px',
+            marginBottom: '8px',
           }}
         >
           {program.organisation}
@@ -95,11 +88,11 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
         <h3
           style={{
             fontFamily: 'DM Serif Display, serif',
-            fontSize: '15.5px',
+            fontSize: '18px',
             fontWeight: 400,
             color: 'var(--ink)',
-            lineHeight: 1.35,
-            marginBottom: '8px',
+            lineHeight: 1.3,
+            marginBottom: '10px',
           }}
         >
           {program.title}
@@ -110,10 +103,10 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
           className="line-clamp-2"
           style={{
             fontFamily: 'DM Sans, sans-serif',
-            fontSize: '13px',
+            fontSize: '14.5px',
             fontWeight: 300,
             color: 'var(--ink-2)',
-            lineHeight: 1.55,
+            lineHeight: 1.6,
           }}
         >
           {program.description_short}
@@ -136,14 +129,14 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
             style={{
               fontFamily: 'DM Sans, sans-serif',
               fontSize: '10.5px',
-              fontWeight: 500,
+              fontWeight: 600,
               borderRadius: '4px',
-              padding: '2px 7px',
+              padding: '3px 8px',
               display: 'inline-block',
               background: typeStyle.bg,
               color: typeStyle.color,
-              textTransform: 'capitalize',
-              lineHeight: 1.4,
+              textTransform: 'uppercase',
+              lineHeight: 1,
             }}
           >
             {program.type}
@@ -164,8 +157,8 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
             <span
               style={{
                 fontFamily: 'DM Sans, sans-serif',
-                fontSize: '11px',
-                fontWeight: 400,
+                fontSize: '12px',
+                fontWeight: 500,
                 color: deadline.color,
               }}
             >

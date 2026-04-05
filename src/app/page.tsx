@@ -76,7 +76,7 @@ export default async function ListingPage() {
             maxWidth: '680px',
           }}
         >
-          Grants &amp; funding programs for <span style={{ color: 'var(--accent)' }}>Indian founders</span>
+          Grants &amp; funding programs for <span style={{ color: 'var(--accent)', fontStyle: 'italic' }}>Indian founders</span>
         </h1>
 
         {/* Subtitle */}
