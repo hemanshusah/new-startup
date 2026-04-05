@@ -190,11 +190,11 @@ export function DetailSidebar({
                     style={{ textDecoration: 'none' }}
                   >
                     <p
+                      className="sidebar-program-title"
                       style={{
                         fontFamily: 'DM Sans, sans-serif',
                         fontSize: '14px',
-                        fontWeight: 500,
-                        color: 'var(--ink)',
+                        fontWeight: 400,
                         margin: '0 0 3px',
                         lineHeight: 1.4,
                       }}

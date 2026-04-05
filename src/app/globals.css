@@ -167,3 +167,11 @@ button {
   background: var(--cream) !important;
 }
 
+/* Sidebar program title hover effect (Phase 4 refinements) */
+.sidebar-program-title {
+  color: var(--ink);
+  transition: color 0.15s ease;
+}
+.sidebar-program-title:hover {
+  color: var(--accent) !important;
+}
