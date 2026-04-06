@@ -84,7 +84,7 @@ export async function recordSIImpression(siId: string, userId?: string | null) {
         softinfra_id: siId,
         user_id: userId,
       })
-    
+
     // We ignore error here since it's likely just a unique constraint violation
     // (meaning the user has already seen this before), which is expected.
     if (error && error.code !== '23505') {

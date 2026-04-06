@@ -125,12 +125,12 @@ export function GrantsGrid({ programs, siSlotPositions = [6, 14, 20], siForSlots
               // Check if we should insert a SoftInfra item AFTER this program
               const pos = index + 1
               const siSlotIndex = siSlotPositions.indexOf(pos)
-              
+
               if (siSlotIndex !== -1) {
                 // Determine which slot this is (a, b, c)
                 const slotNames = ['listing-grid-a', 'listing-grid-b', 'listing-grid-c']
                 const slotName = slotNames[siSlotIndex]
-                
+
                 if (pos === 20) {
                   // Position 20 is always the Newsletter card (listing-grid-nl)
                   elements.push(<SINewsletterCard key={`nl-${pos}`} />)

@@ -21,12 +21,13 @@ function getInitials(user: { email?: string; user_metadata?: { full_name?: strin
 /** Global navigation bar — PROGRESS.md 2.2 & 3.4 */
 export function Navbar() {
   const pathname = usePathname()
-  const { user, openModal, signOut } = useAuth()
+  const { user, profile, openModal, signOut } = useAuth()
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false)
 
   const isActive = (href: string) => pathname === href
-  const avatarUrl = user?.user_metadata?.avatar_url as string | undefined
+  const avatarUrl = profile?.avatar_url || (user?.user_metadata?.avatar_url as string | undefined)
   const initials = user ? getInitials(user) : ''
+  const isAdmin = profile?.role === 'admin'
 
   return (
     <header
@@ -195,7 +196,7 @@ export function Navbar() {
                       border: '1px solid var(--cream-border)',
                       borderRadius: '10px',
                       padding: '6px',
-                      minWidth: '160px',
+                      minWidth: '180px',
                       boxShadow: '0 8px 24px rgba(28,26,22,0.1)',
                       zIndex: 50,
                     }}
@@ -228,12 +229,62 @@ export function Navbar() {
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap',
-                          maxWidth: '140px',
+                          maxWidth: '160px',
                         }}
                       >
                         {user.email}
                       </p>
                     </div>
+
+                    <Link
+                      href="/profile"
+                      onClick={() => setAvatarMenuOpen(false)}
+                      role="menuitem"
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        textAlign: 'left',
+                        fontFamily: 'DM Sans, sans-serif',
+                        fontSize: '13px',
+                        color: 'var(--ink)',
+                        textDecoration: 'none',
+                        background: 'none',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '7px 10px',
+                        cursor: 'pointer',
+                        transition: 'background 0.12s ease',
+                      }}
+                    >
+                      My Profile
+                    </Link>
+
+                    {isAdmin && (
+                      <Link
+                        href="/admin/dashboard"
+                        onClick={() => setAvatarMenuOpen(false)}
+                        role="menuitem"
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          textAlign: 'left',
+                          fontFamily: 'DM Sans, sans-serif',
+                          fontSize: '13px',
+                          color: 'var(--ink)',
+                          textDecoration: 'none',
+                          background: 'none',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '7px 10px',
+                          cursor: 'pointer',
+                          transition: 'background 0.12s ease',
+                        }}
+                      >
+                        Admin Dashboard
+                      </Link>
+                    )}
+
+                    <div style={{ height: '1px', background: 'var(--cream-border)', margin: '6px 0' }} />
 
                     <button
                       id="nav-sign-out-btn"
@@ -245,7 +296,7 @@ export function Navbar() {
                         textAlign: 'left',
                         fontFamily: 'DM Sans, sans-serif',
                         fontSize: '13px',
-                        color: 'var(--ink)',
+                        color: 'var(--accent)',
                         background: 'none',
                         border: 'none',
                         borderRadius: '6px',
