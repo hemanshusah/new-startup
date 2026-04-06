@@ -1,21 +1,23 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { InlineAd } from '@/components/ads/InlineAd'
-import { SidebarAd } from '@/components/ads/SidebarAd'
-import type { Ad, AdFormat } from '@/types/ad'
+import { InlineSI } from '@/components/softinfra/InlineSI'
+import { SidebarSI } from '@/components/softinfra/SidebarSI'
+import { SoftInfraCard } from '@/components/softinfra/SICard'
+import { SINewsletterCard } from '@/components/softinfra/SINewsletterCard'
+import type { SoftInfra, SoftInfraFormat } from '@/types/softinfra'
 
 const PLACEMENTS = ['listing-grid', 'listing-inline', 'detail-inline', 'detail-sidebar'] as const
-const FORMATS: AdFormat[] = ['card-sm', 'card-dark', 'card-wide', 'inline', 'sidebar', 'newsletter']
+const FORMATS: SoftInfraFormat[] = ['card-sm', 'card-dark', 'card-wide', 'inline', 'sidebar', 'newsletter']
 
-interface AdFormProps {
-  ad?: Ad
+interface SIFormProps {
+  si?: SoftInfra
   mode: 'create' | 'edit'
 }
 
-export function AdForm({ ad, mode }: AdFormProps) {
+export function SIForm({ si, mode }: SIFormProps) {
   const supabase = createClient()
   const router = useRouter()
   const [saving, setSaving] = useState(false)
@@ -23,20 +25,20 @@ export function AdForm({ ad, mode }: AdFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Fields
-  const [advertiser, setAdvertiser] = useState(ad?.advertiser ?? '')
-  const [headline, setHeadline] = useState(ad?.headline ?? '')
-  const [subtext, setSubtext] = useState(ad?.subtext ?? '')
-  const [ctaText, setCtaText] = useState(ad?.cta_text ?? '')
-  const [ctaUrl, setCtaUrl] = useState(ad?.cta_url ?? '')
-  const [iconEmoji, setIconEmoji] = useState(ad?.icon_emoji ?? '')
-  const [imageUrl, setImageUrl] = useState(ad?.image_url ?? '')
-  const [format, setFormat] = useState<AdFormat>(ad?.format ?? 'card-sm')
-  const [placements, setPlacements] = useState<string[]>(ad?.placement ?? [])
-  const [slotIndex, setSlotIndex] = useState<string>(ad?.slot_index?.toString() ?? '')
-  const [priority, setPriority] = useState(ad?.priority?.toString() ?? '50')
-  const [startDate, setStartDate] = useState(ad?.start_date ?? '')
-  const [endDate, setEndDate] = useState(ad?.end_date ?? '')
-  const [isActive, setIsActive] = useState(ad?.is_active ?? true)
+  const [advertiser, setAdvertiser] = useState(si?.advertiser ?? '')
+  const [headline, setHeadline] = useState(si?.headline ?? '')
+  const [subtext, setSubtext] = useState(si?.subtext ?? '')
+  const [ctaText, setCtaText] = useState(si?.cta_text ?? '')
+  const [ctaUrl, setCtaUrl] = useState(si?.cta_url ?? '')
+  const [iconEmoji, setIconEmoji] = useState(si?.icon_emoji ?? '')
+  const [imageUrl, setImageUrl] = useState(si?.image_url ?? '')
+  const [format, setFormat] = useState<SoftInfraFormat>(si?.format ?? 'card-sm')
+  const [placements, setPlacements] = useState<string[]>(si?.placement ?? [])
+  const [slotIndex, setSlotIndex] = useState<string>(si?.slot_index?.toString() ?? '')
+  const [priority, setPriority] = useState(si?.priority?.toString() ?? '50')
+  const [startDate, setStartDate] = useState(si?.start_date ?? '')
+  const [endDate, setEndDate] = useState(si?.end_date ?? '')
+  const [isActive, setIsActive] = useState(si?.is_active ?? true)
 
   const showToast = (msg: string, ok = true) => {
     setToast({ msg, ok })
@@ -78,15 +80,15 @@ export function AdForm({ ad, mode }: AdFormProps) {
     setSaving(true)
     const payload = buildPayload()
     const { error } = mode === 'create'
-      ? await supabase.from('ads').insert(payload)
-      : await supabase.from('ads').update(payload).eq('id', ad!.id)
+      ? await supabase.from('softinfra').insert(payload)
+      : await supabase.from('softinfra').update(payload).eq('id', si!.id)
     setSaving(false)
     if (error) { showToast(error.message, false) }
-    else { showToast(mode === 'create' ? 'Ad created!' : 'Ad updated!'); router.push('/admin/ads') }
+    else { showToast(mode === 'create' ? 'Created!' : 'Updated!'); router.push('/admin/softinfra') }
   }
 
-  // Live preview ad object
-  const previewAd: Ad = {
+  // Live preview si object
+  const previewSI: SoftInfra = {
     id: 'preview',
     advertiser, headline, subtext, cta_text: ctaText, cta_url: ctaUrl,
     icon_emoji: iconEmoji || null, image_url: imageUrl || null, format,
@@ -162,7 +164,7 @@ export function AdForm({ ad, mode }: AdFormProps) {
           {/* Format */}
           <div style={{ marginBottom: '16px' }}>
             <label style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', fontWeight: 500, color: 'var(--ink)', display: 'block', marginBottom: '5px' }}>Format <span style={{ color: '#E03E2D' }}>*</span></label>
-            <select value={format} onChange={(e) => setFormat(e.target.value as AdFormat)} style={inputSt}>
+            <select value={format} onChange={(e) => setFormat(e.target.value as SoftInfraFormat)} style={inputSt}>
               {FORMATS.map((f) => <option key={f} value={f}>{f}</option>)}
             </select>
           </div>
@@ -219,7 +221,7 @@ export function AdForm({ ad, mode }: AdFormProps) {
           {/* Save button */}
           <button type="button" onClick={save} disabled={saving}
             style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', fontWeight: 500, color: 'var(--cream)', background: 'var(--ink)', border: 'none', borderRadius: '8px', padding: '10px 24px', cursor: 'pointer' }}>
-            {saving ? 'Saving…' : mode === 'create' ? 'Create ad' : 'Save changes'}
+            {saving ? 'Saving…' : mode === 'create' ? 'Create' : 'Save changes'}
           </button>
         </div>
       </div>
@@ -227,12 +229,12 @@ export function AdForm({ ad, mode }: AdFormProps) {
       {/* Live preview panel */}
       <div style={{ position: 'sticky', top: '24px' }}>
         <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', fontWeight: 500, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '12px' }}>Live Preview — {format}</p>
-        {(format === 'inline' || format === 'card-sm' || format === 'card-wide') && (
-          <InlineAd ad={previewAd} />
-        )}
-        {(format === 'sidebar' || format === 'card-dark' || format === 'newsletter') && (
-          <SidebarAd ad={previewAd} />
-        )}
+        <div style={{ maxWidth: (format === 'card-wide' || format === 'card-dark' || format === 'newsletter') ? '800px' : '360px' }}>
+          {format === 'inline' && <InlineSI si={previewSI} />}
+          {format === 'sidebar' && <SidebarSI si={previewSI} />}
+          {(format === 'card-sm' || format === 'card-dark' || format === 'card-wide') && <SoftInfraCard si={previewSI} />}
+          {format === 'newsletter' && <SINewsletterCard />}
+        </div>
       </div>
     </div>
   )

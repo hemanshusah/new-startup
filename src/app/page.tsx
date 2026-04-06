@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { ProgramListItem } from '@/types/program'
 import { GrantsGrid } from '@/components/listing/GrantsGrid'
+import { getSIForSlots } from '@/lib/softinfra'
 
 // ISR: revalidate every 5 minutes (CONTEXT.md §11)
 export const revalidate = 300
@@ -37,6 +38,19 @@ export default async function ListingPage() {
     .order('deadline', { ascending: true })
 
   const programs: ProgramListItem[] = data ?? []
+
+  // Fetch SoftInfra boundaries and slots
+  const { data: configData } = await supabase
+    .from('site_config')
+    .select('si_slot_positions')
+    .limit(1)
+    .single()
+
+  const siSlotPositions: number[] = configData?.si_slot_positions ?? [6, 14, 20]
+
+  // We have 3 regular slots on the listing page
+  const slotIds = ['listing-grid-a', 'listing-grid-b', 'listing-grid-c']
+  const siForSlots = await getSIForSlots(slotIds, 'listing-grid')
 
   return (
     <div
@@ -126,7 +140,11 @@ export default async function ListingPage() {
       )}
 
       {/* Grants grid (client component — handles filtering, search, pagination) */}
-      <GrantsGrid programs={programs} />
+      <GrantsGrid 
+        programs={programs} 
+        siSlotPositions={siSlotPositions}
+        siForSlots={siForSlots}
+      />
     </div>
   )
 }

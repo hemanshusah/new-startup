@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import type { Program, ProgramListItem } from '@/types/program'
-import type { Ad } from '@/types/ad'
-import { SidebarAd } from '@/components/ads/SidebarAd'
+import type { SoftInfra } from '@/types/softinfra'
+import { SidebarSI } from '@/components/softinfra/SidebarSI'
 
 function daysUntil(dateStr: string): number {
   const today = new Date()
@@ -23,8 +23,8 @@ interface DetailSidebarProps {
   program: Program
   /** Active programs of same type for "More programs" section (max 5) */
   morePrograms: ProgramListItem[]
-  sidebarAdA: Ad | null
-  sidebarAdB: Ad | null
+  sidebarSiA: SoftInfra | null
+  sidebarSiB: SoftInfra | null
 }
 
 const cardStyle: React.CSSProperties = {
@@ -37,13 +37,13 @@ const cardStyle: React.CSSProperties = {
 
 /**
  * DetailSidebar — PROGRESS.md 4.6
- * Sticky sidebar: Quick Facts → SidebarAd A → More Programs → SidebarAd B
+ * Sticky sidebar: Quick Facts → SoftInfra A → More Programs → SoftInfra B
  */
 export function DetailSidebar({
   program,
   morePrograms,
-  sidebarAdA,
-  sidebarAdB,
+  sidebarSiA,
+  sidebarSiB,
 }: DetailSidebarProps) {
   const deadline = formatDeadline(program.deadline)
   const label = program.type.charAt(0).toUpperCase() + program.type.slice(1)
@@ -149,10 +149,10 @@ export function DetailSidebar({
         )}
       </div>
 
-      {/* Sidebar Ad A */}
-      {sidebarAdA && (
+      {/* Sidebar SI A */}
+      {sidebarSiA && (
         <div style={{ marginBottom: '16px' }}>
-          <SidebarAd ad={sidebarAdA} />
+          <SidebarSI si={sidebarSiA} />
         </div>
       )}
 
@@ -219,10 +219,10 @@ export function DetailSidebar({
         </div>
       )}
 
-      {/* Sidebar Ad B */}
-      {sidebarAdB && (
+      {/* Sidebar SI B */}
+      {sidebarSiB && (
         <div>
-          <SidebarAd ad={sidebarAdB} />
+          <SidebarSI si={sidebarSiB} />
         </div>
       )}
     </aside>

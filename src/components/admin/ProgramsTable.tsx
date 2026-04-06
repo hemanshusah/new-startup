@@ -148,7 +148,7 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
       setPrograms((prev) =>
         prev.map((p) => (p.id === program.id ? { ...p, published: program.published } : p))
       )
-      showToast('Failed to update. Please retry.', false)
+      showToast(`Failed to update: ${error.message}`, false)
     } else {
       showToast(`"${program.title}" ${newVal ? 'published' : 'unpublished'}.`)
     }
@@ -159,7 +159,7 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
     if (!confirm(`Delete "${program.title}"? This cannot be undone.`)) return
     const { error } = await supabase.from('programs').delete().eq('id', program.id)
     if (error) {
-      showToast('Delete failed.', false)
+      showToast(`Delete failed: ${error.message}`, false)
     } else {
       setPrograms((prev) => prev.filter((p) => p.id !== program.id))
       showToast(`"${program.title}" deleted.`)
@@ -176,7 +176,7 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
       setSelected(new Set())
       showToast(`${ids.length} programs ${val ? 'published' : 'unpublished'}.`)
     } else {
-      showToast('Bulk action failed.', false)
+      showToast(`Bulk action failed: ${error.message}`, false)
     }
   }
 

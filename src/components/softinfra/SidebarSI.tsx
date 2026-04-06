@@ -1,18 +1,35 @@
-import type { Ad } from '@/types/ad'
+'use client'
 
-interface SidebarAdProps {
-  ad: Ad
+import React, { useEffect, useRef } from 'react'
+import type { SoftInfra } from '@/types/softinfra'
+
+interface SidebarSIProps {
+  si: SoftInfra
 }
 
 /**
- * SidebarAd — vertical stacked ad in the detail page sidebar.
+ * SidebarSI — vertical stacked content in the detail page sidebar.
  * Format: sponsored label | emoji | headline | description | CTA button
  * CONTEXT.md §8 → format: `sidebar`
  */
-export function SidebarAd({ ad }: SidebarAdProps) {
+export function SidebarSI({ si }: SidebarSIProps) {
+  const hasFired = useRef(false)
+
+  useEffect(() => {
+    if (hasFired.current) return
+    hasFired.current = true
+
+    // Track impression
+    fetch('/api/softinfra/impression', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ si_id: si.id }),
+    }).catch((err) => console.error('Failed to log impression', err))
+  }, [si.id])
+
   return (
     <a
-      href={`/api/ads/click?id=${ad.id}&url=${encodeURIComponent(ad.cta_url)}`}
+      href={`/api/softinfra/click?id=${si.id}&url=${encodeURIComponent(si.cta_url)}`}
       target="_blank"
       rel="noopener noreferrer sponsored"
       style={{
@@ -23,7 +40,7 @@ export function SidebarAd({ ad }: SidebarAdProps) {
         padding: '18px',
         textDecoration: 'none',
       }}
-      aria-label={`Sponsored: ${ad.headline}`}
+      aria-label={`Sponsored: ${si.headline}`}
     >
       {/* Sponsored label */}
       <p
@@ -37,11 +54,11 @@ export function SidebarAd({ ad }: SidebarAdProps) {
           margin: '0 0 12px',
         }}
       >
-        Sponsored · {ad.advertiser}
+        Sponsored · {si.advertiser}
       </p>
 
       {/* Icon / image */}
-      {(ad.icon_emoji || ad.image_url) && (
+      {(si.icon_emoji || si.image_url) && (
         <div
           style={{
             width: '38px',
@@ -57,11 +74,11 @@ export function SidebarAd({ ad }: SidebarAdProps) {
             marginBottom: '12px',
           }}
         >
-          {ad.image_url ? (
+          {si.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={ad.image_url} alt={ad.advertiser} style={{ width: '100%', objectFit: 'cover' }} />
+            <img src={si.image_url} alt={si.advertiser} style={{ width: '100%', objectFit: 'cover' }} />
           ) : (
-            ad.icon_emoji
+            si.icon_emoji
           )}
         </div>
       )}
@@ -77,7 +94,7 @@ export function SidebarAd({ ad }: SidebarAdProps) {
           lineHeight: 1.3,
         }}
       >
-        {ad.headline}
+        {si.headline}
       </p>
 
       {/* Sub-text */}
@@ -91,7 +108,7 @@ export function SidebarAd({ ad }: SidebarAdProps) {
           lineHeight: 1.55,
         }}
       >
-        {ad.subtext}
+        {si.subtext}
       </p>
 
       {/* CTA button */}
@@ -107,7 +124,7 @@ export function SidebarAd({ ad }: SidebarAdProps) {
           padding: '7px 14px',
         }}
       >
-        {ad.cta_text}
+        {si.cta_text}
       </div>
     </a>
   )

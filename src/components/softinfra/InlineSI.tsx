@@ -1,19 +1,36 @@
-import type { Ad } from '@/types/ad'
+'use client'
 
-interface InlineAdProps {
-  ad: Ad
+import React, { useEffect, useRef } from 'react'
+import type { SoftInfra } from '@/types/softinfra'
+
+interface InlineSIProps {
+  si: SoftInfra
 }
 
 /**
- * InlineAd — full-width horizontal detail-page ad card.
+ * InlineSI — full-width horizontal detail-page content slot.
  * Format: icon/emoji | headline (DM Serif) | description | CTA link
  * Background: `--cream-dark`
  * CONTEXT.md §8 → format: `inline`
  */
-export function InlineAd({ ad }: InlineAdProps) {
+export function InlineSI({ si }: InlineSIProps) {
+  const hasFired = useRef(false)
+
+  useEffect(() => {
+    if (hasFired.current) return
+    hasFired.current = true
+
+    // Track impression
+    fetch('/api/softinfra/impression', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ si_id: si.id }),
+    }).catch((err) => console.error('Failed to log impression', err))
+  }, [si.id])
+
   return (
     <a
-      href={`/api/ads/click?id=${ad.id}&url=${encodeURIComponent(ad.cta_url)}`}
+      href={`/api/softinfra/click?id=${si.id}&url=${encodeURIComponent(si.cta_url)}`}
       target="_blank"
       rel="noopener noreferrer sponsored"
       style={{
@@ -27,11 +44,11 @@ export function InlineAd({ ad }: InlineAdProps) {
         textDecoration: 'none',
         transition: 'background 0.15s ease',
       }}
-      className="inline-ad-link"
-      aria-label={`Sponsored: ${ad.headline}`}
+      className="inline-si-link"
+      aria-label={`Sponsored: ${si.headline}`}
     >
       {/* Icon / emoji */}
-      {(ad.icon_emoji || ad.image_url) && (
+      {(si.icon_emoji || si.image_url) && (
         <div
           style={{
             flexShrink: 0,
@@ -47,11 +64,11 @@ export function InlineAd({ ad }: InlineAdProps) {
             overflow: 'hidden',
           }}
         >
-          {ad.image_url ? (
+          {si.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={ad.image_url} alt={ad.advertiser} style={{ width: '100%', objectFit: 'cover' }} />
+            <img src={si.image_url} alt={si.advertiser} style={{ width: '100%', objectFit: 'cover' }} />
           ) : (
-            ad.icon_emoji
+            si.icon_emoji
           )}
         </div>
       )}
@@ -69,7 +86,7 @@ export function InlineAd({ ad }: InlineAdProps) {
             margin: '0 0 3px',
           }}
         >
-          Sponsored · {ad.advertiser}
+          Sponsored · {si.advertiser}
         </p>
         <p
           style={{
@@ -81,7 +98,7 @@ export function InlineAd({ ad }: InlineAdProps) {
             lineHeight: 1.3,
           }}
         >
-          {ad.headline}
+          {si.headline}
         </p>
         <p
           style={{
@@ -93,7 +110,7 @@ export function InlineAd({ ad }: InlineAdProps) {
             lineHeight: 1.5,
           }}
         >
-          {ad.subtext}
+          {si.subtext}
         </p>
       </div>
 
@@ -111,7 +128,7 @@ export function InlineAd({ ad }: InlineAdProps) {
           gap: '4px',
         }}
       >
-        {ad.cta_text} →
+        {si.cta_text} →
       </div>
     </a>
   )
