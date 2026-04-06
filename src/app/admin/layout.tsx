@@ -26,7 +26,7 @@ export default async function AdminLayout({
   if (profile?.role !== 'admin') redirect('/')
 
   return (
-    <AdminShell adminEmail={profile?.email ?? user.email}>
+    <AdminShell adminEmail={profile?.email ?? user.email} role={profile?.role}>
       {children}
     </AdminShell>
   )

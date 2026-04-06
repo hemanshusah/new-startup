@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { Navbar } from '@/components/nav/Navbar'
+import { NavWrapper } from '@/components/nav/NavWrapper'
 import { AuthProvider } from '@/components/auth/AuthProvider'
 import { AuthModal } from '@/components/auth/AuthModal'
 
@@ -31,14 +31,8 @@ export default function RootLayout({
         />
       </head>
       <body>
-        {/*
-          AuthProvider must wrap everything so that:
-          1. Navbar can read the current user and show avatar/login button
-          2. GrantsGrid can open the modal via AuthGate
-          3. AuthModal can perform sign-in and redirect after login
-        */}
         <AuthProvider>
-          <Navbar />
+          <NavWrapper />
           <main>{children}</main>
           {/* AuthModal renders as a portal-like overlay on top of everything */}
           <AuthModal />

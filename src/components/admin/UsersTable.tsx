@@ -41,7 +41,7 @@ export function UsersTable({ initialUsers }: { initialUsers: UserRow[] }) {
     setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u)))
     const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', userId)
     if (error) {
-      showToast('Failed to update role.', false)
+      showToast(`Failed to update role: ${error.message}`, false)
       // rollback
       setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, role: u.role } : u)))
     } else {
@@ -61,10 +61,6 @@ export function UsersTable({ initialUsers }: { initialUsers: UserRow[] }) {
     a.click()
   }
 
-  const maskEmail = (e: string) => {
-    const [user] = e.split('@')
-    return `${user.slice(0, 3)}…`
-  }
 
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -113,7 +109,7 @@ export function UsersTable({ initialUsers }: { initialUsers: UserRow[] }) {
                 </td>
                 <td style={{ padding: '12px 14px' }}>
                   <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: 'var(--ink-3)' }}>
-                    {maskEmail(u.email)}@…
+                    {u.email}
                   </span>
                 </td>
                 <td style={{ padding: '12px 14px' }}>

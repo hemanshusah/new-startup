@@ -31,8 +31,8 @@ const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Ads',
-    href: '/admin/ads',
+    label: 'SoftInfra',
+    href: '/admin/softinfra',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
         <path d="M2 11 L8 3 L14 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -65,9 +65,10 @@ const NAV_ITEMS = [
 interface AdminShellProps {
   children: React.ReactNode
   adminEmail?: string
+  role?: string
 }
 
-export function AdminShell({ children, adminEmail }: AdminShellProps) {
+export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = useRef(createClient()).current
@@ -97,7 +98,8 @@ export function AdminShell({ children, adminEmail }: AdminShellProps) {
           top: 0,
           left: 0,
           bottom: 0,
-          zIndex: 40,
+          zIndex: 1000,
+          boxShadow: '4px 0 24px rgba(0,0,0,0.02)',
         }}
       >
         {/* Logo */}
@@ -227,11 +229,35 @@ export function AdminShell({ children, adminEmail }: AdminShellProps) {
           marginLeft: '220px',
           flex: 1,
           minHeight: '100vh',
-          padding: '32px 36px',
+          padding: '40px 48px',
           maxWidth: 'calc(100vw - 220px)',
-          overflowX: 'hidden',
+          position: 'relative',
         }}
       >
+        {/* Admin Role Warning Banner */}
+        {role && role !== 'admin' && (
+          <div style={{
+            background: '#FFF4F2',
+            border: '1px solid #F0B8B8',
+            borderRadius: '8px',
+            padding: '12px 18px',
+            marginBottom: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <span style={{ fontSize: '18px' }}>⚠️</span>
+            <div>
+              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', fontWeight: 600, color: '#B01F1F', margin: 0 }}>
+                Restricted Access
+              </p>
+              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12px', color: '#B01F1F', margin: '2px 0 0', opacity: 0.8 }}>
+                Your account ({adminEmail}) is logged in, but might not have "admin" privileges in the database. some actions may fail.
+              </p>
+            </div>
+          </div>
+        )}
+
         {children}
       </main>
     </div>

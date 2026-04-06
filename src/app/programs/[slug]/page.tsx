@@ -2,19 +2,17 @@ import { notFound, redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import type { Program, ProgramListItem } from '@/types/program'
-import type { Ad } from '@/types/ad'
+import type { SoftInfra } from '@/types/softinfra'
 import { getSimilarPrograms } from '@/lib/similarity'
 import { ProgramHeader } from '@/components/detail/ProgramHeader'
 import { MetaStrip } from '@/components/detail/MetaStrip'
 import { ContentSections } from '@/components/detail/ContentSection'
 import { DetailSidebar } from '@/components/detail/DetailSidebar'
 import { SimilarPrograms } from '@/components/detail/SimilarPrograms'
-import { InlineAd } from '@/components/ads/InlineAd'
+import { InlineSI } from '@/components/softinfra/InlineSI'
 
 // 10-minute ISR cache (CONTEXT.md §11)
 export const revalidate = 600
-
-// ─── Metadata (CONTEXT.md §14) ─────────────────────────────────────────────
 
 export async function generateMetadata({
   params,
@@ -50,8 +48,6 @@ export async function generateMetadata({
   }
 }
 
-// ─── Page ──────────────────────────────────────────────────────────────────
-
 interface Props {
   params: Promise<{ slug: string }>
 }
@@ -59,7 +55,7 @@ interface Props {
 export default async function ProgramDetailPage({ params }: Props) {
   const { slug } = await params
 
-  // ── Auth check (belt-and-braces on top of middleware) ───────────
+  // ── Auth check ───────────
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
@@ -76,28 +72,28 @@ export default async function ProgramDetailPage({ params }: Props) {
 
   if (!program) notFound()
 
-  // ── Detail page ads (fetch once, assign to slots) ──────────────────
-  const { data: adsRaw } = await supabase
-    .from('ads')
+  // ── Detail page SoftInfra (fetch once, assign to slots) ──────────────────
+  const { data: siRaw } = await supabase
+    .from('softinfra')
     .select('*')
     .eq('is_active', true)
     .contains('placement', ['detail-inline'])
     .order('priority', { ascending: true })
 
-  const { data: sidebarAdsRaw } = await supabase
-    .from('ads')
+  const { data: sidebarSiRaw } = await supabase
+    .from('softinfra')
     .select('*')
     .eq('is_active', true)
     .contains('placement', ['detail-sidebar'])
     .order('priority', { ascending: true })
 
-  const inlineAds: Ad[] = adsRaw ?? []
-  const sidebarAds: Ad[] = sidebarAdsRaw ?? []
+  const siInlineItems: SoftInfra[] = siRaw ?? []
+  const siSidebarItems: SoftInfra[] = sidebarSiRaw ?? []
 
-  const adA: Ad | null = inlineAds[0] ?? null
-  const adB: Ad | null = inlineAds[1] ?? null
-  const sidebarAdA: Ad | null = sidebarAds[0] ?? null
-  const sidebarAdB: Ad | null = sidebarAds[1] ?? null
+  const siA: SoftInfra | null = siInlineItems[0] ?? null
+  const siB: SoftInfra | null = siInlineItems[1] ?? null
+  const siSidebarA: SoftInfra | null = siSidebarItems[0] ?? null
+  const siSidebarB: SoftInfra | null = siSidebarItems[1] ?? null
 
   // ── All programs for similarity scoring (lightweight query) ──────────
   const { data: allProgramsRaw } = await supabase
@@ -196,10 +192,10 @@ export default async function ProgramDetailPage({ params }: Props) {
               </section>
             )}
 
-            {/* Inline Ad A — after About, before What you get (PROGRESS.md 4.5) */}
-            {adA && (
+            {/* Inline SI A — after About, before What you get (PROGRESS.md 4.5) */}
+            {siA && (
               <div style={{ marginBottom: '32px' }}>
-                <InlineAd ad={adA} />
+                <InlineSI si={siA} />
               </div>
             )}
 
@@ -210,11 +206,10 @@ export default async function ProgramDetailPage({ params }: Props) {
               excludeAbout
             />
 
-            {/* Inline Ad B — after Eligibility, before Focus sectors
-                ContentSections already renders all sections, so AdB appears after main content */}
-            {adB && (
+            {/* Inline SI B — after Eligibility, before Focus sectors */}
+            {siB && (
               <div style={{ marginTop: '32px' }}>
-                <InlineAd ad={adB} />
+                <InlineSI si={siB} />
               </div>
             )}
 
@@ -229,8 +224,8 @@ export default async function ProgramDetailPage({ params }: Props) {
             <DetailSidebar
               program={program as Program}
               morePrograms={morePrograms}
-              sidebarAdA={sidebarAdA}
-              sidebarAdB={sidebarAdB}
+              sidebarSiA={siSidebarA}
+              sidebarSiB={siSidebarB}
             />
           </div>
         </div>

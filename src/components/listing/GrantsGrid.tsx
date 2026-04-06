@@ -5,14 +5,19 @@ import { ProgramListItem } from '@/types/program'
 import { GrantCard } from './GrantCard'
 import { FilterBar, ScopeFilter, TypeFilter } from './FilterBar'
 import { useAuth } from '@/components/auth/AuthProvider'
+import { SoftInfraCard } from '@/components/softinfra/SICard'
+import { SINewsletterCard } from '@/components/softinfra/SINewsletterCard'
+import type { SoftInfra } from '@/types/softinfra'
 
 const PAGE_SIZE = 12
 
 interface GrantsGridProps {
   programs: ProgramListItem[]
+  siSlotPositions?: number[]
+  siForSlots?: Record<string, SoftInfra | null>
 }
 
-export function GrantsGrid({ programs }: GrantsGridProps) {
+export function GrantsGrid({ programs, siSlotPositions = [6, 14, 20], siForSlots = {} }: GrantsGridProps) {
   const { user, openModal } = useAuth()
 
   // Filter state
@@ -108,13 +113,35 @@ export function GrantsGrid({ programs }: GrantsGridProps) {
               overflow: 'hidden',
             }}
           >
-            {visible.map((program) => (
-              <GrantCard
-                key={program.id}
-                program={program}
-                onClick={() => handleCardClick(program.slug)}
-              />
-            ))}
+            {visible.map((program, index) => {
+              const elements = [
+                <GrantCard
+                  key={program.id}
+                  program={program}
+                  onClick={() => handleCardClick(program.slug)}
+                />
+              ]
+
+              // Check if we should insert a SoftInfra item AFTER this program
+              const pos = index + 1
+              const siSlotIndex = siSlotPositions.indexOf(pos)
+              
+              if (siSlotIndex !== -1) {
+                // Determine which slot this is (a, b, c)
+                const slotNames = ['listing-grid-a', 'listing-grid-b', 'listing-grid-c']
+                const slotName = slotNames[siSlotIndex]
+                
+                if (pos === 20) {
+                  // Position 20 is always the Newsletter card (listing-grid-nl)
+                  elements.push(<SINewsletterCard key={`nl-${pos}`} />)
+                } else if (slotName && siForSlots[slotName]) {
+                  // Render the specified SoftInfra card
+                  elements.push(<SoftInfraCard key={`si-${pos}`} si={siForSlots[slotName]!} />)
+                }
+              }
+
+              return elements
+            })}
           </div>
 
           {/* Result count + View more */}
