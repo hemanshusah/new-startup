@@ -72,6 +72,15 @@ export default async function ProgramDetailPage({ params }: Props) {
 
   if (!program) notFound()
 
+  // ── Record view (CONTEXT.md §5 & §15) ─────────────────────────────
+  // We record this asynchronously so it doesn't block the render
+  supabase.from('program_views').insert({
+    program_id: program.id,
+    user_id: user.id
+  }).then(({ error }) => {
+    if (error) console.error('Error recording program view:', error)
+  })
+
   // ── Detail page SoftInfra (fetch once, assign to slots) ──────────────────
   const { data: siRaw } = await supabase
     .from('softinfra')

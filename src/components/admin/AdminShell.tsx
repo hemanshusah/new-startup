@@ -5,8 +5,10 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/components/auth/AuthProvider'
 import { useRef } from 'react'
+import { PageTransition } from '@/components/ui/PageTransition'
 
 const NAV_ITEMS = [
+  // ... (keep navigation items)
   {
     label: 'Dashboard',
     href: '/admin/dashboard',
@@ -258,7 +260,9 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
           </div>
         )}
 
-        {children}
+        <PageTransition>
+          {children}
+        </PageTransition>
       </main>
     </div>
   )

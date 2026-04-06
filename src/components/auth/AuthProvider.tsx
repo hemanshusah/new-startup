@@ -16,6 +16,16 @@ import { createClient } from '@/lib/supabase/client'
 
 interface AuthContextValue {
   user: User | null
+  profile: {
+    id: string
+    role: 'user' | 'admin'
+    full_name?: string
+    avatar_url?: string
+    phone?: string
+    startup_name?: string
+    startup_website?: string
+    startup_email?: string
+  } | null
   isModalOpen: boolean
   /** Open the auth modal; pass a redirect path to navigate there after sign-in */
   openModal: (redirectTo?: string) => void
@@ -28,11 +38,12 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
+  profile: null,
   isModalOpen: false,
-  openModal: () => {},
-  closeModal: () => {},
+  openModal: () => { },
+  closeModal: () => { },
   redirectTo: null,
-  signOut: async () => {},
+  signOut: async () => { },
 })
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
@@ -42,6 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = useRef(createClient()).current
 
   const [user, setUser] = useState<User | null>(null)
+  const [profile, setProfile] = useState<AuthContextValue['profile'] | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [redirectTo, setRedirectTo] = useState<string | null>(null)
 
@@ -61,6 +73,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => subscription.unsubscribe()
   }, [supabase])
+
+  // ── Fetch Profile when User changes ─────────────────────────────────────────
+  useEffect(() => {
+    if (!user) {
+      setProfile(null)
+      return
+    }
+
+    const fetchProfile = async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+
+      if (!error && data) {
+        setProfile(data)
+      }
+    }
+
+    fetchProfile()
+  }, [user, supabase])
 
   // ── Check if the URL contains ?redirect= (middleware set it) ──────────────
   // If the listing page was loaded after a protected route redirect, auto-open the modal
@@ -95,13 +129,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = useCallback(async () => {
     await supabase.auth.signOut()
     setUser(null)
+    setProfile(null)
     router.push('/')
     router.refresh()
   }, [supabase, router])
 
   return (
     <AuthContext.Provider
-      value={{ user, isModalOpen, openModal, closeModal, redirectTo, signOut }}
+      value={{
+        user,
+        profile,
+        isModalOpen,
+        openModal,
+        closeModal,
+        redirectTo,
+        signOut,
+      }}
     >
       {children}
     </AuthContext.Provider>

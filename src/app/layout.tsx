@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import './globals.css'
 import { NavWrapper } from '@/components/nav/NavWrapper'
+import { NavProgress } from '@/components/nav/NavProgress'
+import { PageTransition } from '@/components/ui/PageTransition'
 import { AuthProvider } from '@/components/auth/AuthProvider'
 import { AuthModal } from '@/components/auth/AuthModal'
 
@@ -32,8 +35,13 @@ export default function RootLayout({
       </head>
       <body>
         <AuthProvider>
+          <Suspense fallback={null}>
+            <NavProgress />
+          </Suspense>
           <NavWrapper />
-          <main>{children}</main>
+          <PageTransition>
+            <main>{children}</main>
+          </PageTransition>
           {/* AuthModal renders as a portal-like overlay on top of everything */}
           <AuthModal />
         </AuthProvider>
