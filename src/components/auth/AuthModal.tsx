@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from './AuthProvider'
-import { getSiteUrl } from '@/lib/site-url'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -131,7 +130,7 @@ export function AuthModal() {
       password,
       options: {
         data: { full_name: fullName || undefined },
-        emailRedirectTo: `${getSiteUrl()}/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     })
     setLoading(false)
@@ -151,7 +150,7 @@ export function AuthModal() {
     setError(null)
     setLoading(true)
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${getSiteUrl()}/auth/callback`,
+      redirectTo: `${window.location.origin}/auth/callback`,
     })
     setLoading(false)
     if (error) {
@@ -169,7 +168,7 @@ export function AuthModal() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent(next)}`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
       },
     })
     // Browser will redirect — no need to setLoading(false)
