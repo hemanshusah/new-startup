@@ -1,6 +1,8 @@
 'use client'
 
+import Link from 'next/link'
 import { ProgramListItem } from '@/types/program'
+import React from 'react'
 
 /** Deadline colour logic per CONTEXT.md §3 */
 function getDeadlineInfo(deadline: string) {
@@ -47,9 +49,8 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
   const typeStyle = TYPE_STYLES[program.type] ?? { bg: 'var(--cream-dark)', color: 'var(--ink-2)' }
 
   return (
-    <article
-      role="button"
-      tabIndex={0}
+    <Link
+      href={`/programs/${program.slug}`}
       onClick={onClick}
       onKeyDown={(e) => e.key === 'Enter' && onClick?.(e as unknown as React.MouseEvent)}
       className="grant-card"
@@ -64,6 +65,7 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
         justifyContent: 'space-between',
         position: 'relative',
         transition: 'background 0.1s ease',
+        textDecoration: 'none', // Critical for Link
       }}
       aria-label={`${program.title} by ${program.organisation}`}
     >
@@ -210,6 +212,6 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
       >
         ↗
       </span>
-    </article>
+    </Link>
   )
 }

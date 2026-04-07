@@ -32,7 +32,7 @@ export async function getSIForSlots(
 
   // Filter out items that have expired or haven't started yet
   const today = new Date().toISOString().split('T')[0]
-  let validSI = (siItems as SoftInfra[]).filter((si) => {
+  const validSI = (siItems as SoftInfra[]).filter((si) => {
     if (si.start_date && si.start_date > today) return false
     if (si.end_date && si.end_date < today) return false
     return true

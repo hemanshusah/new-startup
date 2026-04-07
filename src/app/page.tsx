@@ -140,8 +140,8 @@ export default async function ListingPage() {
       )}
 
       {/* Grants grid (client component — handles filtering, search, pagination) */}
-      <GrantsGrid 
-        programs={programs} 
+      <GrantsGrid
+        programs={programs}
         siSlotPositions={siSlotPositions}
         siForSlots={siForSlots}
       />

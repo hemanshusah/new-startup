@@ -61,15 +61,16 @@ export function GrantsGrid({ programs, siSlotPositions = [6, 14, 20], siForSlots
   const hasMore = visibleCount < filtered.length
 
   /**
-   * Auth gate: if logged in → navigate; if not → open modal with redirect target.
+   * Auth gate: if logged in → let the Link navigate; if not → prevent and open modal.
    * Called from each GrantCard's onClick.
    */
-  const handleCardClick = (slug: string) => {
-    if (user) {
-      window.location.href = `/programs/${slug}`
-    } else {
+  const handleCardClick = (e: React.MouseEvent, slug: string) => {
+    if (!user) {
+      e.preventDefault()
       openModal(`/programs/${slug}`)
     }
+    // If user exists, we do nothing and let the <Link> component handle the navigation.
+    // This allows the global NavProgress click listener to detect it and show the bar.
   }
 
   return (
@@ -118,7 +119,7 @@ export function GrantsGrid({ programs, siSlotPositions = [6, 14, 20], siForSlots
                 <GrantCard
                   key={program.id}
                   program={program}
-                  onClick={() => handleCardClick(program.slug)}
+                  onClick={(e) => handleCardClick(e, program.slug)}
                 />
               ]
 

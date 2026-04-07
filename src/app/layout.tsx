@@ -17,6 +17,8 @@ export const metadata: Metadata = {
     'Discover government and private sector grants, incubation programs, accelerators, and contests for Indian founders. Updated weekly.',
 }
 
+import { Footer } from '@/components/nav/Footer'
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,16 +35,17 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap"
         />
       </head>
-      <body>
+      <body style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <AuthProvider>
           <Suspense fallback={null}>
             <NavProgress />
           </Suspense>
           <NavWrapper />
           <PageTransition>
-            <main>{children}</main>
+            <main style={{ flex: 1 }}>{children}</main>
           </PageTransition>
-          {/* AuthModal renders as a portal-like overlay on top of everything */}
+          {/* Footer added globally */}
+          <Footer />
           <AuthModal />
         </AuthProvider>
       </body>
