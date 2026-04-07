@@ -10,9 +10,17 @@ import { ContentSections } from '@/components/detail/ContentSection'
 import { DetailSidebar } from '@/components/detail/DetailSidebar'
 import { SimilarPrograms } from '@/components/detail/SimilarPrograms'
 import { InlineSI } from '@/components/softinfra/InlineSI'
+import { absoluteUrl } from '@/lib/site-url'
 
 // 10-minute ISR cache (CONTEXT.md §11)
 export const revalidate = 600
+
+function deadlineToIsoDate(deadline: string | null | undefined): string {
+  if (!deadline) return ''
+  const d = new Date(deadline)
+  if (Number.isNaN(d.getTime())) return String(deadline)
+  return d.toISOString().split('T')[0]
+}
 
 export async function generateMetadata({
   params,
@@ -29,20 +37,21 @@ export async function generateMetadata({
 
   if (!data) return { title: 'Program not found' }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://grantsindia.com'
   const ogTitle = data.amount_display
     ? `${data.title} — ${data.amount_display}`
     : data.title
 
   return {
-    title: data.title,
+    title: {
+      absolute: `${data.title} — GrantsIndia`,
+    },
     description: data.description_short,
     openGraph: {
       title: ogTitle,
       description: data.description_short,
     },
     alternates: {
-      canonical: `${siteUrl}/programs/${data.slug}`,
+      canonical: absoluteUrl(`/programs/${data.slug}`),
     },
     robots: { index: true, follow: true },
   }
@@ -123,15 +132,14 @@ export default async function ProgramDetailPage({ params }: Props) {
     .slice(0, 5)
 
   // ── JSON-LD structured data (CONTEXT.md §14) ──────────────────────
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://grantsindia.com'
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Event',
     name: program.title,
     organizer: { '@type': 'Organization', name: program.organisation },
-    endDate: program.deadline,
+    endDate: deadlineToIsoDate(program.deadline as string),
     description: program.description_short,
-    url: `${siteUrl}/programs/${program.slug}`,
+    url: absoluteUrl(`/programs/${program.slug}`),
   }
 
   return (

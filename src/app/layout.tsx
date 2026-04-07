@@ -1,14 +1,16 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import './globals.css'
+import { getSiteUrl } from '@/lib/site-url'
 import { NavWrapper } from '@/components/nav/NavWrapper'
 import { NavProgress } from '@/components/nav/NavProgress'
 import { PageTransition } from '@/components/ui/PageTransition'
 import { AuthProvider } from '@/components/auth/AuthProvider'
 import { AuthModal } from '@/components/auth/AuthModal'
+import { Analytics } from '@vercel/analytics/next'
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  metadataBase: new URL(getSiteUrl()),
   title: {
     default: 'GrantsIndia — Top 2026 Grants & Funding for Indian Startups',
     template: '%s — GrantsIndia',
@@ -48,6 +50,7 @@ export default function RootLayout({
           <Footer />
           <AuthModal />
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   )
