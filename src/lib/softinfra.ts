@@ -1,16 +1,17 @@
 import { createClient } from '@/lib/supabase/server'
 import type { SoftInfra } from '@/types/softinfra'
 
+/** Grid positions for listing slots (CONTEXT.md — after Nth program card). */
+const LISTING_SLOT_GRID_INDEX: Record<string, number> = {
+  'listing-grid-a': 6,
+  'listing-grid-b': 14,
+  'listing-grid-c': 20,
+}
+
 /**
- * Fetches and assigns SoftInfra items to a list of requested slot IDs.
- * Priorities:
- * 1. Exact match on `slot_index`
- * 2. Highest `priority` score (lower number = higher priority)
- * 3. Fallback (random selection among remaining)
- *
- * @param slotIds Array of slot IDs (e.g., ['listing-grid-a', 'listing-grid-b'])
- * @param placement Component placement context (e.g., 'listing-grid')
- * @returns A record mapping slot IDs to an Assigned SoftInfra (or null if none available)
+ * Fetches and assigns SoftInfra items to slot IDs.
+ * Respects `slot_index` when it matches the slot’s grid position, then `priority`, then random tiebreak.
+ * One item per slot per render; each item used at most once.
  */
 export async function getSIForSlots(
   slotIds: string[],
@@ -18,7 +19,6 @@ export async function getSIForSlots(
 ): Promise<Record<string, SoftInfra | null>> {
   const supabase = await createClient()
 
-  // 1. Fetch all active SoftInfra items matching the placement, within their campaign dates
   const { data: siItems, error } = await supabase
     .from('softinfra')
     .select('*')
@@ -30,7 +30,6 @@ export async function getSIForSlots(
     return Object.fromEntries(slotIds.map((id) => [id, null]))
   }
 
-  // Filter out items that have expired or haven't started yet
   const today = new Date().toISOString().split('T')[0]
   const validSI = (siItems as SoftInfra[]).filter((si) => {
     if (si.start_date && si.start_date > today) return false
@@ -41,25 +40,28 @@ export async function getSIForSlots(
   const results: Record<string, SoftInfra | null> = {}
   const usedSIIds = new Set<string>()
 
-  validSI.sort((a, b) => {
-    if (a.slot_index && !b.slot_index) return -1
-    if (!a.slot_index && b.slot_index) return 1
-    if (a.slot_index && b.slot_index) return a.slot_index - b.slot_index
-    return a.priority - b.priority
-  })
-
-  // 3. Assign items to slots
-  // We just iterate through requested slots and assign the best remaining item
   for (const slotId of slotIds) {
-    const siToAssign = validSI.find(
-      (si) => !usedSIIds.has(si.id) && si.format !== 'newsletter' // keep newsletter separate
+    const gridPos = LISTING_SLOT_GRID_INDEX[slotId]
+    const candidates = validSI.filter(
+      (si) => !usedSIIds.has(si.id) && si.format !== 'newsletter'
     )
-    if (siToAssign) {
-      results[slotId] = siToAssign
-      usedSIIds.add(siToAssign.id)
-    } else {
-      results[slotId] = null
-    }
+
+    const scored = candidates
+      .map((si) => {
+        let tier = 2
+        if (gridPos !== undefined && si.slot_index === gridPos) tier = 0
+        else if (si.slot_index == null) tier = 1
+        return { si, tier, priority: si.priority }
+      })
+      .sort((a, b) => {
+        if (a.tier !== b.tier) return a.tier - b.tier
+        if (a.priority !== b.priority) return a.priority - b.priority
+        return Math.random() - 0.5
+      })
+
+    const pick = scored[0]?.si ?? null
+    results[slotId] = pick
+    if (pick) usedSIIds.add(pick.id)
   }
 
   return results
@@ -68,28 +70,21 @@ export async function getSIForSlots(
 /**
  * Records a SoftInfra impression.
  * - Increments `softinfra.impression_count` via RPC
- * - If user is logged in, inserts a row into `softinfra_impressions` (ON CONFLICT DO NOTHING)
+ * - If user is logged in, inserts into `softinfra_impressions` (ON CONFLICT DO NOTHING)
  */
 export async function recordSIImpression(siId: string, userId?: string | null) {
   const supabase = await createClient()
 
-  // 1. Always increment the generic counter
   await supabase.rpc('increment_softinfra_impression', { p_si_id: siId })
 
-  // 2. If user is authenticated, attempt to record their specific impression
   if (userId) {
-    const { error } = await supabase
-      .from('softinfra_impressions')
-      .insert({
-        softinfra_id: siId,
-        user_id: userId,
-      })
+    const { error } = await supabase.from('softinfra_impressions').insert({
+      softinfra_id: siId,
+      user_id: userId,
+    })
 
-    // We ignore error here since it's likely just a unique constraint violation
-    // (meaning the user has already seen this before), which is expected.
     if (error && error.code !== '23505') {
       console.error('Failed to log unique softinfra impression', error)
     }
   }
 }
-

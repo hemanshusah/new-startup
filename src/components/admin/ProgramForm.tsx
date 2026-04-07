@@ -1,9 +1,16 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Program } from '@/types/program'
+import {
+  PROGRAM_FORM_FIELDS,
+  SECTOR_DEFAULTS,
+  mergeFieldSchema,
+  type FieldConfig,
+  type ProgramFormFieldKey,
+} from '@/lib/site-field-schema'
 
 // ── Constants ────────────────────────────────────────────────────
 
@@ -17,12 +24,17 @@ const INDIAN_STATES = [
   'Andaman & Nicobar Islands', 'Dadra & Nagar Haveli and Daman & Diu', 'Lakshadweep',
 ]
 
-const PREDEFINED_SECTORS = [
-  'AgriTech', 'AI / ML', 'CleanTech', 'Climate Tech', 'Deep Tech', 'EdTech',
-  'Fintech', 'HealthTech', 'HRTech', 'IoT', 'LegalTech', 'Logistics', 'Manufacturing',
-  'Media & Entertainment', 'MedTech', 'PropTech', 'RetailTech', 'SaaS', 'SpaceTech',
-  'Sustainability', 'WaterTech', 'Women-led',
+const SECTION_C_KEYS: ProgramFormFieldKey[] = [
+  'mode', 'stage', 'duration', 'cohort_size', 'state', 'apply_url', 'is_featured', 'sectors',
 ]
+const SECTION_D_KEYS: ProgramFormFieldKey[] = [
+  'description_short', 'about', 'what_you_get', 'eligibility', 'how_to_apply',
+]
+const SECTION_B_EXTRA_KEYS: ProgramFormFieldKey[] = ['amount_display', 'amount_min', 'amount_max', 'equity']
+
+function labelForField(key: ProgramFormFieldKey): string {
+  return PROGRAM_FORM_FIELDS.find((f) => f.key === key)?.label ?? key
+}
 
 function toSlug(title: string): string {
   return title
@@ -145,9 +157,23 @@ interface FormErrors { [key: string]: string }
 interface ProgramFormProps {
   program?: Program
   mode: 'create' | 'edit'
+  /** From site_config.sectors — focus-sector chips */
+  sectorOptions?: string[]
+  /** From site_config.field_schema — required / optional / hidden */
+  fieldSchema?: Record<string, FieldConfig>
+  /** True when server moved a published program to draft for this edit session */
+  wasUnpublishedOnEdit?: boolean
 }
 
-export function ProgramForm({ program, mode }: ProgramFormProps) {
+export function ProgramForm({
+  program,
+  mode,
+  sectorOptions = SECTOR_DEFAULTS,
+  fieldSchema: fieldSchemaProp,
+  wasUnpublishedOnEdit = false,
+}: ProgramFormProps) {
+  const fs = mergeFieldSchema(fieldSchemaProp ?? {})
+  const vis = (key: ProgramFormFieldKey) => fs[key] !== 'hidden'
   const router = useRouter()
   const supabase = createClient()
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null)
@@ -178,6 +204,10 @@ export function ProgramForm({ program, mode }: ProgramFormProps) {
   const [cohortSize, setCohortSize] = useState(program?.cohort_size ?? '')
   const [state, setState] = useState(program?.state ?? '')
   const [sectors, setSectors] = useState<string[]>(program?.sectors ?? [])
+  const sectorChoices = useMemo(() => {
+    const merged = new Set<string>([...sectorOptions, ...sectors])
+    return Array.from(merged)
+  }, [sectorOptions, sectors])
   const [isFeatured, setIsFeatured] = useState(program?.is_featured ?? false)
   const [applyUrl, setApplyUrl] = useState(program?.apply_url ?? '')
   const [descriptionShort, setDescriptionShort] = useState(program?.description_short ?? '')
@@ -243,14 +273,41 @@ export function ProgramForm({ program, mode }: ProgramFormProps) {
     how_to_apply: howToApply || null,
   })
 
+  const hasSectionBExtra = SECTION_B_EXTRA_KEYS.some((k) => vis(k))
+  const hasSectionC = SECTION_C_KEYS.some((k) => (k !== 'state' || isIndia) && vis(k))
+  const hasSectionD = SECTION_D_KEYS.some((k) => vis(k))
+
   const validate = (forPublish: boolean): FormErrors => {
     const errs: FormErrors = {}
     if (!title.trim()) errs.title = 'Title is required.'
     if (!slug.trim()) errs.slug = 'Slug is required.'
     if (!organisation.trim()) errs.organisation = 'Organisation is required.'
     if (!deadline) errs.deadline = 'Deadline is required.'
-    if (forPublish && !descriptionShort.trim()) errs.descriptionShort = 'Short description is required to publish.'
     if (amountMin && amountMax && Number(amountMin) > Number(amountMax)) errs.amountMin = 'Min must be ≤ max.'
+
+    if (!forPublish) return errs
+
+    const req = (key: ProgramFormFieldKey, errField: string, ok: boolean) => {
+      if (fs[key] !== 'required' || ok) return
+      errs[errField] = `${labelForField(key)} is required.`
+    }
+
+    req('description_short', 'descriptionShort', !!descriptionShort.trim())
+    req('about', 'about', !!about.trim())
+    req('what_you_get', 'whatYouGet', whatYouGet.length > 0)
+    req('eligibility', 'eligibility', eligibility.length > 0)
+    req('how_to_apply', 'howToApply', !!howToApply.trim())
+    req('mode', 'mode', !!mode2.trim())
+    req('stage', 'stage', !!stage.trim())
+    req('duration', 'duration', !!duration.trim())
+    req('cohort_size', 'cohortSize', !!cohortSize.trim())
+    req('equity', 'equity', !!equity.trim())
+    req('amount_min', 'amountMin', !!amountMin.trim())
+    req('amount_max', 'amountMax', !!amountMax.trim())
+    req('amount_display', 'amountDisplay', !!amountDisplay.trim())
+    if (isIndia) req('state', 'state', !!state.trim())
+    req('sectors', 'sectors', sectors.length > 0)
+    req('apply_url', 'applyUrl', !!applyUrl.trim())
     return errs
   }
 
@@ -309,6 +366,25 @@ export function ProgramForm({ program, mode }: ProgramFormProps) {
       {toast && (
         <div style={{ position: 'fixed', bottom: '24px', right: '24px', background: toast.ok ? '#1E6E2E' : '#B01F1F', color: '#fff', fontFamily: 'DM Sans, sans-serif', fontSize: '13px', padding: '12px 20px', borderRadius: '8px', zIndex: 200, boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }} role="status">
           {toast.msg}
+        </div>
+      )}
+
+      {wasUnpublishedOnEdit && (
+        <div
+          style={{
+            marginBottom: '20px',
+            padding: '14px 18px',
+            background: '#FFF8E8',
+            border: '1px solid #E8D4A8',
+            borderRadius: '10px',
+            fontFamily: 'DM Sans, sans-serif',
+            fontSize: '13px',
+            color: 'var(--ink)',
+            lineHeight: 1.55,
+          }}
+          role="status"
+        >
+          <strong style={{ fontWeight: 600 }}>Draft mode.</strong> This program was live and is now unpublished while you edit. It is hidden from the public listing until you publish again. Continue editing and use <strong>Publish</strong> when ready, or <strong>Delete program</strong> below to remove it.
         </div>
       )}
 
@@ -372,134 +448,210 @@ export function ProgramForm({ program, mode }: ProgramFormProps) {
             <Label required>Application deadline</Label>
             <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} style={inputStyle(!!errors.deadline)} />
           </FieldWrap>
-          <FieldWrap>
-            <Label>Amount display string <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></Label>
-            <input type="text" value={amountDisplay} onChange={(e) => setAmountDisplay(e.target.value)} style={inputStyle()} placeholder="e.g. ₹5Cr – ₹200Cr" />
-          </FieldWrap>
-          <FieldWrap error={errors.amountMin}>
-            <Label>Amount min (₹) <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></Label>
-            <input type="number" min="0" value={amountMin} onChange={(e) => setAmountMin(e.target.value)} style={inputStyle(!!errors.amountMin)} placeholder="0" />
-          </FieldWrap>
-          <FieldWrap>
-            <Label>Amount max (₹) <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></Label>
-            <input type="number" min="0" value={amountMax} onChange={(e) => setAmountMax(e.target.value)} style={inputStyle()} placeholder="0" />
-          </FieldWrap>
-          <FieldWrap>
-            <Label>Equity <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></Label>
-            <input type="text" maxLength={50} value={equity} onChange={(e) => setEquity(e.target.value)} style={inputStyle()} placeholder="e.g. Zero equity, 2–5%" />
-          </FieldWrap>
+          {vis('amount_display') && (
+            <FieldWrap error={errors.amountDisplay}>
+              <Label required={fs.amount_display === 'required'}>
+                Amount display string {fs.amount_display !== 'required' && <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span>}
+              </Label>
+              <input type="text" value={amountDisplay} onChange={(e) => setAmountDisplay(e.target.value)} style={inputStyle(!!errors.amountDisplay)} placeholder="e.g. ₹5Cr – ₹200Cr" />
+            </FieldWrap>
+          )}
+          {vis('amount_min') && (
+            <FieldWrap error={errors.amountMin}>
+              <Label required={fs.amount_min === 'required'}>
+                Amount min (₹) {fs.amount_min !== 'required' && <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span>}
+              </Label>
+              <input type="number" min="0" value={amountMin} onChange={(e) => setAmountMin(e.target.value)} style={inputStyle(!!errors.amountMin)} placeholder="0" />
+            </FieldWrap>
+          )}
+          {vis('amount_max') && (
+            <FieldWrap error={errors.amountMax}>
+              <Label required={fs.amount_max === 'required'}>
+                Amount max (₹) {fs.amount_max !== 'required' && <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span>}
+              </Label>
+              <input type="number" min="0" value={amountMax} onChange={(e) => setAmountMax(e.target.value)} style={inputStyle(!!errors.amountMax)} placeholder="0" />
+            </FieldWrap>
+          )}
+          {vis('equity') && (
+            <FieldWrap error={errors.equity}>
+              <Label required={fs.equity === 'required'}>
+                Equity {fs.equity !== 'required' && <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span>}
+              </Label>
+              <input type="text" maxLength={50} value={equity} onChange={(e) => setEquity(e.target.value)} style={inputStyle(!!errors.equity)} placeholder="e.g. Zero equity, 2–5%" />
+            </FieldWrap>
+          )}
+          {!hasSectionBExtra && (
+            <p style={{ gridColumn: '1 / -1', fontFamily: 'DM Sans, sans-serif', fontSize: '12px', color: 'var(--ink-4)', margin: 0 }}>
+              Funding fields (amount, equity) are hidden in Settings → Field schema.
+            </p>
+          )}
         </div>
       </div>
 
       {/* ── Section C: Program details (collapsible) ── */}
-      <div style={sectionWrap}>
-        <SectionHeader title="C — Program details" open={sectionC} onToggle={() => setSectionC(!sectionC)} />
-        {sectionC && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
-            <FieldWrap>
-              <Label>Mode <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></Label>
-              <select value={mode2} onChange={(e) => setMode2(e.target.value)} style={inputStyle()}>
-                <option value="">— Select —</option>
-                <option>Virtual</option>
-                <option>In-person</option>
-                <option>Hybrid</option>
-                <option>Online + In-person</option>
-              </select>
-            </FieldWrap>
-            <FieldWrap>
-              <Label>Stage <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></Label>
-              <select value={stage} onChange={(e) => setStage(e.target.value)} style={inputStyle()}>
-                <option value="">— Select —</option>
-                <option>Ideation</option>
-                <option>Prototype</option>
-                <option>MVP</option>
-                <option>Revenue Stage</option>
-                <option>Any</option>
-              </select>
-            </FieldWrap>
-            <FieldWrap>
-              <Label>Duration <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></Label>
-              <input type="text" maxLength={50} value={duration} onChange={(e) => setDuration(e.target.value)} style={inputStyle()} placeholder="e.g. ~3 months" />
-            </FieldWrap>
-            <FieldWrap>
-              <Label>Cohort size <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></Label>
-              <input type="text" maxLength={80} value={cohortSize} onChange={(e) => setCohortSize(e.target.value)} style={inputStyle()} placeholder="e.g. 30 startups" />
-            </FieldWrap>
-            {isIndia && (
-              <FieldWrap>
-                <Label>Indian state <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></Label>
-                <select value={state} onChange={(e) => setState(e.target.value)} style={inputStyle()}>
-                  <option value="">— All India —</option>
-                  {INDIAN_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </FieldWrap>
-            )}
-            <FieldWrap>
-              <Label>Apply URL <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></Label>
-              <input type="url" value={applyUrl} onChange={(e) => setApplyUrl(e.target.value)} style={inputStyle()} placeholder="https://…" />
-            </FieldWrap>
-            <FieldWrap>
-              <Label>Is featured</Label>
-              <Toggle checked={isFeatured} onChange={setIsFeatured} label="Feature this program" />
-            </FieldWrap>
-            <div style={{ gridColumn: '1 / -1' }}>
-              <FieldWrap>
-                <Label>Focus sectors <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></Label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 8px', marginBottom: '10px' }}>
-                  {PREDEFINED_SECTORS.map((s) => (
-                    <button key={s} type="button"
-                      onClick={() => setSectors(sectors.includes(s) ? sectors.filter((x) => x !== s) : [...sectors, s])}
-                      style={{
-                        fontFamily: 'DM Sans, sans-serif', fontSize: '11.5px', padding: '4px 12px',
-                        borderRadius: '20px', border: '1px solid var(--cream-border)', cursor: 'pointer',
-                        background: sectors.includes(s) ? 'var(--ink)' : 'var(--cream)',
-                        color: sectors.includes(s) ? 'var(--cream)' : 'var(--ink)',
-                      }}
-                    >
-                      {s}
-                    </button>
-                  ))}
+      {hasSectionC && (
+        <div style={sectionWrap}>
+          <SectionHeader title="C — Program details" open={sectionC} onToggle={() => setSectionC(!sectionC)} />
+          {sectionC && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
+              {vis('mode') && (
+                <FieldWrap error={errors.mode}>
+                  <Label required={fs.mode === 'required'}>
+                    Mode {fs.mode !== 'required' && <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span>}
+                  </Label>
+                  <select value={mode2} onChange={(e) => setMode2(e.target.value)} style={inputStyle(!!errors.mode)}>
+                    <option value="">— Select —</option>
+                    <option>Virtual</option>
+                    <option>In-person</option>
+                    <option>Hybrid</option>
+                    <option>Online + In-person</option>
+                  </select>
+                </FieldWrap>
+              )}
+              {vis('stage') && (
+                <FieldWrap error={errors.stage}>
+                  <Label required={fs.stage === 'required'}>
+                    Stage {fs.stage !== 'required' && <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span>}
+                  </Label>
+                  <select value={stage} onChange={(e) => setStage(e.target.value)} style={inputStyle(!!errors.stage)}>
+                    <option value="">— Select —</option>
+                    <option>Ideation</option>
+                    <option>Prototype</option>
+                    <option>MVP</option>
+                    <option>Revenue Stage</option>
+                    <option>Any</option>
+                  </select>
+                </FieldWrap>
+              )}
+              {vis('duration') && (
+                <FieldWrap error={errors.duration}>
+                  <Label required={fs.duration === 'required'}>
+                    Duration {fs.duration !== 'required' && <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span>}
+                  </Label>
+                  <input type="text" maxLength={50} value={duration} onChange={(e) => setDuration(e.target.value)} style={inputStyle(!!errors.duration)} placeholder="e.g. ~3 months" />
+                </FieldWrap>
+              )}
+              {vis('cohort_size') && (
+                <FieldWrap error={errors.cohortSize}>
+                  <Label required={fs.cohort_size === 'required'}>
+                    Cohort size {fs.cohort_size !== 'required' && <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span>}
+                  </Label>
+                  <input type="text" maxLength={80} value={cohortSize} onChange={(e) => setCohortSize(e.target.value)} style={inputStyle(!!errors.cohortSize)} placeholder="e.g. 30 startups" />
+                </FieldWrap>
+              )}
+              {isIndia && vis('state') && (
+                <FieldWrap error={errors.state}>
+                  <Label required={fs.state === 'required'}>
+                    Indian state {fs.state !== 'required' && <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span>}
+                  </Label>
+                  <select value={state} onChange={(e) => setState(e.target.value)} style={inputStyle(!!errors.state)}>
+                    <option value="">— All India —</option>
+                    {INDIAN_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </FieldWrap>
+              )}
+              {vis('apply_url') && (
+                <FieldWrap error={errors.applyUrl}>
+                  <Label required={fs.apply_url === 'required'}>
+                    Apply URL {fs.apply_url !== 'required' && <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span>}
+                  </Label>
+                  <input type="url" value={applyUrl} onChange={(e) => setApplyUrl(e.target.value)} style={inputStyle(!!errors.applyUrl)} placeholder="https://…" />
+                </FieldWrap>
+              )}
+              {vis('is_featured') && (
+                <FieldWrap>
+                  <Label>Is featured</Label>
+                  <Toggle checked={isFeatured} onChange={setIsFeatured} label="Feature this program" />
+                </FieldWrap>
+              )}
+              {vis('sectors') && (
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <FieldWrap error={errors.sectors}>
+                    <Label required={fs.sectors === 'required'}>
+                      Focus sectors {fs.sectors !== 'required' && <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span>}
+                    </Label>
+                    <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', color: 'var(--ink-4)', margin: '0 0 8px' }}>
+                      Tags from Settings → Sector tags. Selected program sectors stay available even if you later remove a tag from Settings.
+                    </p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 8px', marginBottom: '10px' }}>
+                      {sectorChoices.map((s) => (
+                        <button key={s} type="button"
+                          onClick={() => setSectors(sectors.includes(s) ? sectors.filter((x) => x !== s) : [...sectors, s])}
+                          style={{
+                            fontFamily: 'DM Sans, sans-serif', fontSize: '11.5px', padding: '4px 12px',
+                            borderRadius: '20px', border: '1px solid var(--cream-border)', cursor: 'pointer',
+                            background: sectors.includes(s) ? 'var(--ink)' : 'var(--cream)',
+                            color: sectors.includes(s) ? 'var(--cream)' : 'var(--ink)',
+                          }}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </FieldWrap>
                 </div>
-              </FieldWrap>
+              )}
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* ── Section D: Content (collapsible) ── */}
-      <div style={sectionWrap}>
-        <SectionHeader title="D — Content" open={sectionD} onToggle={() => setSectionD(!sectionD)} />
-        {sectionD && (
-          <>
-            <FieldWrap error={errors.descriptionShort}>
-              <Label>Short description <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(max 300 chars — required to publish)</span></Label>
-              <textarea
-                rows={3} maxLength={300} value={descriptionShort}
-                onChange={(e) => setDescriptionShort(e.target.value)}
-                style={{ ...inputStyle(!!errors.descriptionShort), resize: 'vertical' }}
-                placeholder="Used on listing cards (max 300 chars)"
-              />
-              <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', color: 'var(--ink-4)' }}>{descriptionShort.length}/300</span>
-            </FieldWrap>
-            <FieldWrap>
-              <Label>About the program <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></Label>
-              <textarea rows={6} value={about} onChange={(e) => setAbout(e.target.value)} style={{ ...inputStyle(), resize: 'vertical' }} placeholder="2–5 paragraphs. Use blank lines to separate paragraphs." />
-            </FieldWrap>
-            <FieldWrap>
-              <Label>What you get <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></Label>
-              <ListEditor value={whatYouGet} onChange={setWhatYouGet} placeholder="Add a benefit…" />
-            </FieldWrap>
-            <FieldWrap>
-              <Label>Eligibility criteria <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></Label>
-              <ListEditor value={eligibility} onChange={setEligibility} placeholder="Add a criterion…" />
-            </FieldWrap>
-            <FieldWrap>
-              <Label>How to apply <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></Label>
-              <textarea rows={5} value={howToApply} onChange={(e) => setHowToApply(e.target.value)} style={{ ...inputStyle(), resize: 'vertical' }} placeholder="Steps to apply." />
-            </FieldWrap>
-          </>
-        )}
-      </div>
+      {hasSectionD && (
+        <div style={sectionWrap}>
+          <SectionHeader title="D — Content" open={sectionD} onToggle={() => setSectionD(!sectionD)} />
+          {sectionD && (
+            <>
+              {vis('description_short') && (
+                <FieldWrap error={errors.descriptionShort}>
+                  <Label required={fs.description_short === 'required'}>
+                    Short description {fs.description_short !== 'required' && <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(max 300 chars)</span>}
+                  </Label>
+                  <textarea
+                    rows={3} maxLength={300} value={descriptionShort}
+                    onChange={(e) => setDescriptionShort(e.target.value)}
+                    style={{ ...inputStyle(!!errors.descriptionShort), resize: 'vertical' }}
+                    placeholder="Used on listing cards (max 300 chars)"
+                  />
+                  <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', color: 'var(--ink-4)' }}>{descriptionShort.length}/300</span>
+                </FieldWrap>
+              )}
+              {vis('about') && (
+                <FieldWrap error={errors.about}>
+                  <Label required={fs.about === 'required'}>
+                    About the program {fs.about !== 'required' && <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span>}
+                  </Label>
+                  <textarea rows={6} value={about} onChange={(e) => setAbout(e.target.value)} style={{ ...inputStyle(!!errors.about), resize: 'vertical' }} placeholder="2–5 paragraphs. Use blank lines to separate paragraphs." />
+                </FieldWrap>
+              )}
+              {vis('what_you_get') && (
+                <FieldWrap error={errors.whatYouGet}>
+                  <Label required={fs.what_you_get === 'required'}>
+                    What you get {fs.what_you_get !== 'required' && <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span>}
+                  </Label>
+                  <ListEditor value={whatYouGet} onChange={setWhatYouGet} placeholder="Add a benefit…" />
+                </FieldWrap>
+              )}
+              {vis('eligibility') && (
+                <FieldWrap error={errors.eligibility}>
+                  <Label required={fs.eligibility === 'required'}>
+                    Eligibility criteria {fs.eligibility !== 'required' && <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span>}
+                  </Label>
+                  <ListEditor value={eligibility} onChange={setEligibility} placeholder="Add a criterion…" />
+                </FieldWrap>
+              )}
+              {vis('how_to_apply') && (
+                <FieldWrap error={errors.howToApply}>
+                  <Label required={fs.how_to_apply === 'required'}>
+                    How to apply {fs.how_to_apply !== 'required' && <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span>}
+                  </Label>
+                  <textarea rows={5} value={howToApply} onChange={(e) => setHowToApply(e.target.value)} style={{ ...inputStyle(!!errors.howToApply), resize: 'vertical' }} placeholder="Steps to apply." />
+                </FieldWrap>
+              )}
+            </>
+          )}
+        </div>
+      )}
 
       {/* ── Action buttons ── */}
       <div style={{ display: 'flex', gap: '12px', alignItems: 'center', justifyContent: 'flex-end', paddingTop: '8px' }}>

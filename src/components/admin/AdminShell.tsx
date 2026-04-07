@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/components/auth/AuthProvider'
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { PageTransition } from '@/components/ui/PageTransition'
 
 const NAV_ITEMS = [
@@ -74,6 +74,17 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = useRef(createClient()).current
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+
+  useEffect(() => {
+    if (mobileSidebarOpen) {
+      const prev = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = prev
+      }
+    }
+  }, [mobileSidebarOpen])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -87,8 +98,22 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--cream)' }}>
+      {mobileSidebarOpen && (
+        <div
+          className="admin-sidebar-backdrop"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(28,26,22,0.35)',
+            zIndex: 999,
+          }}
+          onClick={() => setMobileSidebarOpen(false)}
+          aria-hidden
+        />
+      )}
       {/* ── Fixed Left Sidebar ── */}
       <aside
+        className={`admin-sidebar${mobileSidebarOpen ? ' admin-sidebar-open' : ''}`}
         style={{
           width: '220px',
           flexShrink: 0,
@@ -102,6 +127,7 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
           bottom: 0,
           zIndex: 1000,
           boxShadow: '4px 0 24px rgba(0,0,0,0.02)',
+          transition: 'transform 0.2s ease',
         }}
       >
         {/* Logo */}
@@ -146,6 +172,7 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => setMobileSidebarOpen(false)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -227,6 +254,7 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
 
       {/* ── Main content area ── */}
       <main
+        className="admin-main"
         style={{
           marginLeft: '220px',
           flex: 1,
@@ -236,6 +264,30 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
           position: 'relative',
         }}
       >
+        <button
+          type="button"
+          className="admin-burger"
+          aria-label="Open navigation menu"
+          onClick={() => setMobileSidebarOpen(true)}
+          style={{
+            display: 'none',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '40px',
+            height: '40px',
+            marginBottom: '16px',
+            border: '1px solid var(--cream-border)',
+            borderRadius: '8px',
+            background: 'var(--white)',
+            cursor: 'pointer',
+          }}
+        >
+          <span style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <span style={{ width: '18px', height: '2px', background: 'var(--ink)', borderRadius: '1px' }} />
+            <span style={{ width: '18px', height: '2px', background: 'var(--ink)', borderRadius: '1px' }} />
+            <span style={{ width: '18px', height: '2px', background: 'var(--ink)', borderRadius: '1px' }} />
+          </span>
+        </button>
         {/* Admin Role Warning Banner */}
         {role && role !== 'admin' && (
           <div style={{

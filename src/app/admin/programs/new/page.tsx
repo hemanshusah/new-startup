@@ -1,6 +1,9 @@
 import { ProgramForm } from '@/components/admin/ProgramForm'
+import { getProgramFormSiteConfig } from '@/lib/site-config'
 
-export default function NewProgramPage() {
+export default async function NewProgramPage() {
+  const { fieldSchema, sectors } = await getProgramFormSiteConfig()
+
   return (
     <div>
       <h1
@@ -14,7 +17,7 @@ export default function NewProgramPage() {
       >
         New program
       </h1>
-      <ProgramForm mode="create" />
+      <ProgramForm mode="create" fieldSchema={fieldSchema} sectorOptions={sectors} />
     </div>
   )
 }
