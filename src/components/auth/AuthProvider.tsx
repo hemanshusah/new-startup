@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react'
@@ -50,7 +51,7 @@ const AuthContext = createContext<AuthContextValue>({
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const supabase = useRef(createClient()).current
+  const supabase = useMemo(() => createClient(), [])
 
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<AuthContextValue['profile'] | null>(null)
@@ -67,7 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for sign in / sign out events
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event: string, session: any) => {
       setUser(session?.user ?? null)
     })
 

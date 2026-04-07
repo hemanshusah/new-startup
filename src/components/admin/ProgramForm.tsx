@@ -236,47 +236,6 @@ export function ProgramForm({
     setTimeout(() => setToast(null), 4000)
   }
 
-  // Keyboard shortcut: Cmd/Ctrl+S → Save draft
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveDraft() }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  })
-
-  const buildPayload = () => ({
-    title: title.trim(),
-    slug: slug.trim(),
-    organisation: organisation.trim(),
-    type,
-    status,
-    is_india: isIndia,
-    published,
-    deadline,
-    amount_min: amountMin ? Number(amountMin) : null,
-    amount_max: amountMax ? Number(amountMax) : null,
-    amount_display: amountDisplay || null,
-    equity: equity || null,
-    mode: mode2 || null,
-    stage: stage || null,
-    duration: duration || null,
-    cohort_size: cohortSize || null,
-    state: isIndia ? (state || null) : null,
-    sectors: sectors.length > 0 ? sectors : null,
-    is_featured: isFeatured,
-    apply_url: applyUrl || null,
-    description_short: descriptionShort.trim() || null,
-    about: about || null,
-    what_you_get: whatYouGet.length > 0 ? whatYouGet : null,
-    eligibility: eligibility.length > 0 ? eligibility : null,
-    how_to_apply: howToApply || null,
-  })
-
-  const hasSectionBExtra = SECTION_B_EXTRA_KEYS.some((k) => vis(k))
-  const hasSectionC = SECTION_C_KEYS.some((k) => (k !== 'state' || isIndia) && vis(k))
-  const hasSectionD = SECTION_D_KEYS.some((k) => vis(k))
-
   const validate = (forPublish: boolean): FormErrors => {
     const errs: FormErrors = {}
     if (!title.trim()) errs.title = 'Title is required.'
@@ -359,6 +318,47 @@ export function ProgramForm({
       router.push('/admin/programs')
     }
   }
+
+  // Keyboard shortcut: Cmd/Ctrl+S → Save draft
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveDraft() }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  })
+
+  const buildPayload = () => ({
+    title: title.trim(),
+    slug: slug.trim(),
+    organisation: organisation.trim(),
+    type,
+    status,
+    is_india: isIndia,
+    published,
+    deadline,
+    amount_min: amountMin ? Number(amountMin) : null,
+    amount_max: amountMax ? Number(amountMax) : null,
+    amount_display: amountDisplay || null,
+    equity: equity || null,
+    mode: mode2 || null,
+    stage: stage || null,
+    duration: duration || null,
+    cohort_size: cohortSize || null,
+    state: isIndia ? (state || null) : null,
+    sectors: sectors.length > 0 ? sectors : null,
+    is_featured: isFeatured,
+    apply_url: applyUrl || null,
+    description_short: descriptionShort.trim() || null,
+    about: about || null,
+    what_you_get: whatYouGet.length > 0 ? whatYouGet : null,
+    eligibility: eligibility.length > 0 ? eligibility : null,
+    how_to_apply: howToApply || null,
+  })
+
+  const hasSectionBExtra = SECTION_B_EXTRA_KEYS.some((k) => vis(k))
+  const hasSectionC = SECTION_C_KEYS.some((k) => (k !== 'state' || isIndia) && vis(k))
+  const hasSectionD = SECTION_D_KEYS.some((k) => vis(k))
 
   return (
     <form onSubmit={(e) => e.preventDefault()} noValidate>
