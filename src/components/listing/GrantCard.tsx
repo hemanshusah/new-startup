@@ -117,6 +117,7 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
 
       {/* Bottom row */}
       <div
+        className="grant-card-bottom"
         style={{
           display: 'flex',
           alignItems: 'flex-end',
@@ -172,7 +173,7 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
 
         {/* Right: amount */}
         {program.amount_display && (
-          <div style={{ textAlign: 'right' }}>
+          <div className="grant-card-amount" style={{ textAlign: 'right' }}>
             <div
               style={{
                 fontFamily: 'DM Serif Display, serif',

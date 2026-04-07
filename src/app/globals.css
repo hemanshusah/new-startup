@@ -107,19 +107,25 @@ button {
 
 /* ============================================================
    GRANTS GRID RESPONSIVE BREAKPOINTS (PROGRESS.md 2.5)
+   gridTemplateColumns is NOT set inline — all column control lives here.
    ============================================================ */
+
+/* Desktop default: 3 columns */
+#grants-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
 
 /* Tablet: ≤ 1024px → 2 columns */
 @media (max-width: 1024px) {
   #grants-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* Mobile: ≤ 767px → 1 column (covers all phones + small tablets in portrait) */
+/* Mobile: ≤ 767px → 1 column */
 @media (max-width: 767px) {
   #grants-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr;
   }
 }
 
@@ -128,27 +134,44 @@ button {
    ============================================================ */
 
 @media (max-width: 767px) {
-  /* Tighter card padding so single-column cards don't waste vertical space */
+  /* Listing page outer wrapper */
+  .listing-wrap {
+    padding: 24px 16px 48px !important;
+  }
+
+  .listing-wrap h1 {
+    max-width: 100% !important;
+  }
+
+  /* Cards: more breathing room, no fixed height */
   .grant-card {
-    padding: 20px 18px 18px !important;
+    padding: 18px 16px 16px !important;
     min-height: 0 !important;
   }
 
-  /* Boost card title legibility on small screens */
+  /* Larger, more legible title */
   .grant-card h3 {
-    font-size: 16px !important;
+    font-size: 17px !important;
     line-height: 1.4 !important;
+    margin-bottom: 8px !important;
   }
 
-  /* Listing page outer wrapper: less aggressive top/bottom padding */
-  .listing-wrap {
-    padding-top: 28px !important;
-    padding-bottom: 48px !important;
+  /* Description slightly larger on mobile */
+  .grant-card .line-clamp-2 {
+    font-size: 13.5px !important;
+    -webkit-line-clamp: 3 !important;
+    line-clamp: 3 !important;
   }
 
-  /* Page H1 on listing stays legible (clamp already handles it; this is belt-and-braces) */
-  .listing-wrap h1 {
-    max-width: 100% !important;
+  /* Bottom row: stack badge/deadline above amount so they don't clash */
+  .grant-card-bottom {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  .grant-card-amount {
+    text-align: left !important;
   }
 
   /* Footer: reduce top padding */

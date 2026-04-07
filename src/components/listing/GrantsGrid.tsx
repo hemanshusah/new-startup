@@ -106,10 +106,9 @@ export function GrantsGrid({ programs, siSlotPositions = [6, 14, 20], siForSlots
             id="grants-grid"
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
               gap: '1px',
               background: 'var(--cream-border)',
-              border: '1px solid var(--cream-border)', // Outer container border
+              border: '1px solid var(--cream-border)',
               borderRadius: '12px',
               overflow: 'hidden',
             }}
