@@ -6,6 +6,7 @@ import { NavProgress } from '@/components/nav/NavProgress'
 import { PageTransition } from '@/components/ui/PageTransition'
 import { AuthProvider } from '@/components/auth/AuthProvider'
 import { AuthModal } from '@/components/auth/AuthModal'
+import { Analytics } from '@vercel/analytics/next'
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
@@ -48,6 +49,7 @@ export default function RootLayout({
           <Footer />
           <AuthModal />
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   )
