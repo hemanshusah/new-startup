@@ -219,7 +219,8 @@ export function ProgramForm({
   // Auto-slug from title
   useEffect(() => {
     if (!slugManuallyEdited.current) {
-      setSlug(toSlug(title))
+      const timer = setTimeout(() => setSlug(toSlug(title)), 0)
+      return () => clearTimeout(timer)
     }
   }, [title])
 
@@ -235,6 +236,34 @@ export function ProgramForm({
     setToast({ msg, ok })
     setTimeout(() => setToast(null), 4000)
   }
+
+  const buildPayload = () => ({
+    title: title.trim(),
+    slug: slug.trim(),
+    organisation: organisation.trim(),
+    type,
+    status,
+    is_india: isIndia,
+    published,
+    deadline,
+    amount_min: amountMin ? Number(amountMin) : null,
+    amount_max: amountMax ? Number(amountMax) : null,
+    amount_display: amountDisplay || null,
+    equity: equity || null,
+    mode: mode2 || null,
+    stage: stage || null,
+    duration: duration || null,
+    cohort_size: cohortSize || null,
+    state: isIndia ? (state || null) : null,
+    sectors: sectors.length > 0 ? sectors : null,
+    is_featured: isFeatured,
+    apply_url: applyUrl || null,
+    description_short: descriptionShort.trim() || null,
+    about: about || null,
+    what_you_get: whatYouGet.length > 0 ? whatYouGet : null,
+    eligibility: eligibility.length > 0 ? eligibility : null,
+    how_to_apply: howToApply || null,
+  })
 
   const validate = (forPublish: boolean): FormErrors => {
     const errs: FormErrors = {}
@@ -326,34 +355,6 @@ export function ProgramForm({
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  })
-
-  const buildPayload = () => ({
-    title: title.trim(),
-    slug: slug.trim(),
-    organisation: organisation.trim(),
-    type,
-    status,
-    is_india: isIndia,
-    published,
-    deadline,
-    amount_min: amountMin ? Number(amountMin) : null,
-    amount_max: amountMax ? Number(amountMax) : null,
-    amount_display: amountDisplay || null,
-    equity: equity || null,
-    mode: mode2 || null,
-    stage: stage || null,
-    duration: duration || null,
-    cohort_size: cohortSize || null,
-    state: isIndia ? (state || null) : null,
-    sectors: sectors.length > 0 ? sectors : null,
-    is_featured: isFeatured,
-    apply_url: applyUrl || null,
-    description_short: descriptionShort.trim() || null,
-    about: about || null,
-    what_you_get: whatYouGet.length > 0 ? whatYouGet : null,
-    eligibility: eligibility.length > 0 ? eligibility : null,
-    how_to_apply: howToApply || null,
   })
 
   const hasSectionBExtra = SECTION_B_EXTRA_KEYS.some((k) => vis(k))

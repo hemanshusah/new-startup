@@ -20,7 +20,7 @@ interface Profile {
   created_at: string
 }
 
-interface HistoryItem {
+export interface HistoryItem {
   viewed_at: string
   program: {
     id: string
@@ -77,8 +77,9 @@ export function ProfileView({ profile: initialProfile, history }: { profile: Pro
         setMessage({ type: 'success', text: 'Profile updated successfully.' })
         setIsEditing(false)
       }
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to update profile.' })
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to update profile.'
+      setMessage({ type: 'error', text: msg })
     } finally {
       setLoading(false)
     }
@@ -101,7 +102,7 @@ export function ProfileView({ profile: initialProfile, history }: { profile: Pro
       if (error) throw error
       setProfile(prev => ({ ...prev, avatar_url: publicUrl }))
       setMessage({ type: 'success', text: 'Avatar updated!' })
-    } catch (err: any) {
+    } catch (err: unknown) {
       setMessage({ type: 'error', text: 'Failed to upload avatar.' })
     } finally {
       setLoading(false)

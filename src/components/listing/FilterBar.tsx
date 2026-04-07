@@ -101,7 +101,7 @@ export function FilterBar({
         <input
           id="program-search"
           type="search"
-          placeholder="Search programs, orgs..."
+          placeholder="Enter keywords to search"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           style={{

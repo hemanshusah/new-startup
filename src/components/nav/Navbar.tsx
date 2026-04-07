@@ -63,7 +63,10 @@ export function Navbar() {
   }, [mobileMenuOpen])
 
   useEffect(() => {
-    if (!isCompactNav && mobileMenuOpen) setMobileMenuOpen(false)
+    if (!isCompactNav && mobileMenuOpen) {
+      const timer = setTimeout(() => setMobileMenuOpen(false), 0)
+      return () => clearTimeout(timer)
+    }
   }, [isCompactNav, mobileMenuOpen])
 
   return (
@@ -107,208 +110,184 @@ export function Navbar() {
 
         {/* Nav links — desktop (hidden on compact: burger + drawer instead) */}
         {!isCompactNav && (
-        <div className="nav-desktop-links" style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1 }}>
-          <Link
-            href="/"
-            style={{
-              fontFamily: 'DM Sans, sans-serif',
-              fontSize: '13px',
-              fontWeight: isActive('/') ? 500 : 400,
-              color: isActive('/') ? 'var(--ink)' : 'var(--ink-3)',
-              transition: 'color 0.15s ease',
-            }}
-          >
-            Grants &amp; Funding
-          </Link>
+          <div className="nav-desktop-links" style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1 }}>
+            <Link
+              href="/"
+              style={{
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '13px',
+                fontWeight: isActive('/') ? 500 : 400,
+                color: isActive('/') ? 'var(--ink)' : 'var(--ink-3)',
+                transition: 'color 0.15s ease',
+              }}
+            >
+              Grants &amp; Funding
+            </Link>
 
-          <Link
-            href="/events"
-            style={{
-              fontFamily: 'DM Sans, sans-serif',
-              fontSize: '13px',
-              fontWeight: 400,
-              color: 'var(--ink-3)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            Events
-            <ComingSoonBadge label="Launching Soon" />
-          </Link>
+            {/* <Link
+              href="/events"
+              style={{
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '13px',
+                fontWeight: 400,
+                color: 'var(--ink-3)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              Events
+              <ComingSoonBadge label="Launching Soon" />
+            </Link>
 
-          <Link
-            href="/newsletter"
-            style={{
-              fontFamily: 'DM Sans, sans-serif',
-              fontSize: '13px',
-              fontWeight: 400,
-              color: 'var(--ink-3)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            Newsletter
-            <ComingSoonBadge label="Launching Soon" />
-          </Link>
+            <Link
+              href="/newsletter"
+              style={{
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '13px',
+                fontWeight: 400,
+                color: 'var(--ink-3)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              Newsletter
+              <ComingSoonBadge label="Launching Soon" />
+            </Link> */}
 
-          <Link
-            href="/deals"
-            style={{
-              fontFamily: 'DM Sans, sans-serif',
-              fontSize: '13px',
-              fontWeight: 400,
-              color: 'var(--ink-3)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            Software Deals
-            <ComingSoonBadge label="Coming Soon" />
-          </Link>
-        </div>
+            <Link
+              href="mailto:deeksharai014@gmail.com?subject=Software%20Deals%20%20%3C%3E%20StartupProgram%20Site!"
+              style={{
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '13px',
+                fontWeight: 400,
+                color: 'var(--ink-3)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              Software Deals
+              <ComingSoonBadge label="Coming Soon" />
+            </Link>
+          </div>
         )}
 
         {/* Right actions — desktop */}
         {!isCompactNav && (
-        <div
-          className="nav-desktop-actions"
-          style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0, position: 'relative' }}
-        >
-          <WhatsAppLink id="nav-whatsapp-btn" />
+          <div
+            className="nav-desktop-actions"
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0, position: 'relative' }}
+          >
+            <WhatsAppLink id="nav-whatsapp-btn" />
 
-          {user ? (
-            /* ── Logged-in: Avatar / Initials + dropdown ── */
-            <div style={{ position: 'relative' }}>
-              <button
-                id="nav-avatar-btn"
-                onClick={() => setAvatarMenuOpen((o) => !o)}
-                aria-expanded={avatarMenuOpen}
-                aria-haspopup="true"
-                style={{
-                  width: '34px',
-                  height: '34px',
-                  borderRadius: '50%',
-                  border: '2px solid var(--cream-border)',
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                  background: 'var(--cream-dark)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  padding: 0,
-                }}
-              >
-                {avatarUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={avatarUrl}
-                    alt="Your avatar"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                ) : (
-                  <span
-                    style={{
-                      fontFamily: 'DM Sans, sans-serif',
-                      fontSize: '12px',
-                      fontWeight: 500,
-                      color: 'var(--ink-2)',
-                      lineHeight: 1,
-                    }}
-                  >
-                    {initials}
-                  </span>
-                )}
-              </button>
-
-              {/* Dropdown menu */}
-              {avatarMenuOpen && (
-                <>
-                  {/* Backdrop to close menu */}
-                  <div
-                    style={{ position: 'fixed', inset: 0, zIndex: 49 }}
-                    onClick={() => setAvatarMenuOpen(false)}
-                    aria-hidden="true"
-                  />
-                  <div
-                    id="nav-avatar-menu"
-                    style={{
-                      position: 'absolute',
-                      top: 'calc(100% + 8px)',
-                      right: 0,
-                      background: 'var(--white)',
-                      border: '1px solid var(--cream-border)',
-                      borderRadius: '10px',
-                      padding: '6px',
-                      minWidth: '180px',
-                      boxShadow: '0 8px 24px rgba(28,26,22,0.1)',
-                      zIndex: 50,
-                    }}
-                    role="menu"
-                  >
-                    <div
+            {user ? (
+              /* ── Logged-in: Avatar / Initials + dropdown ── */
+              <div style={{ position: 'relative' }}>
+                <button
+                  id="nav-avatar-btn"
+                  onClick={() => setAvatarMenuOpen((o) => !o)}
+                  aria-expanded={avatarMenuOpen}
+                  aria-haspopup="true"
+                  style={{
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '50%',
+                    border: '2px solid var(--cream-border)',
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    background: 'var(--cream-dark)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    padding: 0,
+                  }}
+                >
+                  {avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={avatarUrl}
+                      alt="Your avatar"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <span
                       style={{
-                        padding: '6px 10px 10px',
-                        borderBottom: '1px solid var(--cream-border)',
-                        marginBottom: '6px',
-                      }}
-                    >
-                      <p
-                        style={{
-                          fontFamily: 'DM Sans, sans-serif',
-                          fontSize: '11px',
-                          color: 'var(--ink-4)',
-                          margin: 0,
-                        }}
-                      >
-                        Signed in as
-                      </p>
-                      <p
-                        style={{
-                          fontFamily: 'DM Sans, sans-serif',
-                          fontSize: '12px',
-                          fontWeight: 500,
-                          color: 'var(--ink)',
-                          margin: 0,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          maxWidth: '160px',
-                        }}
-                      >
-                        {user.email}
-                      </p>
-                    </div>
-
-                    <Link
-                      href="/profile"
-                      onClick={() => setAvatarMenuOpen(false)}
-                      role="menuitem"
-                      style={{
-                        display: 'block',
-                        width: '100%',
-                        textAlign: 'left',
                         fontFamily: 'DM Sans, sans-serif',
-                        fontSize: '13px',
-                        color: 'var(--ink)',
-                        textDecoration: 'none',
-                        background: 'none',
-                        border: 'none',
-                        borderRadius: '6px',
-                        padding: '7px 10px',
-                        cursor: 'pointer',
-                        transition: 'background 0.12s ease',
+                        fontSize: '12px',
+                        fontWeight: 500,
+                        color: 'var(--ink-2)',
+                        lineHeight: 1,
                       }}
                     >
-                      My Profile
-                    </Link>
+                      {initials}
+                    </span>
+                  )}
+                </button>
 
-                    {isAdmin && (
+                {/* Dropdown menu */}
+                {avatarMenuOpen && (
+                  <>
+                    {/* Backdrop to close menu */}
+                    <div
+                      style={{ position: 'fixed', inset: 0, zIndex: 49 }}
+                      onClick={() => setAvatarMenuOpen(false)}
+                      aria-hidden="true"
+                    />
+                    <div
+                      id="nav-avatar-menu"
+                      style={{
+                        position: 'absolute',
+                        top: 'calc(100% + 8px)',
+                        right: 0,
+                        background: 'var(--white)',
+                        border: '1px solid var(--cream-border)',
+                        borderRadius: '10px',
+                        padding: '6px',
+                        minWidth: '180px',
+                        boxShadow: '0 8px 24px rgba(28,26,22,0.1)',
+                        zIndex: 50,
+                      }}
+                      role="menu"
+                    >
+                      <div
+                        style={{
+                          padding: '6px 10px 10px',
+                          borderBottom: '1px solid var(--cream-border)',
+                          marginBottom: '6px',
+                        }}
+                      >
+                        <p
+                          style={{
+                            fontFamily: 'DM Sans, sans-serif',
+                            fontSize: '11px',
+                            color: 'var(--ink-4)',
+                            margin: 0,
+                          }}
+                        >
+                          Signed in as
+                        </p>
+                        <p
+                          style={{
+                            fontFamily: 'DM Sans, sans-serif',
+                            fontSize: '12px',
+                            fontWeight: 500,
+                            color: 'var(--ink)',
+                            margin: 0,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            maxWidth: '160px',
+                          }}
+                        >
+                          {user.email}
+                        </p>
+                      </div>
+
                       <Link
-                        href="/admin/dashboard"
+                        href="/profile"
                         onClick={() => setAvatarMenuOpen(false)}
                         role="menuitem"
                         style={{
@@ -327,89 +306,113 @@ export function Navbar() {
                           transition: 'background 0.12s ease',
                         }}
                       >
-                        Admin Dashboard
+                        My Profile
                       </Link>
-                    )}
 
-                    <div style={{ height: '1px', background: 'var(--cream-border)', margin: '6px 0' }} />
+                      {isAdmin && (
+                        <Link
+                          href="/admin/dashboard"
+                          onClick={() => setAvatarMenuOpen(false)}
+                          role="menuitem"
+                          style={{
+                            display: 'block',
+                            width: '100%',
+                            textAlign: 'left',
+                            fontFamily: 'DM Sans, sans-serif',
+                            fontSize: '13px',
+                            color: 'var(--ink)',
+                            textDecoration: 'none',
+                            background: 'none',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '7px 10px',
+                            cursor: 'pointer',
+                            transition: 'background 0.12s ease',
+                          }}
+                        >
+                          Admin Dashboard
+                        </Link>
+                      )}
 
-                    <button
-                      id="nav-sign-out-btn"
-                      onClick={() => { setAvatarMenuOpen(false); signOut() }}
-                      role="menuitem"
-                      style={{
-                        display: 'block',
-                        width: '100%',
-                        textAlign: 'left',
-                        fontFamily: 'DM Sans, sans-serif',
-                        fontSize: '13px',
-                        color: 'var(--accent)',
-                        background: 'none',
-                        border: 'none',
-                        borderRadius: '6px',
-                        padding: '7px 10px',
-                        cursor: 'pointer',
-                        transition: 'background 0.12s ease',
-                      }}
-                    >
-                      Sign out
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          ) : (
-            /* ── Logged-out: Login only (WhatsApp is permanent above) ── */
-            <button
-              id="nav-login-btn"
-              onClick={() => openModal()}
-              style={{
-                fontFamily: 'DM Sans, sans-serif',
-                fontSize: '13px',
-                fontWeight: 400,
-                color: 'var(--ink)',
-                padding: '6px 14px',
-                border: '1px solid var(--cream-border)',
-                borderRadius: '6px',
-                background: 'transparent',
-                cursor: 'pointer',
-                transition: 'border-color 0.15s ease, background 0.15s ease',
-              }}
-            >
-              Login
-            </button>
-          )}
-        </div>
+                      <div style={{ height: '1px', background: 'var(--cream-border)', margin: '6px 0' }} />
+
+                      <button
+                        id="nav-sign-out-btn"
+                        onClick={() => { setAvatarMenuOpen(false); signOut() }}
+                        role="menuitem"
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          textAlign: 'left',
+                          fontFamily: 'DM Sans, sans-serif',
+                          fontSize: '13px',
+                          color: 'var(--accent)',
+                          background: 'none',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '7px 10px',
+                          cursor: 'pointer',
+                          transition: 'background 0.12s ease',
+                        }}
+                      >
+                        Sign out
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              /* ── Logged-out: Login only (WhatsApp is permanent above) ── */
+              <button
+                id="nav-login-btn"
+                onClick={() => openModal()}
+                style={{
+                  fontFamily: 'DM Sans, sans-serif',
+                  fontSize: '13px',
+                  fontWeight: 400,
+                  color: 'var(--ink)',
+                  padding: '6px 14px',
+                  border: '1px solid var(--cream-border)',
+                  borderRadius: '6px',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  transition: 'border-color 0.15s ease, background 0.15s ease',
+                }}
+              >
+                Login
+              </button>
+            )}
+          </div>
         )}
 
         {/* Mobile menu toggle — only on compact screens */}
         {isCompactNav && (
-        <button
-          type="button"
-          className="nav-burger"
-          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={mobileMenuOpen}
-          onClick={() => setMobileMenuOpen((o) => !o)}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            gap: '5px',
-            width: '44px',
-            height: '44px',
-            padding: '10px',
-            background: 'var(--white)',
-            border: '1px solid var(--cream-border)',
-            borderRadius: '10px',
-            cursor: 'pointer',
-            flexShrink: 0,
-            boxShadow: '0 1px 2px rgba(28,26,22,0.06)',
-          }}
-        >
-          <span style={{ display: 'block', height: '2px', background: 'var(--ink)', borderRadius: '1px', width: '100%' }} />
-          <span style={{ display: 'block', height: '2px', background: 'var(--ink)', borderRadius: '1px', width: '100%' }} />
-          <span style={{ display: 'block', height: '2px', background: 'var(--ink)', borderRadius: '1px', width: '100%' }} />
-        </button>
+          <button
+            type="button"
+            className="nav-burger"
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
+            onClick={() => setMobileMenuOpen((o) => !o)}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              gap: '5px',
+              width: '44px',
+              height: '44px',
+              padding: '10px',
+              background: 'var(--white)',
+              border: '1px solid var(--cream-border)',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              flexShrink: 0,
+              boxShadow: '0 1px 2px rgba(28,26,22,0.06)',
+            }}
+          >
+            <span style={{ display: 'block', height: '2px', background: 'var(--ink)', borderRadius: '1px', width: '100%' }} />
+            <span style={{ display: 'block', height: '2px', background: 'var(--ink)', borderRadius: '1px', width: '100%' }} />
+            <span style={{ display: 'block', height: '2px', background: 'var(--ink)', borderRadius: '1px', width: '100%' }} />
+          </button>
         )}
       </nav>
 
@@ -456,9 +459,9 @@ export function Navbar() {
               </button>
             </div>
             <Link href="/" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', fontWeight: isActive('/') ? 500 : 400, color: isActive('/') ? 'var(--ink)' : 'var(--ink-2)', padding: '10px 0', borderBottom: '1px solid var(--cream-border)' }}>Grants &amp; Funding</Link>
-            <Link href="/events" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Events <ComingSoonBadge label="Launching Soon" /></Link>
-            <Link href="/newsletter" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Newsletter <ComingSoonBadge label="Launching Soon" /></Link>
-            <Link href="/deals" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Software Deals <ComingSoonBadge label="Coming Soon" /></Link>
+            {/* <Link href="/events" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Events <ComingSoonBadge label="Launching Soon" /></Link>
+            <Link href="/newsletter" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Newsletter <ComingSoonBadge label="Launching Soon" /></Link> */}
+            <Link href="mailto:deeksharai014@gmail.com?subject=Software%20Deals%20%20%3C%3E%20StartupProgram%20Site!" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Software Deals <ComingSoonBadge label="Coming Soon" /></Link>
             <WhatsAppLink
               onClick={() => setMobileMenuOpen(false)}
               style={{ marginTop: '8px' }}

@@ -45,7 +45,7 @@ export function Footer() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
               <WhatsAppLink />
               <Link
-                href="https://linkedin.com"
+                href="https://linkedin.com/in/deekshavow"
                 target="_blank"
                 style={{
                   display: 'flex',
@@ -64,7 +64,7 @@ export function Footer() {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg>
               </Link>
               <Link
-                href="mailto:hello@startupgrantsindia.com"
+                href="mailto:deeksharai014@gmail.com"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -85,7 +85,7 @@ export function Footer() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <Link href="/contact" style={linkStyle}>Contact Us</Link>
-              <Link href="/advertise" style={linkStyle}>Partner With Us</Link>
+              <Link href="mailto:deeksharai014@gmail.com?subject=Partner%20with%20Us%20%3C%3E%20StartupProgram%20Site!" style={linkStyle}>Partner With Us</Link>
             </div>
           </div>
 
@@ -94,9 +94,9 @@ export function Footer() {
             <h4 style={headerStyle}>FOR FOUNDERS</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <Link href="/" style={linkStyle}>Browse Grants</Link>
-              <Link href="/newsletter" style={linkStyle}>Newsletter</Link>
-              <Link href="/events" style={linkStyle}>Startup Events</Link>
-              <Link href="/deals" style={linkStyle}>Software Deals</Link>
+              {/* <Link href="/newsletter" style={linkStyle}>Newsletter</Link>
+              <Link href="/events" style={linkStyle}>Startup Events</Link> */}
+              <Link href="mailto:deeksharai014@gmail.com?subject=Software%20Deals%20%20%3C%3E%20StartupProgram%20Site!" style={linkStyle}>Software Deals</Link>
             </div>
           </div>
 
@@ -104,10 +104,10 @@ export function Footer() {
           <div>
             <h4 style={headerStyle}>FOR PARTNERS</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <Link href="/advertise" style={linkStyle}>Advertise With Us</Link>
-              <Link href="/submit-program" style={linkStyle}>Submit a Program</Link>
-              <Link href="/deals" style={linkStyle}>Submit a Software Deal</Link>
-              <Link href="/events" style={linkStyle}>Submit an Event</Link>
+              <Link href="mailto:deeksharai014@gmail.com?subject=Advertise%20with%20Us%20%3C%3E%20StartupProgram%20Site!" style={linkStyle}>Advertise With Us</Link>
+              <Link href="mailto:deeksharai014@gmail.com?subject=Submit%20a%20Program%20%3C%3E%20StartupProgram%20Site!" style={linkStyle}>Submit a Program</Link>
+              <Link href="mailto:deeksharai014@gmail.com?subject=Software%20Deals%20%20%3C%3E%20StartupProgram%20Site!" style={linkStyle}>Submit a Software Deal</Link>
+              {/* <Link href="/events" style={linkStyle}>Submit an Event</Link> */}
             </div>
           </div>
 

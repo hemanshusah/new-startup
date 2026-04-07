@@ -12,6 +12,7 @@ import React, {
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
+import { getSiteUrl } from '@/lib/site-url'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -68,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for sign in / sign out events
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event: string, session: any) => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
     })
 
@@ -78,34 +79,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ── Fetch Profile when User changes ─────────────────────────────────────────
   useEffect(() => {
     if (!user) {
-      setProfile(null)
-      return
+      const timer = setTimeout(() => setProfile(null), 0)
+      return () => clearTimeout(timer)
     }
 
     const fetchProfile = async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
-
-      if (!error && data) {
-        setProfile(data)
-      }
+      const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+      if (data) setProfile(data)
     }
-
     fetchProfile()
   }, [user, supabase])
 
-  // ── Check if the URL contains ?redirect= (middleware set it) ──────────────
-  // If the listing page was loaded after a protected route redirect, auto-open the modal
+  // ── Handle redirect param ───────────────────────────────────────────────────
   useEffect(() => {
-    if (typeof window === 'undefined') return
     const params = new URLSearchParams(window.location.search)
     const redir = params.get('redirect')
     if (redir && !user) {
-      setRedirectTo(redir)
-      setIsModalOpen(true)
+      const timer = setTimeout(() => {
+        setRedirectTo(redir)
+        setIsModalOpen(true)
+      }, 0)
+      return () => clearTimeout(timer)
     }
   }, [user])
 
