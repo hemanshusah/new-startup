@@ -1,30 +1,43 @@
-import { createClient } from '@/lib/supabase/server'
-import { SettingsForm } from '@/components/admin/SettingsForm'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { SettingsForm, type FieldConfig } from '@/components/admin/SettingsForm'
+import { SECTOR_DEFAULTS, normalizeSectorsFromDb } from '@/lib/site-field-schema'
+
+async function loadOrCreateSiteConfigRow() {
+  const supabase = await createClient()
+  const { data: rows } = await supabase
+    .from('site_config')
+    .select('id, field_schema, sectors')
+    .limit(1)
+
+  let row = rows?.[0]
+  if (row) return row
+
+  const service = createServiceClient()
+  const { data: inserted, error } = await service
+    .from('site_config')
+    .insert({
+      site_name: 'GrantsIndia',
+      programs_per_page: 12,
+      si_slot_positions: [6, 14, 20],
+      maintenance_mode: false,
+      field_schema: {},
+      sectors: SECTOR_DEFAULTS,
+    })
+    .select('id, field_schema, sectors')
+    .limit(1)
+    .maybeSingle()
+
+  if (!error && inserted) return inserted
+
+  const { data: retry } = await supabase.from('site_config').select('id, field_schema, sectors').limit(1)
+  return retry?.[0] ?? null
+}
 
 export default async function AdminSettingsPage() {
-  const supabase = await createClient()
+  const row = await loadOrCreateSiteConfigRow()
 
-  // Load field schema config and sectors from site_config
-  const { data: configs } = await supabase
-    .from('site_config')
-    .select('key, value')
-    .in('key', ['field_schema', 'sectors'])
-
-  const configMap: Record<string, string> = {}
-  for (const c of configs ?? []) configMap[c.key] = c.value
-
-  const fieldConfig = configMap['field_schema']
-    ? JSON.parse(configMap['field_schema'])
-    : {}
-
-  const sectors = configMap['sectors']
-    ? JSON.parse(configMap['sectors'])
-    : [
-        'AgriTech', 'AI / ML', 'CleanTech', 'Climate Tech', 'Deep Tech', 'EdTech',
-        'Fintech', 'HealthTech', 'HRTech', 'IoT', 'LegalTech', 'Logistics', 'Manufacturing',
-        'Media & Entertainment', 'MedTech', 'PropTech', 'RetailTech', 'SaaS', 'SpaceTech',
-        'Sustainability', 'WaterTech', 'Women-led',
-      ]
+  const fieldConfig = (row?.field_schema as Record<string, FieldConfig> | null) ?? {}
+  const sectors = normalizeSectorsFromDb(row?.sectors)
 
   return (
     <div>
@@ -34,7 +47,11 @@ export default async function AdminSettingsPage() {
           Manage field schema, sector tags, and cache controls.
         </p>
       </div>
-      <SettingsForm initialFieldConfig={fieldConfig} initialSectors={sectors} />
+      <SettingsForm
+        settingsRowId={row?.id ?? null}
+        initialFieldConfig={fieldConfig}
+        initialSectors={sectors}
+      />
     </div>
   )
 }

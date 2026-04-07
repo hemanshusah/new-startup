@@ -37,6 +37,7 @@ export function FilterBar({
 }: FilterBarProps) {
   return (
     <div
+      className="filter-bar-row"
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -84,7 +85,7 @@ export function FilterBar({
       </div>
 
       {/* ── Search input (Pill shape) ── */}
-      <div style={{ position: 'relative', flexShrink: 0 }}>
+      <div className="filter-bar-search" style={{ position: 'relative', flexShrink: 0, minWidth: 0 }}>
         <span
           style={{
             position: 'absolute',
@@ -112,7 +113,8 @@ export function FilterBar({
             border: '1px solid var(--cream-border)',
             borderRadius: '20px', // Pill shape
             padding: '7px 12px 7px 32px', // Extra left padding for icon
-            width: '260px',
+            width: '100%',
+            maxWidth: '260px',
             outline: 'none',
           }}
           aria-label="Search programs"
@@ -121,6 +123,7 @@ export function FilterBar({
 
       {/* ── Type filter tabs ── */}
       <div
+        className="filter-bar-types"
         style={{
           display: 'flex',
           alignItems: 'center',

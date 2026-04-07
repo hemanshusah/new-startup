@@ -1,47 +1,43 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { revalidateAdminPath } from '@/app/admin/actions'
+import {
+  PROGRAM_FORM_FIELDS,
+  SECTOR_DEFAULTS,
+  mergeFieldSchema,
+  type FieldConfig,
+} from '@/lib/site-field-schema'
 
-const FIELDS = [
-  { key: 'description_short', label: 'Short description' },
-  { key: 'about', label: 'About the program' },
-  { key: 'what_you_get', label: 'What you get' },
-  { key: 'eligibility', label: 'Eligibility criteria' },
-  { key: 'how_to_apply', label: 'How to apply' },
-  { key: 'mode', label: 'Mode' },
-  { key: 'stage', label: 'Stage' },
-  { key: 'duration', label: 'Duration' },
-  { key: 'cohort_size', label: 'Cohort size' },
-  { key: 'equity', label: 'Equity' },
-  { key: 'amount_min', label: 'Amount (min)' },
-  { key: 'amount_max', label: 'Amount (max)' },
-  { key: 'amount_display', label: 'Amount display string' },
-  { key: 'state', label: 'Indian state' },
-  { key: 'sectors', label: 'Focus sectors' },
-  { key: 'apply_url', label: 'Apply URL' },
-  { key: 'is_featured', label: 'Is featured' },
-]
+export type { FieldConfig }
 
-const SECTOR_DEFAULTS = [
-  'AgriTech', 'AI / ML', 'CleanTech', 'Climate Tech', 'Deep Tech', 'EdTech',
-  'Fintech', 'HealthTech', 'HRTech', 'IoT', 'LegalTech', 'Logistics', 'Manufacturing',
-  'Media & Entertainment', 'MedTech', 'PropTech', 'RetailTech', 'SaaS', 'SpaceTech',
-  'Sustainability', 'WaterTech', 'Women-led',
-]
-
-type FieldConfig = 'required' | 'optional' | 'hidden'
+/** PostgREST: columns missing from DB / stale schema cache */
+function formatSiteConfigError(err: { code?: string; message?: string }): string {
+  const msg = err.message ?? ''
+  if (err.code === 'PGRST204' && (msg.includes('field_schema') || msg.includes('sectors'))) {
+    return 'Your Supabase database is missing columns field_schema and/or sectors. Run the SQL in grantsindia/supabase/migrations/007_site_config_add_field_schema_sectors.sql in the Supabase SQL Editor, then open Project Settings → Data API and reload the schema (or wait ~1 minute).'
+  }
+  return msg || 'Save failed.'
+}
 
 interface SettingsFormProps {
+  settingsRowId: string | null
   initialFieldConfig: Record<string, FieldConfig>
   initialSectors: string[]
 }
 
-export function SettingsForm({ initialFieldConfig, initialSectors }: SettingsFormProps) {
+export function SettingsForm({ settingsRowId, initialFieldConfig, initialSectors }: SettingsFormProps) {
   const supabase = createClient()
-  const [fieldConfig, setFieldConfig] = useState<Record<string, FieldConfig>>(initialFieldConfig)
+  const [rowId, setRowId] = useState<string | null>(settingsRowId)
+  const [fieldConfig, setFieldConfig] = useState<Record<string, FieldConfig>>(() =>
+    mergeFieldSchema(initialFieldConfig)
+  )
   const [sectors, setSectors] = useState<string[]>(initialSectors)
+
+  useEffect(() => {
+    setRowId(settingsRowId)
+  }, [settingsRowId])
   const [newSector, setNewSector] = useState('')
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null)
   const [saving, setSaving] = useState(false)
@@ -51,18 +47,70 @@ export function SettingsForm({ initialFieldConfig, initialSectors }: SettingsFor
     setTimeout(() => setToast(null), 4000)
   }
 
+  const ensureRowInsert = async (): Promise<{ id: string | null; err?: { code?: string; message?: string } }> => {
+    const { data, error } = await supabase
+      .from('site_config')
+      .insert({
+        site_name: 'GrantsIndia',
+        programs_per_page: 12,
+        si_slot_positions: [6, 14, 20],
+        maintenance_mode: false,
+        field_schema: fieldConfig,
+        sectors,
+      })
+      .select('id')
+      .single()
+    if (error) {
+      console.error('[settings] insert site_config', error)
+      return { id: null, err: error }
+    }
+    return { id: data?.id ?? null }
+  }
+
   const saveFieldConfig = async () => {
     setSaving(true)
-    const { error } = await supabase.from('site_config').upsert({ key: 'field_schema', value: JSON.stringify(fieldConfig) }, { onConflict: 'key' })
+    let id = rowId
+    if (!id) {
+      const { id: newId, err } = await ensureRowInsert()
+      if (err) {
+        setSaving(false)
+        showToast(formatSiteConfigError(err), false)
+        return
+      }
+      if (newId) setRowId(newId)
+      id = newId
+    }
+    if (!id) {
+      setSaving(false)
+      showToast('Could not create site_config. Set SUPABASE_SERVICE_ROLE_KEY for server-side seed or run migration 007.', false)
+      return
+    }
+    const { error } = await supabase.from('site_config').update({ field_schema: fieldConfig }).eq('id', id)
     setSaving(false)
-    error ? showToast('Save failed.', false) : showToast('Field schema saved.')
+    error ? showToast(formatSiteConfigError(error), false) : showToast('Field schema saved.')
   }
 
   const saveSectors = async () => {
     setSaving(true)
-    const { error } = await supabase.from('site_config').upsert({ key: 'sectors', value: JSON.stringify(sectors) }, { onConflict: 'key' })
+    let id = rowId
+    if (!id) {
+      const { id: newId, err } = await ensureRowInsert()
+      if (err) {
+        setSaving(false)
+        showToast(formatSiteConfigError(err), false)
+        return
+      }
+      if (newId) setRowId(newId)
+      id = newId
+    }
+    if (!id) {
+      setSaving(false)
+      showToast('Could not create site_config. Set SUPABASE_SERVICE_ROLE_KEY or run migration 007.', false)
+      return
+    }
+    const { error } = await supabase.from('site_config').update({ sectors }).eq('id', id)
     setSaving(false)
-    error ? showToast('Save failed.', false) : showToast('Sector tags saved.')
+    error ? showToast(formatSiteConfigError(error), false) : showToast('Sector tags saved.')
   }
 
   const addSector = () => {
@@ -105,7 +153,7 @@ export function SettingsForm({ initialFieldConfig, initialSectors }: SettingsFor
             </tr>
           </thead>
           <tbody>
-            {FIELDS.map((f) => (
+            {PROGRAM_FORM_FIELDS.map((f) => (
               <tr key={f.key} style={{ borderTop: '1px solid var(--cream-border)' }}>
                 <td style={{ padding: '10px 12px', fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink)' }}>{f.label}</td>
                 {(['required', 'optional', 'hidden'] as const).map((opt) => (

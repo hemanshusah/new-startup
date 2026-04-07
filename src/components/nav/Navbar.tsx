@@ -2,9 +2,26 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect, useSyncExternalStore } from 'react'
 import { ComingSoonBadge } from './ComingSoonBadge'
+import { WhatsAppLink } from './WhatsAppLink'
 import { useAuth } from '../auth/AuthProvider'
+
+const COMPACT_NAV_MQ = '(max-width: 1024px)'
+
+function subscribeCompactNav(callback: () => void) {
+  const mq = window.matchMedia(COMPACT_NAV_MQ)
+  mq.addEventListener('change', callback)
+  return () => mq.removeEventListener('change', callback)
+}
+
+function getCompactNavSnapshot() {
+  return window.matchMedia(COMPACT_NAV_MQ).matches
+}
+
+function getCompactNavServerSnapshot() {
+  return false
+}
 
 /** Returns up to 2 initials from a name or email */
 function getInitials(user: { email?: string; user_metadata?: { full_name?: string } }) {
@@ -23,11 +40,31 @@ export function Navbar() {
   const pathname = usePathname()
   const { user, profile, openModal, signOut } = useAuth()
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const isCompactNav = useSyncExternalStore(
+    subscribeCompactNav,
+    getCompactNavSnapshot,
+    getCompactNavServerSnapshot
+  )
 
   const isActive = (href: string) => pathname === href
   const avatarUrl = profile?.avatar_url || (user?.user_metadata?.avatar_url as string | undefined)
   const initials = user ? getInitials(user) : ''
   const isAdmin = profile?.role === 'admin'
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      const prev = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = prev
+      }
+    }
+  }, [mobileMenuOpen])
+
+  useEffect(() => {
+    if (!isCompactNav && mobileMenuOpen) setMobileMenuOpen(false)
+  }, [isCompactNav, mobileMenuOpen])
 
   return (
     <header
@@ -40,20 +77,22 @@ export function Navbar() {
       }}
     >
       <nav
+        className="navbar-shell"
         style={{
           maxWidth: '1280px',
           margin: '0 auto',
-          padding: '0 24px',
-          height: '56px',
+          padding: isCompactNav ? '0 16px' : '0 24px',
+          minHeight: '56px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: '24px',
+          gap: '16px',
         }}
       >
         {/* Logo */}
         <Link
           href="/"
+          onClick={() => setMobileMenuOpen(false)}
           style={{
             fontFamily: 'DM Serif Display, serif',
             fontSize: '20px',
@@ -66,8 +105,9 @@ export function Navbar() {
           <span style={{ color: 'var(--accent)' }}>India</span>
         </Link>
 
-        {/* Nav links */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1 }}>
+        {/* Nav links — desktop (hidden on compact: burger + drawer instead) */}
+        {!isCompactNav && (
+        <div className="nav-desktop-links" style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1 }}>
           <Link
             href="/"
             style={{
@@ -129,38 +169,15 @@ export function Navbar() {
             <ComingSoonBadge label="Coming Soon" />
           </Link>
         </div>
+        )}
 
-        {/* Right actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0, position: 'relative' }}>
-          {/* Permanent WhatsApp Community Button */}
-          <Link
-            href="https://chat.whatsapp.com/L9zR9g0GpLSFRTzQ5Ybcru"
-            target="_blank"
-            rel="noopener noreferrer"
-            id="nav-whatsapp-btn"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              background: '#fff',
-              border: '1px solid var(--cream-border)',
-              borderRadius: '100px',
-              padding: '6px 14px',
-              textDecoration: 'none',
-              color: 'var(--ink-2)',
-              fontFamily: 'DM Sans, sans-serif',
-              fontSize: '12px',
-              fontWeight: 500,
-              transition: 'all 0.15s ease'
-            }}
-            onMouseOver={(e) => (e.currentTarget.style.borderColor = 'var(--accent)')}
-            onMouseOut={(e) => (e.currentTarget.style.borderColor = 'var(--cream-border)')}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-            </svg>
-            WhatsApp
-          </Link>
+        {/* Right actions — desktop */}
+        {!isCompactNav && (
+        <div
+          className="nav-desktop-actions"
+          style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0, position: 'relative' }}
+        >
+          <WhatsAppLink id="nav-whatsapp-btn" />
 
           {user ? (
             /* ── Logged-in: Avatar / Initials + dropdown ── */
@@ -363,7 +380,133 @@ export function Navbar() {
             </button>
           )}
         </div>
+        )}
+
+        {/* Mobile menu toggle — only on compact screens */}
+        {isCompactNav && (
+        <button
+          type="button"
+          className="nav-burger"
+          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={mobileMenuOpen}
+          onClick={() => setMobileMenuOpen((o) => !o)}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            gap: '5px',
+            width: '44px',
+            height: '44px',
+            padding: '10px',
+            background: 'var(--white)',
+            border: '1px solid var(--cream-border)',
+            borderRadius: '10px',
+            cursor: 'pointer',
+            flexShrink: 0,
+            boxShadow: '0 1px 2px rgba(28,26,22,0.06)',
+          }}
+        >
+          <span style={{ display: 'block', height: '2px', background: 'var(--ink)', borderRadius: '1px', width: '100%' }} />
+          <span style={{ display: 'block', height: '2px', background: 'var(--ink)', borderRadius: '1px', width: '100%' }} />
+          <span style={{ display: 'block', height: '2px', background: 'var(--ink)', borderRadius: '1px', width: '100%' }} />
+        </button>
+        )}
       </nav>
+
+      {/* Mobile drawer */}
+      {isCompactNav && mobileMenuOpen && (
+        <>
+          <div
+            className="nav-mobile-backdrop"
+            style={{ position: 'fixed', inset: 0, background: 'rgba(28,26,22,0.35)', zIndex: 60 }}
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden
+          />
+          <div
+            className="nav-mobile-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Main navigation"
+            style={{
+              position: 'fixed',
+              top: 0,
+              right: 0,
+              width: 'min(320px, 92vw)',
+              height: '100vh',
+              background: 'var(--white)',
+              borderLeft: '1px solid var(--cream-border)',
+              zIndex: 70,
+              padding: '20px 18px 28px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px',
+              overflowY: 'auto',
+              boxShadow: '-8px 0 32px rgba(0,0,0,0.08)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12px', fontWeight: 600, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Menu</span>
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close menu"
+                style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '22px', lineHeight: 1, color: 'var(--ink-3)', padding: '4px 8px', background: 'none', border: 'none', cursor: 'pointer' }}
+              >
+                ×
+              </button>
+            </div>
+            <Link href="/" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', fontWeight: isActive('/') ? 500 : 400, color: isActive('/') ? 'var(--ink)' : 'var(--ink-2)', padding: '10px 0', borderBottom: '1px solid var(--cream-border)' }}>Grants &amp; Funding</Link>
+            <Link href="/events" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Events <ComingSoonBadge label="Launching Soon" /></Link>
+            <Link href="/newsletter" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Newsletter <ComingSoonBadge label="Launching Soon" /></Link>
+            <Link href="/deals" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Software Deals <ComingSoonBadge label="Coming Soon" /></Link>
+            <WhatsAppLink
+              onClick={() => setMobileMenuOpen(false)}
+              style={{ marginTop: '8px' }}
+            />
+            <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid var(--cream-border)' }}>
+              {user ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <Link href="/profile" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>My Profile</Link>
+                  {isAdmin && (
+                    <Link href="/admin/dashboard" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>Admin Dashboard</Link>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false)
+                      signOut()
+                    }}
+                    style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', color: 'var(--accent)', textAlign: 'left', padding: '8px 0', background: 'none', border: 'none', cursor: 'pointer' }}
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    openModal()
+                  }}
+                  style={{
+                    width: '100%',
+                    fontFamily: 'DM Sans, sans-serif',
+                    fontSize: '14px',
+                    padding: '10px 14px',
+                    border: '1px solid var(--cream-border)',
+                    borderRadius: '8px',
+                    background: 'var(--ink)',
+                    color: 'var(--cream)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Login
+                </button>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </header>
   )
 }
