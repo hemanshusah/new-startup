@@ -116,10 +116,55 @@ button {
   }
 }
 
-/* Mobile: ≤ 640px → 1 column */
-@media (max-width: 640px) {
+/* Mobile: ≤ 767px → 1 column (covers all phones + small tablets in portrait) */
+@media (max-width: 767px) {
   #grants-grid {
     grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   MOBILE — General listing + card improvements
+   ============================================================ */
+
+@media (max-width: 767px) {
+  /* Tighter card padding so single-column cards don't waste vertical space */
+  .grant-card {
+    padding: 20px 18px 18px !important;
+    min-height: 0 !important;
+  }
+
+  /* Boost card title legibility on small screens */
+  .grant-card h3 {
+    font-size: 16px !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Listing page outer wrapper: less aggressive top/bottom padding */
+  .listing-wrap {
+    padding-top: 28px !important;
+    padding-bottom: 48px !important;
+  }
+
+  /* Page H1 on listing stays legible (clamp already handles it; this is belt-and-braces) */
+  .listing-wrap h1 {
+    max-width: 100% !important;
+  }
+
+  /* Footer: reduce top padding */
+  footer {
+    padding-top: 48px !important;
+  }
+
+  /* Footer bottom bar — stack on very narrow screens */
+  .footer-bottom-bar {
+    flex-direction: column !important;
+    gap: 14px !important;
+    align-items: flex-start !important;
+  }
+
+  .footer-disclaimer-badge {
+    font-size: 10px !important;
   }
 }
 

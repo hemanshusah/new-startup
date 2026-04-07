@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     'Discover government and private sector grants, incubation programs, accelerators, and contests for Indian founders. Updated weekly.',
 }
 
-import { Footer } from '@/components/nav/Footer'
+import { FooterWrapper } from '@/components/nav/FooterWrapper'
 
 export default function RootLayout({
   children,
@@ -46,8 +46,7 @@ export default function RootLayout({
           <PageTransition>
             <main style={{ flex: 1 }}>{children}</main>
           </PageTransition>
-          {/* Footer added globally */}
-          <Footer />
+          <FooterWrapper />
           <AuthModal />
         </AuthProvider>
         <Analytics />
