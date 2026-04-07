@@ -63,7 +63,10 @@ export function Navbar() {
   }, [mobileMenuOpen])
 
   useEffect(() => {
-    if (!isCompactNav && mobileMenuOpen) setMobileMenuOpen(false)
+    if (!isCompactNav && mobileMenuOpen) {
+      const timer = setTimeout(() => setMobileMenuOpen(false), 0)
+      return () => clearTimeout(timer)
+    }
   }, [isCompactNav, mobileMenuOpen])
 
   return (

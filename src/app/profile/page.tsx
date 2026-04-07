@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { ProfileView } from '@/components/profile/ProfileView'
+import { ProfileView, type HistoryItem } from '@/components/profile/ProfileView'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,6 +8,7 @@ export default async function ProfilePage() {
   const supabase = await createClient()
 
   // 1. Get Session
+  // eslint-disable-next-line react-hooks/purity
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     redirect('/?redirect=/profile')
@@ -47,9 +48,9 @@ export default async function ProfilePage() {
   // 4. Flatten and Filter for Unique Programs
   const seen = new Set<string>()
   const history = (historyData || [])
-    .map((h: any) => ({
-      viewed_at: h.viewed_at as string,
-      program: h.programs as any
+    .map((h: { viewed_at: string; programs: any }) => ({
+      viewed_at: h.viewed_at,
+      program: h.programs as HistoryItem['program']
     }))
     .filter((h) => {
       if (!h.program || seen.has(h.program.id)) return false

@@ -2,8 +2,8 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { StatCard } from '@/components/admin/StatCard'
 
-function relativeTime(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime()
+function relativeTime(dateStr: string, now: number): string {
+  const diff = now - new Date(dateStr).getTime()
   const mins = Math.floor(diff / 60000)
   if (mins < 60) return `${mins}m ago`
   const hrs = Math.floor(mins / 60)
@@ -21,9 +21,11 @@ const ACTION_COLORS: Record<string, string> = {
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
-  const today = new Date().toISOString().split('T')[0]
-  const sevenDaysLater = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0]
-  const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString()
+  // eslint-disable-next-line react-hooks/purity
+  const now = Date.now()
+  const today = new Date(now).toISOString().split('T')[0]
+  const sevenDaysLater = new Date(now + 7 * 86400000).toISOString().split('T')[0]
+  const sevenDaysAgo = new Date(now - 7 * 86400000).toISOString()
 
   // ── Metric queries (parallel) ──────────────────────────────────────
   const [
@@ -317,7 +319,7 @@ export default async function AdminDashboard() {
                         margin: 0,
                       }}
                     >
-                      {relativeTime(entry.changed_at)}
+                      {relativeTime(entry.changed_at, now)}
                     </p>
                   </div>
                 </li>
