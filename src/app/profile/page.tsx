@@ -45,13 +45,13 @@ export default async function ProfilePage() {
     .limit(30) // Get more to filter for unique program_ids
 
   // 4. Flatten and Filter for Unique Programs
-  const seen = new Set()
+  const seen = new Set<string>()
   const history = (historyData || [])
     .map((h: any) => ({
-      viewed_at: h.viewed_at,
-      program: h.programs
+      viewed_at: h.viewed_at as string,
+      program: h.programs as any
     }))
-    .filter((h: any) => {
+    .filter((h) => {
       if (!h.program || seen.has(h.program.id)) return false
       seen.add(h.program.id)
       return true

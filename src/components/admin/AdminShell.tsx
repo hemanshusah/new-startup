@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/components/auth/AuthProvider'
-import { useRef, useState, useEffect } from 'react'
+import { useMemo, useRef, useState, useEffect } from 'react'
 import { PageTransition } from '@/components/ui/PageTransition'
 
 const NAV_ITEMS = [
@@ -73,7 +73,7 @@ interface AdminShellProps {
 export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const supabase = useRef(createClient()).current
+  const supabase = useMemo(() => createClient(), [])
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
   useEffect(() => {
@@ -306,7 +306,7 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
                 Restricted Access
               </p>
               <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12px', color: '#B01F1F', margin: '2px 0 0', opacity: 0.8 }}>
-                Your account ({adminEmail}) is logged in, but might not have "admin" privileges in the database. some actions may fail.
+                Your account ({adminEmail}) is logged in, but might not have &quot;admin&quot; privileges in the database. some actions may fail.
               </p>
             </div>
           </div>

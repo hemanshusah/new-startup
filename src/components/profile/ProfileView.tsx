@@ -33,7 +33,7 @@ interface HistoryItem {
   }
 }
 
-export function ProfileView({ profile: initialProfile, history }: { profile: any; history: any[] }) {
+export function ProfileView({ profile: initialProfile, history }: { profile: Profile; history: HistoryItem[] }) {
   const supabase = createClient()
   const [profile, setProfile] = useState<Profile>(initialProfile)
   const [isEditing, setIsEditing] = useState(false)

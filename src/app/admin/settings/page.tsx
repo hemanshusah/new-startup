@@ -9,7 +9,7 @@ async function loadOrCreateSiteConfigRow() {
     .select('id, field_schema, sectors')
     .limit(1)
 
-  let row = rows?.[0]
+  const row = rows?.[0]
   if (row) return row
 
   const service = createServiceClient()
