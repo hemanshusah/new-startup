@@ -55,6 +55,7 @@ export default async function ListingPage() {
 
   return (
     <div
+      className="listing-wrap"
       style={{
         maxWidth: '1280px',
         margin: '0 auto',

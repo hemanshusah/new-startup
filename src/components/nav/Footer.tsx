@@ -9,7 +9,7 @@ export function Footer() {
       background: 'var(--cream)',
       borderTop: '1px solid var(--cream-border)',
       padding: '80px 24px 40px',
-      marginTop: 'auto'
+      marginTop: 'auto',
     }}>
       <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
         <div className="footer-grid" style={{
@@ -122,35 +122,41 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingTop: '32px',
-          borderTop: '1px solid var(--cream-border)'
-        }}>
+        <div
+          className="footer-bottom-bar"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingTop: '32px',
+            borderTop: '1px solid var(--cream-border)',
+          }}
+        >
           <p style={{
             fontFamily: 'SF Mono, Fira Code, monospace',
             fontSize: '11px',
             color: 'var(--ink-4)',
-            textTransform: 'lowercase'
+            textTransform: 'lowercase',
           }}>
             © 2026 Poodnak Private Limited. All rights reserved.
           </p>
 
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '8px 16px',
-            background: '#FFF9ED',
-            border: '1px solid #FFBE46',
-            borderRadius: '100px',
-            color: '#D4820E',
-            fontSize: '11px',
-            fontFamily: 'DM Sans, sans-serif'
-          }}>
-            <span style={{ width: '6px', height: '6px', background: '#D4820E', borderRadius: '50%' }} />
+          <div
+            className="footer-disclaimer-badge"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 16px',
+              background: '#FFF9ED',
+              border: '1px solid #FFBE46',
+              borderRadius: '100px',
+              color: '#D4820E',
+              fontSize: '11px',
+              fontFamily: 'DM Sans, sans-serif',
+            }}
+          >
+            <span style={{ width: '6px', height: '6px', background: '#D4820E', borderRadius: '50%', flexShrink: 0 }} />
             We are a private platform. Not affiliated with any government body
           </div>
         </div>
