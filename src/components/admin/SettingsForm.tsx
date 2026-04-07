@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { revalidateAdminPath } from '@/app/admin/actions'
 
 const FIELDS = [
   { key: 'description_short', label: 'Short description' },
@@ -72,10 +73,9 @@ export function SettingsForm({ initialFieldConfig, initialSectors }: SettingsFor
   }
 
   const revalidate = async (path: string) => {
-    const secret = process.env.NEXT_PUBLIC_REVALIDATE_SECRET ?? ''
-    const res = await fetch(`/api/revalidate?path=${encodeURIComponent(path)}&secret=${secret}`)
+    const res = await revalidateAdminPath(path)
     if (res.ok) showToast(`Revalidated ${path}`)
-    else showToast('Revalidation failed.', false)
+    else showToast(res.error ?? 'Revalidation failed.', false)
   }
 
   const sectionHead = (title: string) => (

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { ProgramListItem } from '@/types/program'
 import { GrantsGrid } from '@/components/listing/GrantsGrid'
 import { getSIForSlots } from '@/lib/softinfra'
+import { getSiteUrl } from '@/lib/site-url'
 
 // ISR: revalidate every 5 minutes (CONTEXT.md §11)
 export const revalidate = 300
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
     images: ['/og-default.png'],
   },
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://grantsindia.com'}/`,
+    canonical: `${getSiteUrl()}/`,
   },
 }
 
