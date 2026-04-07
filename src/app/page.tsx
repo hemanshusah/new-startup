@@ -106,7 +106,7 @@ export default async function ListingPage() {
             maxWidth: '520px',
           }}
         >
-          Curated government and private sector opportunities — updated weekly so you
+          Curated government and private sector opportunities updated weekly so you
           never miss a deadline.
         </p>
       </header>
