@@ -8,7 +8,7 @@ import { useAuth } from './AuthProvider'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type View = 'signin' | 'signup' | 'forgot'
+type View = 'signin' | 'signup' | 'forgot' | 'verify'
 
 // ─── Google SVG Icon ──────────────────────────────────────────────────────────
 
@@ -70,6 +70,7 @@ export function AuthModal() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [fullName, setFullName] = useState('')
+  const [otp, setOtp] = useState('')
 
   // Reset state when view changes
   const switchView = (v: View) => {
@@ -78,6 +79,7 @@ export function AuthModal() {
     setSuccess(null)
     setPassword('')
     setConfirmPassword('')
+    setOtp('')
   }
 
   // Close on Escape key
@@ -141,7 +143,8 @@ export function AuthModal() {
         setError(result.error || 'Sign up failed')
       } else {
         if (result.confirmationRequired) {
-          setSuccess('Check your email for a confirmation link!')
+          switchView('verify')
+          setSuccess('A 6-digit code has been sent to your email.')
         } else {
           // Auto-login after successful registration
           await handleSignIn(e)
@@ -149,6 +152,51 @@ export function AuthModal() {
       }
     } catch (err) {
       setError('Sign up failed. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // ── Verify OTP ───────────────────────────────────────────────────────────
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    setSuccess(null)
+
+    try {
+      const { verifyOtp } = await import('./auth-verify')
+      const result = await verifyOtp(email, otp)
+      
+      if (!result.success) {
+        setError(result.error || 'Verification failed')
+      } else {
+        handleSuccess()
+      }
+    } catch (err) {
+      setError('Verification failed. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // ── Resend OTP ───────────────────────────────────────────────────────────
+  const handleResendOtp = async () => {
+    setLoading(true)
+    setError(null)
+    setSuccess(null)
+
+    try {
+      const { resendOtp } = await import('./auth-verify')
+      const result = await resendOtp(email)
+      
+      if (!result.success) {
+        setError(result.error || 'Failed to resend code')
+      } else {
+        setSuccess('A new 6-digit code has been sent to your email.')
+      }
+    } catch (err) {
+      setError('Failed to resend. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -653,6 +701,131 @@ export function AuthModal() {
                 }}
               >
                 Already have an account? Sign in
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* ── Verify View ─────────────────────────────── */}
+        {view === 'verify' && (
+          <>
+            <h2
+              id="auth-modal-title"
+              style={{
+                fontFamily: 'DM Serif Display, serif',
+                fontSize: '20px',
+                fontWeight: 400,
+                color: 'var(--ink)',
+                marginBottom: '4px',
+              }}
+            >
+              Verify your email
+            </h2>
+            <p
+              style={{
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '13px',
+                color: 'var(--ink-3)',
+                marginBottom: '24px',
+              }}
+            >
+              Enter the 6-digit code we sent to <strong>{email}</strong>
+            </p>
+
+            {success && (
+              <div
+                style={{
+                  background: '#EDF5EA',
+                  border: '1px solid #A8D4A0',
+                  borderRadius: '8px',
+                  padding: '14px 16px',
+                  fontFamily: 'DM Sans, sans-serif',
+                  fontSize: '13px',
+                  color: '#2A6620',
+                  marginBottom: '12px',
+                }}
+              >
+                {success}
+              </div>
+            )}
+
+            <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <input
+                id="verify-otp"
+                type="text"
+                maxLength={6}
+                placeholder="000000"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                required
+                style={{
+                  ...inputStyle,
+                  fontSize: '24px',
+                  letterSpacing: '8px',
+                  textAlign: 'center',
+                  padding: '16px',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              />
+
+              {error && (
+                <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: '#B01F1F', margin: 0 }}>
+                  {error}
+                </p>
+              )}
+
+              <button
+                id="verify-submit"
+                type="submit"
+                disabled={loading || otp.length !== 6}
+                style={{
+                  fontFamily: 'DM Sans, sans-serif',
+                  fontSize: '13.5px',
+                  fontWeight: 500,
+                  color: 'var(--cream)',
+                  background: loading || otp.length !== 6 ? 'var(--ink-3)' : 'var(--ink)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '11px',
+                  cursor: loading || otp.length !== 6 ? 'not-allowed' : 'pointer',
+                  width: '100%',
+                  marginTop: '4px',
+                }}
+              >
+                {loading ? 'Verifying…' : 'Verify email'}
+              </button>
+            </form>
+
+            <div style={{ marginTop: '16px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <button
+                onClick={handleResendOtp}
+                disabled={loading}
+                style={{
+                  fontFamily: 'DM Sans, sans-serif',
+                  fontSize: '12px',
+                  color: 'var(--ink-3)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  padding: 0,
+                  textDecoration: 'underline',
+                }}
+              >
+                Didn't receive a code? Resend
+              </button>
+              <button
+                onClick={() => switchView('signup')}
+                style={{
+                  fontFamily: 'DM Sans, sans-serif',
+                  fontSize: '12px',
+                  color: 'var(--accent)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                }}
+              >
+                ← Back to sign up
               </button>
             </div>
           </>
