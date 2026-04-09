@@ -25,3 +25,26 @@ export async function uploadAvatar(userId: string, file: File) {
 
   return publicUrl
 }
+
+/** Upload a file to a public bucket */
+export async function uploadPublicImage(bucket: string, file: File) {
+  const supabase = createClient()
+  const fileExt = file.name.split('.').pop()
+  const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`
+  const filePath = fileName
+
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: true
+    })
+
+  if (error) throw error
+
+  const { data: { publicUrl } } = supabase.storage
+    .from(bucket)
+    .getPublicUrl(filePath)
+
+  return publicUrl
+}

@@ -1,24 +1,25 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { auth } from '@/auth'
+import { createServiceClient } from '@/lib/supabase/server'
 import { ProfileView, type HistoryItem } from '@/components/profile/ProfileView'
 
 export const dynamic = 'force-dynamic'
 
 export default async function ProfilePage() {
-  const supabase = await createClient()
+  const session = await auth()
+  const user = session?.user
 
-  // 1. Get Session
-  // eslint-disable-next-line react-hooks/purity
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
+  if (!user?.email) {
     redirect('/?redirect=/profile')
   }
 
-  // 2. Fetch Profile (Full)
+  const supabase = createServiceClient()
+
+  // 2. Fetch Profile (Full) by email to bridge from Supabase Auth
   const { data: profile } = await supabase
     .from('profiles')
     .select('*')
-    .eq('id', user.id)
+    .eq('email', user.email)
     .single()
 
   if (!profile) {

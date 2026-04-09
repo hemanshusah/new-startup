@@ -77,25 +77,6 @@ export function SITable({ initialSI }: { initialSI: SoftInfra[] }) {
         </div>
       )}
 
-      {/* Placement preview wireframe */}
-      <div style={{ background: 'var(--white)', border: '1px solid var(--cream-border)', borderRadius: '12px', padding: '18px', marginBottom: '20px' }}>
-        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', fontWeight: 500, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '14px' }}>Placement Wireframe</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', maxWidth: '400px' }}>
-          {['listing-grid-a (pos 6)', 'listing-grid-b (pos 14)', 'listing-grid-nl (pos 20)'].map((slot, i) => {
-            const slotPositions = [6, 14, 20]
-            const pos = slotPositions[i]
-            const highlighted = hoveredId
-              ? siItems.find((a) => a.id === hoveredId && a.placement?.includes('listing-grid' as never) && a.slot_index === pos)
-              : null
-            return (
-              <div key={slot} style={{ height: '50px', borderRadius: '6px', border: highlighted ? '1.5px solid var(--accent)' : '1px dashed var(--cream-border)', background: highlighted ? 'var(--accent-light)' : 'var(--cream)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease' }}>
-                <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '9.5px', fontWeight: highlighted ? 600 : 400, color: highlighted ? 'var(--accent)' : 'var(--ink-4)' }}>Slot {i + 1}</span>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
       {/* Table */}
       <div style={{ background: 'var(--white)', border: '1px solid var(--cream-border)', borderRadius: '12px', overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>

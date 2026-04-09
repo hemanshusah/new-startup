@@ -35,97 +35,110 @@ export function SidebarSI({ si }: SidebarSIProps) {
       style={{
         display: 'block',
         background: 'var(--cream-dark)',
-        border: '1px solid var(--cream-border)',
+        border: si.is_image_only ? 'none' : '1px solid var(--cream-border)',
         borderRadius: '12px',
-        padding: '18px',
+        padding: si.is_image_only ? '0' : '18px',
         textDecoration: 'none',
+        overflow: 'hidden',
+        position: 'relative',
+        minHeight: si.is_image_only ? '250px' : 'auto',
       }}
       aria-label={`Sponsored: ${si.headline}`}
     >
-      {/* Sponsored label */}
-      <p
-        style={{
-          fontFamily: 'DM Sans, sans-serif',
-          fontSize: '9.5px',
-          fontWeight: 500,
-          color: 'var(--ink-4)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          margin: '0 0 12px',
-        }}
-      >
-        Sponsored · {si.advertiser}
-      </p>
+      {si.is_image_only && si.image_url ? (
+        <img 
+          src={si.image_url} 
+          alt={si.headline || si.advertiser} 
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
+        />
+      ) : (
+        <>
+          {/* Sponsored label */}
+          <p
+            style={{
+              fontFamily: 'DM Sans, sans-serif',
+              fontSize: '9.5px',
+              fontWeight: 500,
+              color: 'var(--ink-4)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              margin: '0 0 12px',
+            }}
+          >
+            Sponsored · {si.advertiser}
+          </p>
 
-      {/* Icon / image */}
-      {(si.icon_emoji || si.image_url) && (
-        <div
-          style={{
-            width: '38px',
-            height: '38px',
-            borderRadius: '9px',
-            background: 'var(--white)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '20px',
-            border: '1px solid var(--cream-border)',
-            overflow: 'hidden',
-            marginBottom: '12px',
-          }}
-        >
-          {si.image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={si.image_url} alt={si.advertiser} style={{ width: '100%', objectFit: 'cover' }} />
-          ) : (
-            si.icon_emoji
+          {/* Icon / image */}
+          {(si.icon_emoji || si.image_url) && (
+            <div
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '9px',
+                background: 'var(--white)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px',
+                border: '1px solid var(--cream-border)',
+                overflow: 'hidden',
+                marginBottom: '12px',
+              }}
+            >
+              {si.image_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={si.image_url} alt={si.advertiser} style={{ width: '100%', objectFit: 'cover' }} />
+              ) : (
+                si.icon_emoji
+              )}
+            </div>
           )}
-        </div>
+
+          {/* Headline */}
+          <p
+            style={{
+              fontFamily: 'DM Serif Display, serif',
+              fontSize: '14.5px',
+              fontWeight: 400,
+              color: 'var(--ink)',
+              margin: '0 0 6px',
+              lineHeight: 1.3,
+            }}
+          >
+            {si.headline}
+          </p>
+
+          {/* Sub-text */}
+          <p
+            style={{
+              fontFamily: 'DM Sans, sans-serif',
+              fontSize: '12px',
+              fontWeight: 300,
+              color: 'var(--ink-2)',
+              margin: '0 0 14px',
+              lineHeight: 1.55,
+            }}
+          >
+            {si.subtext}
+          </p>
+
+          {/* CTA button */}
+          <div
+            style={{
+              display: 'inline-block',
+              fontFamily: 'DM Sans, sans-serif',
+              fontSize: '12px',
+              fontWeight: 500,
+              color: 'var(--cream)',
+              background: 'var(--ink)',
+              borderRadius: '6px',
+              padding: '7px 14px',
+            }}
+          >
+            {si.cta_text}
+          </div>
+        </>
       )}
-
-      {/* Headline */}
-      <p
-        style={{
-          fontFamily: 'DM Serif Display, serif',
-          fontSize: '14.5px',
-          fontWeight: 400,
-          color: 'var(--ink)',
-          margin: '0 0 6px',
-          lineHeight: 1.3,
-        }}
-      >
-        {si.headline}
-      </p>
-
-      {/* Sub-text */}
-      <p
-        style={{
-          fontFamily: 'DM Sans, sans-serif',
-          fontSize: '12px',
-          fontWeight: 300,
-          color: 'var(--ink-2)',
-          margin: '0 0 14px',
-          lineHeight: 1.55,
-        }}
-      >
-        {si.subtext}
-      </p>
-
-      {/* CTA button */}
-      <div
-        style={{
-          display: 'inline-block',
-          fontFamily: 'DM Sans, sans-serif',
-          fontSize: '12px',
-          fontWeight: 500,
-          color: 'var(--cream)',
-          background: 'var(--ink)',
-          borderRadius: '6px',
-          padding: '7px 14px',
-        }}
-      >
-        {si.cta_text}
-      </div>
     </a>
   )
 }

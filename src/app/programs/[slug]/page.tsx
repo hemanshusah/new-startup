@@ -1,9 +1,11 @@
 import { notFound, redirect } from 'next/navigation'
 import type { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { auth } from '@/auth'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { Program, ProgramListItem } from '@/types/program'
 import type { SoftInfra } from '@/types/softinfra'
 import { getSimilarPrograms } from '@/lib/similarity'
+import { getActiveSoftInfra } from '@/lib/softinfra'
 import { ProgramHeader } from '@/components/detail/ProgramHeader'
 import { MetaStrip } from '@/components/detail/MetaStrip'
 import { ContentSections } from '@/components/detail/ContentSection'
@@ -63,13 +65,21 @@ interface Props {
 
 export default async function ProgramDetailPage({ params }: Props) {
   const { slug } = await params
+  const session = await auth()
+  const user = session?.user
 
-  // ── Auth check ───────────
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
+  if (!user?.email) {
     redirect(`/?redirect=/programs/${slug}`)
   }
+
+  const supabase = createServiceClient()
+
+  // 1. Fetch profile to get legacy ID for recording views
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('email', user.email)
+    .single()
 
   // ── Fetch full program ─────────────────────────────────────────────
   const { data: program } = await supabase
@@ -82,31 +92,18 @@ export default async function ProgramDetailPage({ params }: Props) {
   if (!program) notFound()
 
   // ── Record view (CONTEXT.md §5 & §15) ─────────────────────────────
-  // We record this asynchronously so it doesn't block the render
-  supabase.from('program_views').insert({
-    program_id: program.id,
-    user_id: user.id
-  }).then(({ error }) => {
-    if (error) console.error('Error recording program view:', error)
-  })
+  if (profile) {
+    supabase.from('program_views').insert({
+      program_id: program.id,
+      user_id: profile.id
+    }).then(({ error }) => {
+      if (error) console.error('Error recording program view:', error)
+    })
+  }
 
-  // ── Detail page SoftInfra (fetch once, assign to slots) ──────────────────
-  const { data: siRaw } = await supabase
-    .from('softinfra')
-    .select('*')
-    .eq('is_active', true)
-    .contains('placement', ['detail-inline'])
-    .order('priority', { ascending: true })
-
-  const { data: sidebarSiRaw } = await supabase
-    .from('softinfra')
-    .select('*')
-    .eq('is_active', true)
-    .contains('placement', ['detail-sidebar'])
-    .order('priority', { ascending: true })
-
-  const siInlineItems: SoftInfra[] = siRaw ?? []
-  const siSidebarItems: SoftInfra[] = sidebarSiRaw ?? []
+  // ── Detail page SoftInfra (fetch once, assign sequentially) ──────────────────
+  const siInlineItems = await getActiveSoftInfra('detail-inline')
+  const siSidebarItems = await getActiveSoftInfra('detail-sidebar')
 
   const siA: SoftInfra | null = siInlineItems[0] ?? null
   const siB: SoftInfra | null = siInlineItems[1] ?? null

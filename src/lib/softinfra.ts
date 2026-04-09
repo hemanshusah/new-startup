@@ -1,22 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import type { SoftInfra } from '@/types/softinfra'
 
-/** Grid positions for listing slots (CONTEXT.md — after Nth program card). */
-const LISTING_SLOT_GRID_INDEX: Record<string, number> = {
-  'listing-grid-a': 6,
-  'listing-grid-b': 14,
-  'listing-grid-c': 20,
-}
-
 /**
- * Fetches and assigns SoftInfra items to slot IDs.
- * Respects `slot_index` when it matches the slot’s grid position, then `priority`, then random tiebreak.
- * One item per slot per render; each item used at most once.
+ * Fetches all valid SoftInfra items for a specific placement, sorted purely by priority descending.
  */
-export async function getSIForSlots(
-  slotIds: string[],
-  placement: string
-): Promise<Record<string, SoftInfra | null>> {
+export async function getActiveSoftInfra(placement: string): Promise<SoftInfra[]> {
   const supabase = await createClient()
 
   const { data: siItems, error } = await supabase
@@ -27,7 +15,7 @@ export async function getSIForSlots(
 
   if (error || !siItems) {
     console.error('Error fetching SoftInfra:', error)
-    return Object.fromEntries(slotIds.map((id) => [id, null]))
+    return []
   }
 
   const today = new Date().toISOString().split('T')[0]
@@ -37,34 +25,10 @@ export async function getSIForSlots(
     return true
   })
 
-  const results: Record<string, SoftInfra | null> = {}
-  const usedSIIds = new Set<string>()
+  // Sort strictly by Priority Descending (e.g. 100 comes first, 1 comes last)
+  validSI.sort((a, b) => b.priority - a.priority)
 
-  for (const slotId of slotIds) {
-    const gridPos = LISTING_SLOT_GRID_INDEX[slotId]
-    const candidates = validSI.filter(
-      (si) => !usedSIIds.has(si.id) && si.format !== 'newsletter'
-    )
-
-    const scored = candidates
-      .map((si) => {
-        let tier = 2
-        if (gridPos !== undefined && si.slot_index === gridPos) tier = 0
-        else if (si.slot_index == null) tier = 1
-        return { si, tier, priority: si.priority }
-      })
-      .sort((a, b) => {
-        if (a.tier !== b.tier) return a.tier - b.tier
-        if (a.priority !== b.priority) return a.priority - b.priority
-        return Math.random() - 0.5
-      })
-
-    const pick = scored[0]?.si ?? null
-    results[slotId] = pick
-    if (pick) usedSIIds.add(pick.id)
-  }
-
-  return results
+  return validSI
 }
 
 /**

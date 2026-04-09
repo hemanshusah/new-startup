@@ -24,8 +24,8 @@ function getCompactNavServerSnapshot() {
 }
 
 /** Returns up to 2 initials from a name or email */
-function getInitials(user: { email?: string; user_metadata?: { full_name?: string } }) {
-  const name = user.user_metadata?.full_name
+function getInitials(user: { email?: string | null; name?: string | null }) {
+  const name = user.name
   if (name) {
     const parts = name.trim().split(' ')
     return parts.length >= 2
@@ -48,7 +48,7 @@ export function Navbar() {
   )
 
   const isActive = (href: string) => pathname === href
-  const avatarUrl = profile?.avatar_url || (user?.user_metadata?.avatar_url as string | undefined)
+  const avatarUrl = profile?.avatar_url || user?.image
   const initials = user ? getInitials(user) : ''
   const isAdmin = profile?.role === 'admin'
 

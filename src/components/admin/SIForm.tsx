@@ -7,10 +7,11 @@ import { InlineSI } from '@/components/softinfra/InlineSI'
 import { SidebarSI } from '@/components/softinfra/SidebarSI'
 import { SoftInfraCard } from '@/components/softinfra/SICard'
 import { SINewsletterCard } from '@/components/softinfra/SINewsletterCard'
+import { uploadPublicImage } from '@/lib/supabase/storage'
 import type { SoftInfra, SoftInfraFormat } from '@/types/softinfra'
 
-const PLACEMENTS = ['listing-grid', 'listing-inline', 'detail-inline', 'detail-sidebar'] as const
-const FORMATS: SoftInfraFormat[] = ['card-sm', 'card-dark', 'card-wide', 'inline', 'sidebar', 'newsletter']
+const PLACEMENTS = ['listing-grid', 'detail-inline', 'detail-sidebar'] as const
+const FORMATS: SoftInfraFormat[] = ['card-sm', 'card-dark', 'card-wide', 'inline', 'sidebar'] as const
 
 interface SIFormProps {
   si?: SoftInfra
@@ -21,6 +22,7 @@ export function SIForm({ si, mode }: SIFormProps) {
   const supabase = createClient()
   const router = useRouter()
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -39,6 +41,7 @@ export function SIForm({ si, mode }: SIFormProps) {
   const [startDate, setStartDate] = useState(si?.start_date ?? '')
   const [endDate, setEndDate] = useState(si?.end_date ?? '')
   const [isActive, setIsActive] = useState(si?.is_active ?? true)
+  const [isImageOnly, setIsImageOnly] = useState(si?.is_image_only ?? false)
 
   const showToast = (msg: string, ok = true) => {
     setToast({ msg, ok })
@@ -48,10 +51,13 @@ export function SIForm({ si, mode }: SIFormProps) {
   const validate = (): Record<string, string> => {
     const e: Record<string, string> = {}
     if (!advertiser.trim()) e.advertiser = 'Required.'
-    if (!headline.trim()) e.headline = 'Required.'
-    if (!subtext.trim()) e.subtext = 'Required.'
-    if (!ctaText.trim()) e.ctaText = 'Required.'
+    if (!isImageOnly) {
+      if (!headline.trim()) e.headline = 'Required.'
+      if (!subtext.trim()) e.subtext = 'Required.'
+      if (!ctaText.trim()) e.ctaText = 'Required.'
+    }
     if (!ctaUrl.trim()) e.ctaUrl = 'Required.'
+    if (isImageOnly && !imageUrl) e.imageUrl = 'Image is required for Image Only mode.'
     if (placements.length === 0) e.placements = 'At least one placement is required.'
     return e
   }
@@ -71,6 +77,7 @@ export function SIForm({ si, mode }: SIFormProps) {
     start_date: startDate || null,
     end_date: endDate || null,
     is_active: isActive,
+    is_image_only: isImageOnly,
   })
 
   const save = async () => {
@@ -93,9 +100,28 @@ export function SIForm({ si, mode }: SIFormProps) {
     advertiser, headline, subtext, cta_text: ctaText, cta_url: ctaUrl,
     icon_emoji: iconEmoji || null, image_url: imageUrl || null, format,
     placement: placements as never, slot_index: slotIndex ? Number(slotIndex) : null,
-    priority: Number(priority), is_active: isActive,
+    priority: Number(priority), is_active: isActive, is_image_only: isImageOnly,
     start_date: startDate || null, end_date: endDate || null,
     click_count: 0, impression_count: 0, unique_view_count: 0, created_at: '',
+  }
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const url = await uploadPublicImage('softinfra', file)
+      setImageUrl(url)
+      showToast('Image uploaded successfully!')
+    } catch (err: any) {
+      console.error('Upload Error Details:', err)
+      const msg = err.message === 'Bucket not found' 
+        ? 'Error: "softinfra" storage bucket not found. Please create it in Supabase dashboard.' 
+        : (err.message || 'Upload failed')
+      showToast(msg, false)
+    } finally {
+      setUploading(false)
+    }
   }
 
   const inputSt: React.CSSProperties = { fontFamily: 'DM Sans, sans-serif', fontSize: '13px', width: '100%', border: '1px solid var(--cream-border)', borderRadius: '7px', padding: '9px 12px', outline: 'none', background: 'var(--white)', boxSizing: 'border-box' }
@@ -149,15 +175,54 @@ export function SIForm({ si, mode }: SIFormProps) {
             </div>
           </div>
 
-          {/* Icon / Image */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 20px', marginBottom: '16px' }}>
-            <div>
-              <label style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', fontWeight: 500, color: 'var(--ink)', display: 'block', marginBottom: '5px' }}>Icon emoji <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></label>
-              <input type="text" value={iconEmoji} onChange={(e) => setIconEmoji(e.target.value)} style={inputSt} placeholder="Single emoji e.g. 📝" />
+          {/* Icon / Image / Image Only Toggle */}
+          <div style={{ padding: '20px', background: 'var(--cream-bg)', borderRadius: '12px', marginBottom: '24px', border: '2px solid var(--cream-border)', boxShadow: isImageOnly ? '0 0 0 2px var(--accent)' : 'none', transition: 'all 0.2s ease' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', marginBottom: '20px' }}>
+              <div 
+                onClick={() => setIsImageOnly(!isImageOnly)}
+                style={{ 
+                  width: '44px', 
+                  height: '24px', 
+                  borderRadius: '12px', 
+                  background: isImageOnly ? 'var(--accent)' : 'var(--cream-border)', 
+                  position: 'relative', 
+                  transition: 'background 0.2s ease' 
+                }}
+              >
+                <div style={{ position: 'absolute', top: '3px', left: isImageOnly ? '23px' : '3px', width: '18px', height: '18px', borderRadius: '50%', background: 'var(--white)', transition: 'left 0.2s ease' }} />
+              </div>
+              <div>
+                <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', fontWeight: 600, color: 'var(--ink)', display: 'block' }}>Display Ad Mode (Image Only)</span>
+                <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12px', color: 'var(--ink-3)' }}>The entire card will be replaced by your uploaded image. No text will be shown.</span>
+              </div>
+            </label>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 24px' }}>
+              <div>
+                <label style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', fontWeight: 500, color: 'var(--ink)', display: 'block', marginBottom: '5px' }}>Icon emoji <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></label>
+                <input type="text" value={iconEmoji} onChange={(e) => setIconEmoji(e.target.value)} style={inputSt} placeholder="Single emoji e.g. 📝" disabled={isImageOnly} />
+              </div>
+              <div>
+                <label style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', fontWeight: 500, color: 'var(--ink)', display: 'block', marginBottom: '5px' }}>Upload Image</label>
+                <input type="file" accept="image/*" onChange={handleFileUpload} style={{ ...inputSt, padding: '7px' }} disabled={uploading} />
+                {uploading && <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', color: 'var(--ink-4)', marginTop: '4px' }}>Uploading...</p>}
+                {imageUrl && !uploading && <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', color: '#1E6E2E', marginTop: '4px' }}>✓ Image ready</p>}
+                
+                {/* Dimensional Guidance */}
+                <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', color: 'var(--accent)', marginTop: '8px', fontWeight: 500 }}>
+                  Recommended: {
+                    format === 'card-sm' ? '400 × 280 px' :
+                    format === 'card-dark' || format === 'card-wide' ? '800 × 280 px' :
+                    format === 'inline' ? '1200 × 140 px' :
+                    format === 'sidebar' ? '300 × 250 px' : 'Original size'
+                  }
+                </p>
+              </div>
             </div>
-            <div>
-              <label style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', fontWeight: 500, color: 'var(--ink)', display: 'block', marginBottom: '5px' }}>Image URL <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span></label>
-              <input type="url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} style={inputSt} placeholder="https://…" />
+            <div style={{ marginTop: '16px' }}>
+                <label style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', fontWeight: 500, color: 'var(--ink)', display: 'block', marginBottom: '5px' }}>Image URL <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Manual Override)</span></label>
+                <input type="url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} style={iFull('imageUrl')} placeholder="https://…" />
+                {errors.imageUrl && <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', color: '#E03E2D', marginTop: '4px' }}>{errors.imageUrl}</p>}
             </div>
           </div>
 
@@ -233,7 +298,6 @@ export function SIForm({ si, mode }: SIFormProps) {
           {format === 'inline' && <InlineSI si={previewSI} />}
           {format === 'sidebar' && <SidebarSI si={previewSI} />}
           {(format === 'card-sm' || format === 'card-dark' || format === 'card-wide') && <SoftInfraCard si={previewSI} />}
-          {format === 'newsletter' && <SINewsletterCard />}
         </div>
       </div>
     </div>

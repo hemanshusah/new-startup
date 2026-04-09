@@ -15,6 +15,7 @@ export interface SoftInfra {
   slot_index: number | null
   priority: number
   is_active: boolean
+  is_image_only: boolean
   start_date: string | null
   end_date: string | null
   click_count: number

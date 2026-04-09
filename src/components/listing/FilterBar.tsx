@@ -118,6 +118,7 @@ export function FilterBar({
             outline: 'none',
           }}
           aria-label="Search programs"
+          suppressHydrationWarning
         />
       </div>
 

@@ -1,22 +1,56 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { recordSIImpression } from '@/lib/softinfra'
+import { auth } from '@/auth'
+import { createServiceClient } from '@/lib/supabase/server'
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const siId = searchParams.get('id')
+  if (!siId) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
+  return handleTracking(siId, request)
+}
 
 export async function POST(request: Request) {
+  const { siId } = await request.json()
+  if (!siId) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
+  return handleTracking(siId, request)
+}
+
+async function handleTracking(siId: string, request: Request) {
   try {
-    const { si_id } = await request.json()
-    if (!si_id) {
-      return NextResponse.json({ error: 'Missing si_id' }, { status: 400 })
+    const supabase = createServiceClient()
+    const session = await auth()
+    const user = session?.user
+
+    let profileId = null
+    if (user?.email) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', user.email)
+        .single()
+      profileId = profile?.id
     }
 
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    // 1. Increment generic impression counter
+    await supabase.rpc('increment_softinfra_impression', { p_si_id: siId })
 
-    await recordSIImpression(si_id, user?.id)
+    // 2. Log the detailed impression
+    const { error } = await supabase
+      .from('softinfra_impression_log')
+      .insert({
+        softinfra_id: siId,
+        user_id: profileId,
+        page: request.headers.get('referer') || 'unknown'
+      })
 
-    return NextResponse.json({ success: true })
+    if (error) {
+      console.error('Failed to insert into impression_log', error)
+    }
+
+    return NextResponse.json({ ok: true })
+    
   } catch (error) {
-    console.error('Error in impression route:', error)
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+    console.error('Error in impression tracking route:', error)
+    return NextResponse.json({ error: 'Tracking failed' }, { status: 500 })
   }
 }

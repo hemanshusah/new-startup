@@ -14,10 +14,14 @@ const PAGE_SIZE = 12
 interface GrantsGridProps {
   programs: ProgramListItem[]
   siSlotPositions?: number[]
-  siForSlots?: Record<string, SoftInfra | null>
+  siAds?: SoftInfra[]
 }
 
-export function GrantsGrid({ programs, siSlotPositions = [6, 14, 20], siForSlots = {} }: GrantsGridProps) {
+export function GrantsGrid({ 
+  programs, 
+  siSlotPositions = [6, 14, 20], 
+  siAds = []
+}: GrantsGridProps) {
   const { user, openModal } = useAuth()
 
   // Filter state
@@ -73,6 +77,58 @@ export function GrantsGrid({ programs, siSlotPositions = [6, 14, 20], siForSlots
     // This allows the global NavProgress click listener to detect it and show the bar.
   }
 
+  // ── Intelligent Slotting Engine (Pinpoint + Flow) ──
+  // Calculate exactly which SoftInfra object lands at which absolute positional index.
+  const exactAdMapping = useMemo(() => {
+    const mapping = new Map<number, SoftInfra>()
+    if (!siAds || siAds.length === 0) return mapping
+
+    // siAds is already sorted by priority DESC natively from the DB fetch.
+    const pinpointAds = siAds.filter((ad) => ad.slot_index != null)
+    const flowingAds = siAds.filter((ad) => ad.slot_index == null)
+
+    // 1. PINPOINT: Lock in the manually assigned slots.
+    // Since it's sorted by priority, the first one to claim a slot_index wins.
+    for (const ad of pinpointAds) {
+      if (!mapping.has(ad.slot_index!)) {
+        mapping.set(ad.slot_index!, ad)
+      }
+    }
+
+    // 2. GENERATE CONTINUOUS FLOW: Build the grid's structural interval matrix
+    const flowPositions: number[] = []
+    const defaultGap = 6
+    let posIterator = 0
+    // Guarantee enough structural positions for the flowing ads (with +10 buffer)
+    while (flowPositions.length < flowingAds.length + 10) {
+      if (posIterator < siSlotPositions.length) {
+        flowPositions.push(siSlotPositions[posIterator])
+      } else {
+        const last = flowPositions.length > 0 ? flowPositions[flowPositions.length - 1] : 0
+        const prev = flowPositions.length > 1 ? flowPositions[flowPositions.length - 2] : 0
+        const gap = (last && prev) ? (last - prev) : defaultGap
+        flowPositions.push(last + gap)
+      }
+      posIterator++
+    }
+
+    // 3. FLOW MATRICULATION: Drop flowing ads into available positions natively.
+    let flowIndex = 0
+    for (const pos of flowPositions) {
+      if (flowIndex >= flowingAds.length) break
+
+      // A position is natively unavailable if a Pinpoint Ad claimed it
+      const hasPinpoint = mapping.has(pos)
+
+      if (!hasPinpoint) {
+        mapping.set(pos, flowingAds[flowIndex])
+        flowIndex++
+      }
+    }
+
+    return mapping
+  }, [siSlotPositions, siAds])
+
   return (
     <div>
       {/* Filter bar */}
@@ -123,22 +179,12 @@ export function GrantsGrid({ programs, siSlotPositions = [6, 14, 20], siForSlots
                 />
               ]
 
-              // Check if we should insert a SoftInfra item AFTER this program
               const pos = index + 1
-              const siSlotIndex = siSlotPositions.indexOf(pos)
 
-              if (siSlotIndex !== -1) {
-                // Determine which slot this is (a, b, c)
-                const slotNames = ['listing-grid-a', 'listing-grid-b', 'listing-grid-c']
-                const slotName = slotNames[siSlotIndex]
-
-                if (pos === 20) {
-                  // Position 20 is always the Newsletter card (listing-grid-nl)
-                  elements.push(<SINewsletterCard key={`nl-${pos}`} />)
-                } else if (slotName && siForSlots[slotName]) {
-                  // Render the specified SoftInfra card
-                  elements.push(<SoftInfraCard key={`si-${pos}`} si={siForSlots[slotName]!} />)
-                }
+              // Check if we inject a standard ad here (handles both Pinpoint and Flow logic)
+              const mappedAd = exactAdMapping.get(pos)
+              if (mappedAd) {
+                 elements.push(<SoftInfraCard key={`si-${pos}`} si={mappedAd} />)
               }
 
               return elements
