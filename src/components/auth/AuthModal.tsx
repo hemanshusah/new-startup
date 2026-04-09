@@ -8,7 +8,7 @@ import { useAuth } from './AuthProvider'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type View = 'signin' | 'signup' | 'forgot'
+type View = 'signin' | 'signup' | 'forgot' | 'verify'
 
 // ─── Google SVG Icon ──────────────────────────────────────────────────────────
 
@@ -70,6 +70,7 @@ export function AuthModal() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [fullName, setFullName] = useState('')
+  const [otp, setOtp] = useState('')
 
   // Reset state when view changes
   const switchView = (v: View) => {
@@ -140,12 +141,10 @@ export function AuthModal() {
       if (!result.success) {
         setError(result.error || 'Sign up failed')
       } else {
-        if (result.confirmationRequired) {
-          setSuccess('Check your email for a confirmation link!')
-        } else {
-          // Auto-login after successful registration
-          await handleSignIn(e)
-        }
+        // Switch to verification view regardless of result.confirmationRequired
+        // because we are now handling verification via Firebase
+        setView('verify')
+        setSuccess('We sent a verification code to your email.')
       }
     } catch (err) {
       setError('Sign up failed. Please try again.')
@@ -153,6 +152,36 @@ export function AuthModal() {
       setLoading(false)
     }
   }
+
+  // ── Verify OTP ───────────────────────────────────────────────────────────
+  const handleVerifyOtp = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    setLoading(true)
+    setError(null)
+
+    try {
+      const { verifyOtp } = await import('./auth-verify')
+      const result = await verifyOtp(email, otp)
+
+      if (result.success) {
+        setSuccess('Email verified successfully!')
+        setTimeout(() => handleSuccess(), 1000)
+      } else {
+        setError(result.error || 'Invalid verification code.')
+      }
+    } catch (err) {
+      setError('Verification failed. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Auto-submit when 6 digits are reached
+  useEffect(() => {
+    if (otp.length === 6 && view === 'verify') {
+      handleVerifyOtp()
+    }
+  }, [otp])
 
   // ── Forgot Password ──────────────────────────────────────────────────────
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -653,6 +682,105 @@ export function AuthModal() {
                 }}
               >
                 Already have an account? Sign in
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* ── Verify View ─────────────────────────────── */}
+        {view === 'verify' && (
+          <>
+            <h2
+              id="auth-modal-title"
+              style={{
+                fontFamily: 'DM Serif Display, serif',
+                fontSize: '20px',
+                fontWeight: 400,
+                color: 'var(--ink)',
+                marginBottom: '4px',
+              }}
+            >
+              Verify your email
+            </h2>
+            <p
+              style={{
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '13px',
+                color: 'var(--ink-3)',
+                marginBottom: '24px',
+              }}
+            >
+              We&apos;ve sent a 6-digit code to <strong>{email}</strong>.
+            </p>
+
+            <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <input
+                id="verify-otp"
+                type="text"
+                maxLength={6}
+                placeholder="000000"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                required
+                style={{
+                  ...inputStyle,
+                  textAlign: 'center',
+                  fontSize: '24px',
+                  letterSpacing: '8px',
+                  fontWeight: 600,
+                  height: '56px',
+                }}
+              />
+
+              {error && (
+                <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: '#B01F1F', margin: 0, textAlign: 'center' }}>
+                  {error}
+                </p>
+              )}
+
+              <button
+                id="verify-submit"
+                type="submit"
+                disabled={loading || otp.length < 6}
+                style={{
+                  fontFamily: 'DM Sans, sans-serif',
+                  fontSize: '13.5px',
+                  fontWeight: 500,
+                  color: 'var(--cream)',
+                  background: loading || otp.length < 6 ? 'var(--ink-3)' : 'var(--ink)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '11px',
+                  cursor: loading || otp.length < 6 ? 'not-allowed' : 'pointer',
+                  width: '100%',
+                }}
+              >
+                {loading ? 'Verifying…' : 'Verify & Continue'}
+              </button>
+            </form>
+
+            <div style={{ marginTop: '20px', textAlign: 'center' }}>
+              <button
+                onClick={async () => {
+                  setLoading(true)
+                  const { sendOtp } = await import('./auth-verify')
+                  await sendOtp(email)
+                  setLoading(false)
+                  setSuccess('A new code has been sent!')
+                }}
+                disabled={loading}
+                style={{
+                  fontFamily: 'DM Sans, sans-serif',
+                  fontSize: '12px',
+                  color: loading ? 'var(--ink-4)' : 'var(--ink-3)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  padding: 0,
+                  textDecoration: 'underline',
+                }}
+              >
+                Didn&apos;t get a code? Resend
               </button>
             </div>
           </>
