@@ -20,6 +20,7 @@ export async function proxy(request: NextRequest) {
     userEmail = user?.email
     userId = user?.id
   }
+  const { pathname } = request.nextUrl
   
   // Step 1: Protect /programs/[slug] routes — require authentication.
   // If the user is not logged in, redirect to / with a ?redirect param
