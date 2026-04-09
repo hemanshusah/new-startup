@@ -1,6 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import type { Metadata } from 'next'
-import { auth } from '@/auth'
+import { getAuthenticatedUser } from '@/lib/auth-utils'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { Program, ProgramListItem } from '@/types/program'
 import type { SoftInfra } from '@/types/softinfra'
@@ -65,21 +65,13 @@ interface Props {
 
 export default async function ProgramDetailPage({ params }: Props) {
   const { slug } = await params
-  const session = await auth()
-  const user = session?.user
+  const user = await getAuthenticatedUser()
 
   if (!user?.email) {
     redirect(`/?redirect=/programs/${slug}`)
   }
 
   const supabase = createServiceClient()
-
-  // 1. Fetch profile to get legacy ID for recording views
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('email', user.email)
-    .single()
 
   // ── Fetch full program ─────────────────────────────────────────────
   const { data: program } = await supabase
@@ -92,10 +84,10 @@ export default async function ProgramDetailPage({ params }: Props) {
   if (!program) notFound()
 
   // ── Record view (CONTEXT.md §5 & §15) ─────────────────────────────
-  if (profile) {
+  if (user) {
     supabase.from('program_views').insert({
       program_id: program.id,
-      user_id: profile.id
+      user_id: user.id
     }).then(({ error }) => {
       if (error) console.error('Error recording program view:', error)
     })
