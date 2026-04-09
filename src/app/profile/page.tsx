@@ -1,13 +1,12 @@
 import { redirect } from 'next/navigation'
-import { auth } from '@/auth'
+import { getAuthenticatedUser } from '@/lib/auth-utils'
 import { createServiceClient } from '@/lib/supabase/server'
 import { ProfileView, type HistoryItem } from '@/components/profile/ProfileView'
 
 export const dynamic = 'force-dynamic'
 
 export default async function ProfilePage() {
-  const session = await auth()
-  const user = session?.user
+  const user = await getAuthenticatedUser()
 
   if (!user?.email) {
     redirect('/?redirect=/profile')

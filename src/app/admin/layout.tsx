@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { auth } from '@/auth'
+import { getAuthenticatedUser } from '@/lib/auth-utils'
 import { createServiceClient } from '@/lib/supabase/server'
 import { AdminShell } from '@/components/admin/AdminShell'
 
@@ -13,8 +13,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await auth()
-  const user = session?.user
+  const user = await getAuthenticatedUser()
 
   if (!user?.email) redirect('/')
 

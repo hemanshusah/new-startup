@@ -5,22 +5,27 @@
  */
 import { auth } from "@/auth"
 import { type NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createServiceClient, createClient } from '@/lib/supabase/server'
 
-/**
- * Proxy (Next.js 16 Middleware) — Handles global request interception.
- * Replaces the deprecated middleware.ts convention.
- */
 export async function proxy(request: NextRequest) {
+  // 1. Check Auth.js session
   const session = await auth()
-  const user = session?.user
-  
-  const { pathname } = request.nextUrl
+  let userEmail = session?.user?.email
+  let userId = session?.user?.id
 
+  // 2. Check Supabase session if Auth.js failed
+  if (!userEmail) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    userEmail = user?.email
+    userId = user?.id
+  }
+  const { pathname } = request.nextUrl
+  
   // Step 1: Protect /programs/[slug] routes — require authentication.
   // If the user is not logged in, redirect to / with a ?redirect param
   if (pathname.startsWith('/programs/')) {
-    if (!user) {
+    if (!userEmail) {
       const redirectUrl = new URL('/', request.url)
       redirectUrl.searchParams.set('redirect', pathname)
       return NextResponse.redirect(redirectUrl)
@@ -29,7 +34,7 @@ export async function proxy(request: NextRequest) {
 
   // Step 2: Protect /admin/* routes — require admin role.
   if (pathname.startsWith('/admin')) {
-    if (!user?.email) {
+    if (!userEmail) {
       return NextResponse.redirect(new URL('/', request.url))
     }
 
@@ -38,7 +43,7 @@ export async function proxy(request: NextRequest) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
-      .eq('email', user.email)
+      .eq('email', userEmail)
       .single()
 
     if (profile?.role !== 'admin') {
