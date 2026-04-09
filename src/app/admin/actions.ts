@@ -1,23 +1,24 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { auth } from '@/auth'
+import { createServiceClient } from '@/lib/supabase/server'
 import { revalidateCachePath } from '@/lib/revalidate-paths'
 
 export async function revalidateAdminPath(
   path: string
 ): Promise<{ ok: true } | { ok: false; error: string }> {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) {
+  const session = await auth()
+  const user = session?.user
+  if (!user?.email) {
     return { ok: false, error: 'Unauthorized' }
   }
 
+  // Use service client for profile check to handle email lookups reliably
+  const supabase = createServiceClient()
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
-    .eq('id', user.id)
+    .eq('email', user.email)
     .single()
 
   if (profile?.role !== 'admin') {

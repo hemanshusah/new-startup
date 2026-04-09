@@ -1,34 +1,44 @@
+/**
+ * ⚠️ CAUTION: NEXT.JS 16 PROXY (MIDDLEWARE)
+ * This file now handles Auth.js session protection.
+ * See REVERT_AUTH_MIGRATION.md if you need to roll back to Supabase Auth.
+ */
+import { auth } from "@/auth"
 import { type NextRequest, NextResponse } from 'next/server'
-import { updateSession } from '@/lib/supabase/middleware'
+import { createServiceClient } from '@/lib/supabase/server'
 
+/**
+ * Proxy (Next.js 16 Middleware) — Handles global request interception.
+ * Replaces the deprecated middleware.ts convention.
+ */
 export async function proxy(request: NextRequest) {
-  // Step 1: Refresh the Supabase session on every request.
-  // This MUST happen before any redirect logic to keep the session alive.
-  const { supabaseResponse, user, supabase } = await updateSession(request)
+  const session = await auth()
+  const user = session?.user
+  
+  const { pathname } = request.nextUrl
 
-  // Step 2: Protect /programs/[slug] routes — require authentication.
+  // Step 1: Protect /programs/[slug] routes — require authentication.
   // If the user is not logged in, redirect to / with a ?redirect param
-  // so the listing page can open the auth modal and redirect back after login.
-  if (request.nextUrl.pathname.startsWith('/programs/')) {
+  if (pathname.startsWith('/programs/')) {
     if (!user) {
       const redirectUrl = new URL('/', request.url)
-      redirectUrl.searchParams.set('redirect', request.nextUrl.pathname)
+      redirectUrl.searchParams.set('redirect', pathname)
       return NextResponse.redirect(redirectUrl)
     }
   }
 
-  // Step 3: Protect /admin/* routes — require admin role.
-  // No session → redirect home silently.
-  // Session but not admin → redirect home silently (per CONTEXT.md §9).
-  if (request.nextUrl.pathname.startsWith('/admin')) {
-    if (!user) {
+  // Step 2: Protect /admin/* routes — require admin role.
+  if (pathname.startsWith('/admin')) {
+    if (!user?.email) {
       return NextResponse.redirect(new URL('/', request.url))
     }
 
+    // Use service client to bypass RLS for role checks based on email
+    const supabase = createServiceClient()
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
-      .eq('id', user.id)
+      .eq('email', user.email)
       .single()
 
     if (profile?.role !== 'admin') {
@@ -36,7 +46,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  return supabaseResponse
+  return NextResponse.next()
 }
 
 export const config = {

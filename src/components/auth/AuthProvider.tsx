@@ -6,18 +6,16 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react'
 import { useRouter } from 'next/navigation'
-import type { User } from '@supabase/supabase-js'
+import { SessionProvider, useSession, signOut as nextAuthSignOut } from 'next-auth/react'
 import { createClient } from '@/lib/supabase/client'
-import { getSiteUrl } from '@/lib/site-url'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface AuthContextValue {
-  user: User | null
+  user: any | null // Transitioning from Supabase User to Auth.js User
   profile: {
     id: string
     role: 'user' | 'admin'
@@ -34,6 +32,7 @@ interface AuthContextValue {
   closeModal: () => void
   redirectTo: string | null
   signOut: () => Promise<void>
+  status: 'loading' | 'authenticated' | 'unauthenticated'
 }
 
 // ─── Context ──────────────────────────────────────────────────────────────────
@@ -46,49 +45,38 @@ const AuthContext = createContext<AuthContextValue>({
   closeModal: () => { },
   redirectTo: null,
   signOut: async () => { },
+  status: 'loading',
 })
 
-// ─── Provider ─────────────────────────────────────────────────────────────────
+// ─── Inner Provider (where useSession is available) ──────────────────────────
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+function AuthProviderInner({ children }: { children: React.ReactNode }) {
   const router = useRouter()
+  const { data: session, status } = useSession()
   const supabase = useMemo(() => createClient(), [])
 
-  const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<AuthContextValue['profile'] | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [redirectTo, setRedirectTo] = useState<string | null>(null)
 
-  // ── Bootstrap: read initial session & listen for changes ──────────────────
-  useEffect(() => {
-    // Get the current session synchronously from the cookie-backed client
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user ?? null)
-    })
-
-    // Listen for sign in / sign out events
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [supabase])
+  const user = session?.user ?? null
 
   // ── Fetch Profile when User changes ─────────────────────────────────────────
   useEffect(() => {
-    if (!user) {
-      const timer = setTimeout(() => setProfile(null), 0)
-      return () => clearTimeout(timer)
+    if (!user?.email) {
+      setProfile(null)
+      return
     }
 
     const fetchProfile = async () => {
-      const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-      if (data) setProfile(data)
+      const { getCurrentProfile } = await import('./auth-actions')
+      const data = await getCurrentProfile()
+      if (data) {
+        setProfile(data)
+      }
     }
     fetchProfile()
-  }, [user, supabase])
+  }, [user])
 
   // ── Handle redirect param ───────────────────────────────────────────────────
   useEffect(() => {
@@ -122,12 +110,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut()
-    setUser(null)
+    await nextAuthSignOut({ redirect: false })
     setProfile(null)
     router.push('/')
     router.refresh()
-  }, [supabase, router])
+  }, [router])
 
   return (
     <AuthContext.Provider
@@ -139,10 +126,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         closeModal,
         redirectTo,
         signOut,
+        status,
       }}
     >
       {children}
     </AuthContext.Provider>
+  )
+}
+
+// ─── Main Provider Wrapper ────────────────────────────────────────────────────
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <SessionProvider>
+      <AuthProviderInner>
+        {children}
+      </AuthProviderInner>
+    </SessionProvider>
   )
 }
 

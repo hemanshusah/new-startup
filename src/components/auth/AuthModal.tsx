@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { signIn as nextAuthSignIn } from 'next-auth/react'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from './AuthProvider'
-import { getSiteUrl } from '@/lib/site-url'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -98,66 +98,83 @@ export function AuthModal() {
   }, [closeModal, redirectTo, router])
 
   // ── Sign In ──────────────────────────────────────────────────────────────
-
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError(null)
     setLoading(true)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    setLoading(false)
-    if (error) {
-      setError(error.message)
-    } else {
-      handleSuccess()
+    setError(null)
+
+    try {
+      const result = await nextAuthSignIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      })
+
+      if (result?.error) {
+        setError('Invalid email or password')
+      } else {
+        handleSuccess()
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.')
+    } finally {
+      setLoading(false)
     }
   }
 
   // ── Sign Up ──────────────────────────────────────────────────────────────
-
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError(null)
     if (password !== confirmPassword) {
-      setError('Passwords do not match.')
+      setError('Passwords do not match')
       return
     }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.')
-      return
-    }
+
     setLoading(true)
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName || undefined },
-        emailRedirectTo: `${getSiteUrl()}/auth/callback`,
-      },
-    })
-    setLoading(false)
-    if (error) {
-      setError(error.message)
-    } else {
-      setSuccess(
-        'Account created! Check your email to confirm your address, then sign in.'
-      )
+    setError(null)
+
+    try {
+      const { registerUser } = await import('./auth-register')
+      const result = await registerUser({ email, password, fullName })
+
+      if (!result.success) {
+        setError(result.error || 'Sign up failed')
+      } else {
+        if (result.confirmationRequired) {
+          setSuccess('Check your email for a confirmation link!')
+        } else {
+          // Auto-login after successful registration
+          await handleSignIn(e)
+        }
+      }
+    } catch (err) {
+      setError('Sign up failed. Please try again.')
+    } finally {
+      setLoading(false)
     }
   }
 
   // ── Forgot Password ──────────────────────────────────────────────────────
-
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError(null)
     setLoading(true)
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${getSiteUrl()}/auth/callback`,
-    })
-    setLoading(false)
-    if (error) {
-      setError(error.message)
-    } else {
-      setSuccess('Password reset email sent! Check your inbox.')
+    setError(null)
+    setSuccess(null)
+
+    try {
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/?view=reset`,
+      })
+
+      if (error) {
+        setError(error.message)
+      } else {
+        setSuccess('Check your email for the reset link!')
+      }
+    } catch (err) {
+      setError('Failed to send reset email. Please try again.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -166,13 +183,9 @@ export function AuthModal() {
   const handleGoogleSignIn = async () => {
     setLoading(true)
     const next = redirectTo ?? '/'
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent(next)}`,
-      },
+    await nextAuthSignIn('google', {
+      callbackUrl: next,
     })
-    // Browser will redirect — no need to setLoading(false)
   }
 
   if (!isModalOpen) return null
