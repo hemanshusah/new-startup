@@ -79,7 +79,6 @@ export function AuthModal() {
     setSuccess(null)
     setPassword('')
     setConfirmPassword('')
-    setOtp('')
   }
 
   // Close on Escape key
@@ -142,13 +141,10 @@ export function AuthModal() {
       if (!result.success) {
         setError(result.error || 'Sign up failed')
       } else {
-        if (result.confirmationRequired) {
-          switchView('verify')
-          setSuccess('A 6-digit code has been sent to your email.')
-        } else {
-          // Auto-login after successful registration
-          await handleSignIn(e)
-        }
+        // Switch to verification view regardless of result.confirmationRequired
+        // because we are now handling verification via Firebase
+        setView('verify')
+        setSuccess('We sent a verification code to your email.')
       }
     } catch (err) {
       setError('Sign up failed. Please try again.')
@@ -158,20 +154,20 @@ export function AuthModal() {
   }
 
   // ── Verify OTP ───────────────────────────────────────────────────────────
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleVerifyOtp = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
     setLoading(true)
     setError(null)
-    setSuccess(null)
 
     try {
       const { verifyOtp } = await import('./auth-verify')
       const result = await verifyOtp(email, otp)
-      
-      if (!result.success) {
-        setError(result.error || 'Verification failed')
+
+      if (result.success) {
+        setSuccess('Email verified successfully!')
+        setTimeout(() => handleSuccess(), 1000)
       } else {
-        handleSuccess()
+        setError(result.error || 'Invalid verification code.')
       }
     } catch (err) {
       setError('Verification failed. Please try again.')
@@ -180,27 +176,12 @@ export function AuthModal() {
     }
   }
 
-  // ── Resend OTP ───────────────────────────────────────────────────────────
-  const handleResendOtp = async () => {
-    setLoading(true)
-    setError(null)
-    setSuccess(null)
-
-    try {
-      const { resendOtp } = await import('./auth-verify')
-      const result = await resendOtp(email)
-      
-      if (!result.success) {
-        setError(result.error || 'Failed to resend code')
-      } else {
-        setSuccess('A new 6-digit code has been sent to your email.')
-      }
-    } catch (err) {
-      setError('Failed to resend. Please try again.')
-    } finally {
-      setLoading(false)
+  // Auto-submit when 6 digits are reached
+  useEffect(() => {
+    if (otp.length === 6 && view === 'verify') {
+      handleVerifyOtp()
     }
-  }
+  }, [otp])
 
   // ── Forgot Password ──────────────────────────────────────────────────────
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -729,27 +710,10 @@ export function AuthModal() {
                 marginBottom: '24px',
               }}
             >
-              Enter the 6-digit code we sent to <strong>{email}</strong>
+              We&apos;ve sent a 6-digit code to <strong>{email}</strong>.
             </p>
 
-            {success && (
-              <div
-                style={{
-                  background: '#EDF5EA',
-                  border: '1px solid #A8D4A0',
-                  borderRadius: '8px',
-                  padding: '14px 16px',
-                  fontFamily: 'DM Sans, sans-serif',
-                  fontSize: '13px',
-                  color: '#2A6620',
-                  marginBottom: '12px',
-                }}
-              >
-                {success}
-              </div>
-            )}
-
-            <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <input
                 id="verify-otp"
                 type="text"
@@ -760,16 +724,16 @@ export function AuthModal() {
                 required
                 style={{
                   ...inputStyle,
+                  textAlign: 'center',
                   fontSize: '24px',
                   letterSpacing: '8px',
-                  textAlign: 'center',
-                  padding: '16px',
-                  fontVariantNumeric: 'tabular-nums',
+                  fontWeight: 600,
+                  height: '56px',
                 }}
               />
 
               {error && (
-                <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: '#B01F1F', margin: 0 }}>
+                <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: '#B01F1F', margin: 0, textAlign: 'center' }}>
                   {error}
                 </p>
               )}
@@ -777,33 +741,38 @@ export function AuthModal() {
               <button
                 id="verify-submit"
                 type="submit"
-                disabled={loading || otp.length !== 6}
+                disabled={loading || otp.length < 6}
                 style={{
                   fontFamily: 'DM Sans, sans-serif',
                   fontSize: '13.5px',
                   fontWeight: 500,
                   color: 'var(--cream)',
-                  background: loading || otp.length !== 6 ? 'var(--ink-3)' : 'var(--ink)',
+                  background: loading || otp.length < 6 ? 'var(--ink-3)' : 'var(--ink)',
                   border: 'none',
                   borderRadius: '8px',
                   padding: '11px',
-                  cursor: loading || otp.length !== 6 ? 'not-allowed' : 'pointer',
+                  cursor: loading || otp.length < 6 ? 'not-allowed' : 'pointer',
                   width: '100%',
-                  marginTop: '4px',
                 }}
               >
-                {loading ? 'Verifying…' : 'Verify email'}
+                {loading ? 'Verifying…' : 'Verify & Continue'}
               </button>
             </form>
 
-            <div style={{ marginTop: '16px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ marginTop: '20px', textAlign: 'center' }}>
               <button
-                onClick={handleResendOtp}
+                onClick={async () => {
+                  setLoading(true)
+                  const { sendOtp } = await import('./auth-verify')
+                  await sendOtp(email)
+                  setLoading(false)
+                  setSuccess('A new code has been sent!')
+                }}
                 disabled={loading}
                 style={{
                   fontFamily: 'DM Sans, sans-serif',
                   fontSize: '12px',
-                  color: 'var(--ink-3)',
+                  color: loading ? 'var(--ink-4)' : 'var(--ink-3)',
                   background: 'none',
                   border: 'none',
                   cursor: loading ? 'not-allowed' : 'pointer',
@@ -811,21 +780,7 @@ export function AuthModal() {
                   textDecoration: 'underline',
                 }}
               >
-                Didn't receive a code? Resend
-              </button>
-              <button
-                onClick={() => switchView('signup')}
-                style={{
-                  fontFamily: 'DM Sans, sans-serif',
-                  fontSize: '12px',
-                  color: 'var(--accent)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 0,
-                }}
-              >
-                ← Back to sign up
+                Didn&apos;t get a code? Resend
               </button>
             </div>
           </>
