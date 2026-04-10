@@ -63,6 +63,10 @@ button {
 
 .grant-card {
   transition: background 0.15s ease;
+  /* Performance: skip offscreen rendering on long lists (big mobile win). */
+  content-visibility: auto;
+  /* Reserve space so scroll doesn't jump while rendering (approx card height). */
+  contain-intrinsic-size: 260px 420px;
 }
 
 .grant-card:hover {
