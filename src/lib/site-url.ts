@@ -2,28 +2,42 @@
  * Dynamically determines the base URL of the application.
  * Priority: Manual env var > Vercel URL > Browser origin > Localhost fallback.
  */
+import { headers } from 'next/headers'
+
 export function getSiteUrl(): string {
-  // If we are in the browser, window.location.origin is the most reliable
+  // 1. Production Shield: If we are on Vercel, always use the Vercel URL
+  // This overrides any accidental 'localhost' settings in .env
+  const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+  if (vercelUrl && !vercelUrl.includes('localhost')) {
+    return `https://${vercelUrl.replace(/\/$/, '')}`
+  }
+
+  // 2. Browser Detection: If we are in the browser, ground truth is the origin
   if (typeof window !== 'undefined' && window.location.origin) {
     const origin = window.location.origin
-    // Only use hardcoded env var if it's NOT localhost OR if the current origin IS localhost
+    // Only use manual env if it's explicitly NOT localhost (v18 Poison-Proof)
     const envUrl = process.env.NEXT_PUBLIC_SITE_URL
     if (envUrl && !envUrl.includes('localhost')) return envUrl.replace(/\/$/, '')
     return origin.replace(/\/$/, '')
   }
 
-  // Server-side logic (e.g. for Metadata or server-side redirects)
-  let url =
-    process.env.NEXT_PUBLIC_SITE_URL ?? 
-    process.env.NEXT_PUBLIC_VERCEL_URL ?? 
-    'http://localhost:3000'
-
-  // If we're on Vercel, ensuring https
-  if (url.includes('vercel.app') && !url.startsWith('http')) {
-    url = `https://${url}`
+  // 3. Request Detection: If we are on the server (Server Actions), check headers
+  try {
+    const headerList = headers()
+    const host = headerList.get('host')
+    if (host && !host.includes('localhost')) {
+      const protocol = host.includes('vercel.app') || !host.includes(':') ? 'https' : 'http'
+      return `${protocol}://${host}`.replace(/\/$/, '')
+    }
+  } catch (e) {
+    // headers() might not be available during static builds
   }
 
-  return url.replace(/\/$/, '')
+  // 4. Final Fallback: Manual Env (if not localhost) or Localhost
+  const envUrl = process.env.NEXT_PUBLIC_SITE_URL
+  if (envUrl && !envUrl.includes('localhost')) return envUrl.replace(/\/$/, '')
+  
+  return 'http://localhost:3000'
 }
 
 export function absoluteUrl(path: string): string {
