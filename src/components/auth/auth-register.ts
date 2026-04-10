@@ -15,7 +15,8 @@ export async function registerUser(formData: {
   // 2. Dynamic Server-Side Link Detection (v20 Build-Safe)
   let redirectBase = getSiteUrl()
   try {
-    const host = headers().get('host')
+    const headerList = await headers()
+    const host = headerList.get('host')
     if (host && !host.includes('localhost')) {
       const protocol = host.includes('vercel.app') || !host.includes(':') ? 'https' : 'http'
       redirectBase = `${protocol}://${host}`
