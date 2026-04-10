@@ -18,9 +18,8 @@ export async function registerUser(formData: {
       data: {
         full_name: fullName,
       },
-      // Automatically confirm email for this demo/startup stage if desired, 
-      // or let Supabase send a verification email.
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback`,
+      // Since the user has Firebase SMTP linked, this will go through Firebase
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/verify`,
     },
   })
 
@@ -28,13 +27,8 @@ export async function registerUser(formData: {
     return { success: false, error: error.message }
   }
 
-  // 2. Generate and trigger OTP (New flow)
-  const { sendOtp } = await import('./auth-verify')
-  await sendOtp(email)
-
   return { 
     success: true, 
-    user: data.user,
-    confirmationRequired: true // Force confirmation flow
+    user: data.user
   }
 }

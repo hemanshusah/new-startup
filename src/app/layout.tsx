@@ -47,7 +47,9 @@ export default function RootLayout({
             <main style={{ flex: 1 }}>{children}</main>
           </PageTransition>
           <FooterWrapper />
-          <AuthModal />
+          <Suspense fallback={null}>
+            <AuthModal />
+          </Suspense>
         </AuthProvider>
         <Analytics />
       </body>
