@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { signIn as nextAuthSignIn } from 'next-auth/react'
 import { createClient } from '@/lib/supabase/client'
+import { getSiteUrl } from '@/lib/site-url'
 import { useAuth } from './AuthProvider'
 import { auth as firebaseAuth } from '@/lib/firebase'
 import { 
@@ -222,7 +223,7 @@ export function AuthModal() {
     try {
       const currentPath = window.location.pathname
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/verify?next=${currentPath}&view=reset`
+        redirectTo: `${getSiteUrl()}/verify?next=${currentPath}&view=reset`
       })
       if (error) throw error
       setSuccess('Check your email for the reset link!')

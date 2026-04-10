@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getSiteUrl } from '@/lib/site-url'
 
 export async function registerUser(formData: {
   email: string
@@ -19,7 +20,7 @@ export async function registerUser(formData: {
         full_name: fullName,
       },
       // Since the user has Firebase SMTP linked, this will go through Firebase
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/verify`,
+      emailRedirectTo: `${getSiteUrl()}/verify`,
     },
   })
 
