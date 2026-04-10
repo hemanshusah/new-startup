@@ -1,14 +1,21 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { signIn as nextAuthSignIn } from 'next-auth/react'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from './AuthProvider'
+import { auth as firebaseAuth } from '@/lib/firebase'
+import { 
+  createUserWithEmailAndPassword, 
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword as firebaseSignIn
+} from 'firebase/auth'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type View = 'signin' | 'signup' | 'forgot' | 'verify'
+type View = 'signin' | 'signup' | 'forgot' | 'verify' | 'reset'
 
 // ─── Google SVG Icon ──────────────────────────────────────────────────────────
 
@@ -54,8 +61,9 @@ const inputStyle: React.CSSProperties = {
 // ─── AuthModal ────────────────────────────────────────────────────────────────
 
 export function AuthModal() {
-  const { isModalOpen, closeModal, redirectTo } = useAuth()
+  const { isModalOpen, openModal, closeModal, redirectTo } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = useRef(createClient()).current
 
   const [view, setView] = useState<View>('signin')
@@ -70,7 +78,6 @@ export function AuthModal() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [fullName, setFullName] = useState('')
-  const [otp, setOtp] = useState('')
 
   // Reset state when view changes
   const switchView = (v: View) => {
@@ -81,14 +88,33 @@ export function AuthModal() {
     setConfirmPassword('')
   }
 
-  // Close on Escape key
+  // Handle URL-triggered views (e.g. ?view=reset or ?verified=true)
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeModal()
+    const v = searchParams.get('view') as View | null
+    const verified = searchParams.get('verified') === 'true'
+
+    if (v === 'reset') {
+      setView('reset')
+      if (!isModalOpen) openModal()
+      // Clean the URL so we don't re-trigger this logic on next render
+      router.replace(window.location.pathname)
+    } else if (verified && !v) {
+      setSuccess('Email verified successfully! Please sign in to continue.')
+      setView('signin')
+      if (!isModalOpen) openModal()
+      // Clean the URL
+      router.replace(window.location.pathname)
     }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [closeModal])
+  }, [searchParams, isModalOpen, openModal, router])
+
+  // Pre-fill email if a Supabase session exists (e.g. after verification/reset)
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user?.email) {
+        setEmail(data.user.email)
+      }
+    })
+  }, [supabase])
 
   const handleSuccess = useCallback(() => {
     closeModal()
@@ -140,48 +166,51 @@ export function AuthModal() {
 
       if (!result.success) {
         setError(result.error || 'Sign up failed')
-      } else {
-        // Switch to verification view regardless of result.confirmationRequired
-        // because we are now handling verification via Firebase
-        setView('verify')
-        setSuccess('We sent a verification code to your email.')
+        setLoading(false)
+        return
       }
-    } catch (err) {
-      setError('Sign up failed. Please try again.')
+
+      setSuccess('Verification link sent to your email!')
+      setView('verify')
+    } catch (err: any) {
+      setError(err.message || 'Sign up failed. Please try again.')
     } finally {
       setLoading(false)
     }
   }
 
-  // ── Verify OTP ───────────────────────────────────────────────────────────
-  const handleVerifyOtp = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault()
+  // ── Update Password ─────────────────────────────────────────────────────
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
     setLoading(true)
     setError(null)
 
     try {
-      const { verifyOtp } = await import('./auth-verify')
-      const result = await verifyOtp(email, otp)
+      const { updatePassword } = await import('./auth-reset')
+      const result = await updatePassword(password)
 
       if (result.success) {
-        setSuccess('Email verified successfully!')
-        setTimeout(() => handleSuccess(), 1000)
+        setSuccess('Password updated successfully! You can now sign in with your new password.')
+        
+        // Return to sign-in view after a short delay so they can see the success message
+        setTimeout(() => {
+          setView('signin')
+          setSuccess('Password updated! Ready to sign in.')
+        }, 3000)
       } else {
-        setError(result.error || 'Invalid verification code.')
+        setError(result.error || 'Failed to update password')
       }
     } catch (err) {
-      setError('Verification failed. Please try again.')
+      setError('An error occurred. Please try again.')
     } finally {
       setLoading(false)
     }
   }
-
-  // Auto-submit when 6 digits are reached
-  useEffect(() => {
-    if (otp.length === 6 && view === 'verify') {
-      handleVerifyOtp()
-    }
-  }, [otp])
 
   // ── Forgot Password ──────────────────────────────────────────────────────
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -191,17 +220,14 @@ export function AuthModal() {
     setSuccess(null)
 
     try {
-      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/?view=reset`,
+      const currentPath = window.location.pathname
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/verify?next=${currentPath}&view=reset`
       })
-
-      if (error) {
-        setError(error.message)
-      } else {
-        setSuccess('Check your email for the reset link!')
-      }
-    } catch (err) {
-      setError('Failed to send reset email. Please try again.')
+      if (error) throw error
+      setSuccess('Check your email for the reset link!')
+    } catch (err: any) {
+      setError(err.message || 'Failed to send reset link.')
     } finally {
       setLoading(false)
     }
@@ -710,63 +736,48 @@ export function AuthModal() {
                 marginBottom: '24px',
               }}
             >
-              We&apos;ve sent a 6-digit code to <strong>{email}</strong>.
+              We&apos;ve sent a verification link to <strong>{email}</strong>.
+              <br/><br/>
+              Please click the link in your inbox to verify your account. Once clicked, you will be redirected to your profile and logged in.
             </p>
 
-            <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <input
-                id="verify-otp"
-                type="text"
-                maxLength={6}
-                placeholder="000000"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                required
-                style={{
-                  ...inputStyle,
-                  textAlign: 'center',
-                  fontSize: '24px',
-                  letterSpacing: '8px',
-                  fontWeight: 600,
-                  height: '56px',
-                }}
-              />
-
-              {error && (
-                <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: '#B01F1F', margin: 0, textAlign: 'center' }}>
-                  {error}
-                </p>
-              )}
-
-              <button
-                id="verify-submit"
-                type="submit"
-                disabled={loading || otp.length < 6}
-                style={{
-                  fontFamily: 'DM Sans, sans-serif',
-                  fontSize: '13.5px',
-                  fontWeight: 500,
-                  color: 'var(--cream)',
-                  background: loading || otp.length < 6 ? 'var(--ink-3)' : 'var(--ink)',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '11px',
-                  cursor: loading || otp.length < 6 ? 'not-allowed' : 'pointer',
-                  width: '100%',
-                }}
-              >
-                {loading ? 'Verifying…' : 'Verify & Continue'}
-              </button>
-            </form>
+            <button
+              onClick={() => setView('signin')}
+              style={{
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '13.5px',
+                fontWeight: 500,
+                color: 'var(--cream)',
+                background: 'var(--ink)',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '11px',
+                cursor: 'pointer',
+                width: '100%',
+              }}
+            >
+              Go to Sign In
+            </button>
 
             <div style={{ marginTop: '20px', textAlign: 'center' }}>
               <button
                 onClick={async () => {
                   setLoading(true)
-                  const { sendOtp } = await import('./auth-verify')
-                  await sendOtp(email)
-                  setLoading(false)
-                  setSuccess('A new code has been sent!')
+                  try {
+                    const { error } = await supabase.auth.resend({
+                      type: 'signup',
+                      email,
+                      options: {
+                        emailRedirectTo: `${window.location.origin}/api/auth/confirm`
+                      }
+                    })
+                    if (error) throw error
+                    setSuccess('A new link has been sent!')
+                  } catch (err: any) {
+                    setError('Failed to resend. Please wait a moment.')
+                  } finally {
+                    setLoading(false)
+                  }
                 }}
                 disabled={loading}
                 style={{
@@ -780,9 +791,144 @@ export function AuthModal() {
                   textDecoration: 'underline',
                 }}
               >
-                Didn&apos;t get a code? Resend
+                Didn&apos;t get it? Resend Link
               </button>
             </div>
+          </>
+        )}
+
+        {/* ── Reset Password View ───────────────────── */}
+        {view === 'reset' && (
+          <>
+            <h2
+              id="auth-modal-title"
+              style={{
+                fontFamily: 'DM Serif Display, serif',
+                fontSize: '20px',
+                fontWeight: 400,
+                color: 'var(--ink)',
+                marginBottom: '4px',
+              }}
+            >
+              Create new password
+            </h2>
+            <p
+              style={{
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '13px',
+                color: 'var(--ink-3)',
+                marginBottom: '24px',
+              }}
+            >
+              Set a new secure password for your account.
+            </p>
+
+            {success ? (
+              <div
+                style={{
+                  background: '#EDF5EA',
+                  border: '1px solid #A8D4A0',
+                  borderRadius: '8px',
+                  padding: '14px 16px',
+                  fontFamily: 'DM Sans, sans-serif',
+                  fontSize: '13px',
+                  color: '#2A6620',
+                }}
+              >
+                {success}
+              </div>
+            ) : (
+              <form onSubmit={handleUpdatePassword} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    id="reset-password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="New password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    style={{ ...inputStyle, paddingRight: '44px' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontFamily: 'DM Sans, sans-serif',
+                      fontSize: '11px',
+                      color: 'var(--ink-3)',
+                      padding: 0,
+                    }}
+                  >
+                    {showPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+
+                <div style={{ position: 'relative' }}>
+                  <input
+                    id="reset-confirm-password"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="Confirm new password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    style={{ ...inputStyle, paddingRight: '44px' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontFamily: 'DM Sans, sans-serif',
+                      fontSize: '11px',
+                      color: 'var(--ink-3)',
+                      padding: 0,
+                    }}
+                  >
+                    {showConfirmPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+
+                {error && (
+                  <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: '#B01F1F', margin: 0 }}>
+                    {error}
+                  </p>
+                )}
+
+                <button
+                  id="reset-submit"
+                  type="submit"
+                  disabled={loading}
+                  style={{
+                    fontFamily: 'DM Sans, sans-serif',
+                    fontSize: '13.5px',
+                    fontWeight: 500,
+                    color: 'var(--cream)',
+                    background: loading ? 'var(--ink-3)' : 'var(--ink)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '11px',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    width: '100%',
+                    marginTop: '4px',
+                  }}
+                >
+                  {loading ? 'Updating…' : 'Update password'}
+                </button>
+              </form>
+            )}
           </>
         )}
 

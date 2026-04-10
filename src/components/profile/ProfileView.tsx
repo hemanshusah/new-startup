@@ -5,7 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { uploadAvatar } from '@/lib/supabase/storage'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { formatDistanceToNow } from 'date-fns'
+import { useEffect } from 'react'
 
 interface Profile {
   id: string
@@ -41,6 +43,14 @@ export function ProfileView({ profile: initialProfile, history }: { profile: Pro
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const searchParams = useSearchParams()
+
+  // Handle verification success message
+  useEffect(() => {
+    if (searchParams.get('verified') === 'true') {
+      setMessage({ type: 'success', text: 'Email verified successfully! Welcome to your profile.' })
+    }
+  }, [searchParams])
 
   // ── Handlers ────────────────────────────────────────────────────────────
 
