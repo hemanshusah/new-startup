@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { signIn as nextAuthSignIn } from 'next-auth/react'
 import { createClient } from '@/lib/supabase/client'
@@ -65,7 +65,7 @@ export function AuthModal() {
   const { isModalOpen, openModal, closeModal, redirectTo } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const supabase = useRef(createClient()).current
+  const supabase = useMemo(() => createClient(), [])
 
   const [view, setView] = useState<View>('signin')
   const [loading, setLoading] = useState(false)
@@ -222,8 +222,9 @@ export function AuthModal() {
 
     try {
       const currentPath = window.location.pathname
+      const base = getSiteUrl().replace(/\/$/, '')
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${getSiteUrl()}/verify?next=${currentPath}&view=reset`
+        redirectTo: `${base}/verify?next=${encodeURIComponent(currentPath)}&view=reset`,
       })
       if (error) throw error
       setSuccess('Check your email for the reset link!')
@@ -769,8 +770,9 @@ export function AuthModal() {
                       type: 'signup',
                       email,
                       options: {
-                        emailRedirectTo: `${window.location.origin}/api/auth/confirm`
-                      }
+                        // Must match signup in auth-register.ts (`/verify`) — not NextAuth `/api/auth/...`
+                        emailRedirectTo: `${getSiteUrl().replace(/\/$/, '')}/verify`,
+                      },
                     })
                     if (error) throw error
                     setSuccess('A new link has been sent!')
