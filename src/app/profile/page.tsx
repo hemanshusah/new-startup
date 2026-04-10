@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { getAuthenticatedUser } from '@/lib/auth-utils'
 import { createServiceClient } from '@/lib/supabase/server'
@@ -62,10 +63,12 @@ export default async function ProfilePage() {
   return (
     <main style={{ background: 'var(--cream)', minHeight: 'calc(100vh - 56px)', padding: '40px 24px' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        <ProfileView
-          profile={profile}
-          history={history}
-        />
+        <Suspense fallback={<div>Loading profile...</div>}>
+          <ProfileView
+            profile={profile}
+            history={history}
+          />
+        </Suspense>
       </div>
     </main>
   )
