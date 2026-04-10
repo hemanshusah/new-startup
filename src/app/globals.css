@@ -37,7 +37,7 @@ html {
 body {
   background: var(--cream);
   color: var(--ink);
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: var(--font-sans, 'DM Sans'), system-ui, sans-serif;
   font-weight: 400;
   line-height: 1.6;
   min-height: 100vh;
@@ -181,11 +181,11 @@ button {
 }
 
 .serif {
-  font-family: 'DM Serif Display', Georgia, serif;
+  font-family: var(--font-serif, 'DM Serif Display'), Georgia, serif;
 }
 
 .sans {
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: var(--font-sans, 'DM Sans'), system-ui, sans-serif;
 }
 
 /* ============================================================
