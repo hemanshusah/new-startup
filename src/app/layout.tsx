@@ -8,6 +8,7 @@ import { PageTransition } from '@/components/ui/PageTransition'
 import { AuthProvider } from '@/components/auth/AuthProvider'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { Analytics } from '@vercel/analytics/next'
+import { DM_Sans, DM_Serif_Display } from 'next/font/google'
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
@@ -21,6 +22,20 @@ export const metadata: Metadata = {
 
 import { FooterWrapper } from '@/components/nav/FooterWrapper'
 
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500'],
+  display: 'swap',
+  variable: '--font-sans',
+})
+
+const dmSerif = DM_Serif_Display({
+  subsets: ['latin'],
+  weight: ['400'],
+  display: 'swap',
+  variable: '--font-serif',
+})
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,15 +44,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Google Fonts — DM Serif Display + DM Sans (PROGRESS.md 2.1) */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap"
-        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <body
+        className={`${dmSans.variable} ${dmSerif.variable}`}
+        style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}
+      >
         <AuthProvider>
           <Suspense fallback={null}>
             <NavProgress />
