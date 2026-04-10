@@ -1,6 +1,7 @@
 'use client'
 
 import { ProgramType } from '@/types/program'
+import { useEffect, useState } from 'react'
 
 export type ScopeFilter = 'national' | 'international'
 export type TypeFilter = ProgramType | 'all'
@@ -35,6 +36,21 @@ export function FilterBar({
   totalShown,
   totalFiltered,
 }: FilterBarProps) {
+  const [localSearch, setLocalSearch] = useState(search)
+
+  // Keep local input in sync if parent resets it
+  useEffect(() => {
+    setLocalSearch(search)
+  }, [search])
+
+  // Debounce updates to avoid filtering on every keystroke
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      onSearchChange(localSearch)
+    }, 180)
+    return () => window.clearTimeout(t)
+  }, [localSearch, onSearchChange])
+
   return (
     <div
       className="filter-bar-row"
@@ -102,8 +118,8 @@ export function FilterBar({
           id="program-search"
           type="search"
           placeholder="Enter keywords to search"
-          value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
+          value={localSearch}
+          onChange={(e) => setLocalSearch(e.target.value)}
           style={{
             fontFamily: 'DM Sans, sans-serif',
             fontSize: '12.5px',

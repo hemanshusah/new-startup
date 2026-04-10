@@ -12,17 +12,20 @@ export async function registerUser(formData: {
   const { email, password, fullName } = formData
   const supabase = await createClient()
 
-  // 2. Dynamic Server-Side Link Detection (v20 Build-Safe)
+  // Prefer request host (custom domain on Vercel sends x-forwarded-host) over env defaults
   let redirectBase = getSiteUrl()
   try {
     const headerList = await headers()
-    const host = headerList.get('host')
-    if (host && !host.includes('localhost')) {
-      const protocol = host.includes('vercel.app') || !host.includes(':') ? 'https' : 'http'
-      redirectBase = `${protocol}://${host}`
+    const forwarded = headerList.get('x-forwarded-host')
+    const rawHost = forwarded?.split(',')[0]?.trim() || headerList.get('host')
+    if (rawHost && !rawHost.includes('localhost')) {
+      const proto =
+        headerList.get('x-forwarded-proto')?.split(',')[0]?.trim() ||
+        (rawHost.includes('localhost') ? 'http' : 'https')
+      redirectBase = `${proto}://${rawHost}`
     }
-  } catch (e) {
-    // Fallback to getSiteUrl() if headers aren't available
+  } catch {
+    // Fallback to getSiteUrl()
   }
 
   // 1. Sign up in Supabase Auth (handles password hashing & security)

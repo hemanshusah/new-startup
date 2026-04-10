@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useDeferredValue, useMemo, useState } from 'react'
 import { ProgramListItem } from '@/types/program'
 import { GrantCard } from './GrantCard'
 import { FilterBar, ScopeFilter, TypeFilter } from './FilterBar'
@@ -29,6 +29,7 @@ export function GrantsGrid({
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1) // how many PAGE_SIZE batches to show
+  const deferredSearch = useDeferredValue(search)
 
   // When any filter changes, reset pagination to page 1
   const handleScopeChange = (s: ScopeFilter) => { setScope(s); setPage(1) }
@@ -46,8 +47,8 @@ export function GrantsGrid({
       if (typeFilter !== 'all' && p.type !== typeFilter) return false
 
       // Search filter (title + organisation + description_short)
-      if (search.trim()) {
-        const q = search.toLowerCase()
+      if (deferredSearch.trim()) {
+        const q = deferredSearch.toLowerCase()
         const hit =
           p.title.toLowerCase().includes(q) ||
           p.organisation.toLowerCase().includes(q) ||
@@ -57,7 +58,7 @@ export function GrantsGrid({
 
       return true
     })
-  }, [programs, scope, typeFilter, search])
+  }, [programs, scope, typeFilter, deferredSearch])
 
   // Paginate: show first (page * PAGE_SIZE) items
   const visibleCount = page * PAGE_SIZE
