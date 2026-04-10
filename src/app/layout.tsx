@@ -6,9 +6,9 @@ import { NavWrapper } from '@/components/nav/NavWrapper'
 import { NavProgress } from '@/components/nav/NavProgress'
 import { PageTransition } from '@/components/ui/PageTransition'
 import { AuthProvider } from '@/components/auth/AuthProvider'
-import { AuthModal } from '@/components/auth/AuthModal'
-import { Analytics } from '@vercel/analytics/next'
 import { DM_Sans, DM_Serif_Display } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
+import { AuthModalLazy } from '@/components/auth/AuthModalLazy'
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
@@ -59,9 +59,7 @@ export default function RootLayout({
             <main style={{ flex: 1 }}>{children}</main>
           </PageTransition>
           <FooterWrapper />
-          <Suspense fallback={null}>
-            <AuthModal />
-          </Suspense>
+          <AuthModalLazy />
         </AuthProvider>
         <Analytics />
       </body>
