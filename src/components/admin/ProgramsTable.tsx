@@ -141,6 +141,7 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
       prev.map((p) => (p.id === program.id ? { ...p, published: newVal } : p))
     )
     
+    showToast(`"${program.title}" ${newVal ? 'published' : 'unpublished'}.`)
     const res = await updateProgramPublished(program.id, newVal)
     
     if (!res.ok) {
@@ -149,8 +150,6 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
         prev.map((p) => (p.id === program.id ? { ...p, published: program.published } : p))
       )
       showToast(`Failed to update: ${res.error}`, false)
-    } else {
-      showToast(`"${program.title}" ${newVal ? 'published' : 'unpublished'}.`)
     }
   }, [])
 
@@ -380,7 +379,7 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
                   {/* Published toggle */}
                   <td style={tdBase}>
                     <button
-                      onClick={() => startTransition(() => { togglePublished(p) })}
+                      onClick={() => togglePublished(p)}
                       style={{
                         width: '36px',
                         height: '20px',

@@ -35,7 +35,15 @@ export interface HistoryItem {
   }
 }
 
-export function ProfileView({ profile: initialProfile, history }: { profile: Profile; history: HistoryItem[] }) {
+export function ProfileView({ 
+  profile: initialProfile, 
+  history, 
+  userImage 
+}: { 
+  profile: Profile; 
+  history: HistoryItem[]; 
+  userImage?: string | null 
+}) {
   const supabase = createClient()
   const [profile, setProfile] = useState<Profile>(initialProfile)
   const [isEditing, setIsEditing] = useState(false)
@@ -145,9 +153,13 @@ export function ProfileView({ profile: initialProfile, history }: { profile: Pro
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              {profile.avatar_url ? (
+              {profile.avatar_url || userImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={profile.avatar_url} alt={profile.full_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img 
+                  src={profile.avatar_url || userImage || ''} 
+                  alt={profile.full_name} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
               ) : (
                 <span style={{ fontSize: '36px', fontFamily: 'DM Serif Display', color: 'var(--ink-3)' }}>
                   {profile.full_name?.slice(0, 1) || profile.email?.slice(0, 1).toUpperCase()}

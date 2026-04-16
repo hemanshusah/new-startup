@@ -39,12 +39,16 @@ export async function updateProgramPublished(
   }
 
   try {
-    revalidateCachePath('/admin/programs')
-    revalidateCachePath('/programs')
-    revalidateCachePath(`/programs/${programId}`) // Just in case, though usually slug is used
+    // 3. Clear relevant caches in parallel
+    await Promise.allSettled([
+      revalidateCachePath('/admin/programs'),
+      revalidateCachePath('/programs'),
+      revalidateCachePath(`/programs/${programId}`),
+    ])
+
     return { ok: true }
-  } catch (e) {
-    console.error('[updateProgramPublished revalidate]', e)
-    return { ok: true } // Still ok since DB updated
+  } catch (err) {
+    console.error('Failed to update published status:', err)
+    return { ok: false, error: 'Failed to update program status' }
   }
 }
