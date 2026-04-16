@@ -1,8 +1,8 @@
-import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/server'
 import { UsersTable } from '@/components/admin/UsersTable'
 
 export default async function AdminUsersPage() {
-  const supabase = await createClient()
+  const supabase = createServiceClient()
 
   // Fetch profiles with view counts (LEFT JOIN via program_views)
   const { data: profiles } = await supabase

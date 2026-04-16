@@ -74,6 +74,7 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = useMemo(() => createClient(), [])
+  const { signOut } = useAuth()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
   useEffect(() => {
@@ -87,9 +88,7 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
   }, [mobileSidebarOpen])
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push('/')
-    router.refresh()
+    await signOut()
   }
 
   const displayName = adminEmail

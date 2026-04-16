@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/server'
 import { StatCard } from '@/components/admin/StatCard'
 
 function relativeTime(dateStr: string, now: number): string {
@@ -20,7 +20,7 @@ const ACTION_COLORS: Record<string, string> = {
 }
 
 export default async function AdminDashboard() {
-  const supabase = await createClient()
+  const supabase = createServiceClient()
   // eslint-disable-next-line react-hooks/purity
   const now = Date.now()
   const today = new Date(now).toISOString().split('T')[0]

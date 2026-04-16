@@ -1,11 +1,11 @@
 import { notFound } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/server'
 import { SIForm } from '@/components/admin/SIForm'
 import type { SoftInfra } from '@/types/softinfra'
 
 export default async function EditSIPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const supabase = await createClient()
+  const supabase = createServiceClient()
   const { data: siItem } = await supabase.from('softinfra').select('*').eq('id', id).single()
   if (!siItem) notFound()
 
