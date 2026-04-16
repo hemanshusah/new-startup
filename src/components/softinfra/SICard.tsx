@@ -32,22 +32,24 @@ export function SoftInfraCard({ si }: SoftInfraCardProps) {
       href={`/api/softinfra/click?id=${si.id}&url=${encodeURIComponent(si.cta_url)}`}
       target="_blank"
       rel="noopener noreferrer sponsored"
+      className={`si-card-link ${isInline ? 'si-card-standalone' : ''}`}
       style={{
         display: 'flex',
         flexDirection: isInline ? 'row' : 'column',
         alignItems: isInline ? 'center' : 'stretch',
         justifyContent: 'space-between',
-        padding: si.is_image_only ? '0' : (isInline ? '18px 24px' : '24px'),
+        padding: si.is_image_only ? '0' : (isInline ? '24px 32px' : '24px'),
         textDecoration: 'none',
         background: isDark ? 'var(--ink)' : 'var(--cream-dark)',
-        gridColumn: isInline ? 'span 3' : (isWide ? 'span 2' : 'span 1'),
+        // Standard cards stay in grid, Inline ads break out in GrantsGrid
+        gridColumn: isInline ? '1 / -1' : (isWide ? 'span 2' : 'span 1'),
         border: (isDark || si.is_image_only) ? 'none' : '1px solid var(--cream-border)',
-        borderRadius: '0', 
+        borderRadius: isInline ? '12px' : '0', 
+        margin: isInline ? '32px 0' : '0',
         position: 'relative',
         overflow: 'hidden',
         minHeight: (isInline && !si.is_image_only) ? 'auto' : '280px',
       }}
-      className="si-card-link"
       aria-label={`Sponsored: ${si.headline}`}
     >
       {si.is_image_only && si.image_url ? (
@@ -65,7 +67,7 @@ export function SoftInfraCard({ si }: SoftInfraCardProps) {
             <div style={{ flex: 1, minWidth: 0 }}>
               <p
                 style={{
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-sans), sans-serif',
                   fontSize: '10px',
                   fontWeight: 500,
                   color: isDark ? 'var(--ink-4)' : 'var(--ink-3)',
@@ -106,7 +108,7 @@ export function SoftInfraCard({ si }: SoftInfraCardProps) {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <h3
                     style={{
-                      fontFamily: 'DM Serif Display, serif',
+                      fontFamily: 'var(--font-serif), serif',
                       fontSize: isInline ? '18px' : (isWide ? '28px' : '20px'),
                       fontWeight: 400,
                       color: isDark ? 'white' : 'var(--ink)',
@@ -120,7 +122,7 @@ export function SoftInfraCard({ si }: SoftInfraCardProps) {
                   {(!isInline || (isInline && si.subtext)) && (
                     <p
                       style={{
-                        fontFamily: 'DM Sans, sans-serif',
+                        fontFamily: 'var(--font-sans), sans-serif',
                         fontSize: '13.5px',
                         fontWeight: 300,
                         color: isDark ? 'var(--ink-4)' : 'var(--ink-2)',
@@ -138,10 +140,11 @@ export function SoftInfraCard({ si }: SoftInfraCardProps) {
           </div>
 
           <div
+            className="si-cta-button"
             style={{
               marginTop: isInline ? '0' : '24px',
               marginLeft: isInline ? '24px' : '0',
-              fontFamily: 'DM Sans, sans-serif',
+              fontFamily: 'var(--font-sans), sans-serif',
               fontSize: '13px',
               fontWeight: 500,
               color: isDark ? 'var(--cream)' : 'var(--accent)',

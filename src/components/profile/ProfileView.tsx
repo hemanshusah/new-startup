@@ -161,7 +161,7 @@ export function ProfileView({
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                 />
               ) : (
-                <span style={{ fontSize: '36px', fontFamily: 'DM Serif Display', color: 'var(--ink-3)' }}>
+                <span style={{ fontSize: '36px', fontFamily: 'var(--font-serif)', color: 'var(--ink-3)' }}>
                   {profile.full_name?.slice(0, 1) || profile.email?.slice(0, 1).toUpperCase()}
                 </span>
               )}
@@ -197,10 +197,10 @@ export function ProfileView({
             />
           </div>
 
-          <h1 style={{ fontFamily: 'DM Serif Display', fontSize: '24px', margin: '0 0 4px' }}>
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', margin: '0 0 4px' }}>
             {profile.full_name || 'Anonymous User'}
           </h1>
-          <p style={{ fontFamily: 'DM Sans', fontSize: '13px', color: 'var(--ink-3)', margin: '0 0 20px' }}>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: 'var(--ink-3)', margin: '0 0 20px' }}>
             Member since {new Date(profile.created_at).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
           </p>
 
@@ -251,7 +251,7 @@ export function ProfileView({
           border: '1px solid var(--cream-border)'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-            <h2 style={{ fontFamily: 'DM Serif Display', fontSize: '22px', margin: 0 }}>Account Information</h2>
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', margin: 0 }}>Account Information</h2>
             <button
               onClick={() => setIsEditing(!isEditing)}
               style={{
@@ -316,7 +316,7 @@ export function ProfileView({
 
                 <div style={{ height: '1px', background: 'var(--cream-border)', margin: '10px 0' }} />
 
-                <h3 style={{ fontFamily: 'DM Serif Display', fontSize: '18px', margin: '0 0 4px' }}>Startup Details</h3>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', margin: '0 0 4px' }}>Startup Details</h3>
                 <p style={{ fontSize: '13px', color: 'var(--ink-3)', margin: '0 0 20px' }}>Tell us about your venture to get tailored recommendations.</p>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -424,7 +424,7 @@ export function ProfileView({
           borderRadius: '16px',
           border: '1px solid var(--cream-border)'
         }}>
-          <h2 style={{ fontFamily: 'DM Serif Display', fontSize: '22px', marginBottom: '24px' }}>Recently Viewed Programs</h2>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', marginBottom: '24px' }}>Recently Viewed Programs</h2>
 
           {history.length === 0 ? (
             <p style={{ color: 'var(--ink-4)', textAlign: 'center', padding: '40px 0' }}>No programs viewed yet. Start exploring our listings!</p>
@@ -449,7 +449,7 @@ export function ProfileView({
                   >
                     <div>
                       <p style={{ fontSize: '10px', color: 'var(--ink-4)', textTransform: 'uppercase', marginBottom: '4px' }}>{p.organisation}</p>
-                      <h4 style={{ fontFamily: 'DM Serif Display', fontSize: '16px', color: 'var(--ink)', margin: 0 }}>{p.title}</h4>
+                      <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '16px', color: 'var(--ink)', margin: 0 }}>{p.title}</h4>
                       <p style={{ fontSize: '12px', color: 'var(--ink-3)', marginTop: '2px' }}>
                         {p.type.charAt(0).toUpperCase() + p.type.slice(1)} • {p.amount_display || 'TBA'}
                       </p>
@@ -484,7 +484,7 @@ const inputStyle = {
   borderRadius: '8px',
   border: '1px solid var(--cream-border)',
   background: 'var(--cream)',
-  fontFamily: 'DM Sans',
+  fontFamily: 'var(--font-sans)',
   fontSize: '14px',
   outline: 'none',
 }

@@ -43,12 +43,15 @@ export default async function ListingPage() {
   // Fetch SoftInfra boundaries and slots
   const { data: configData } = await supabase
     .from('site_config')
-    .select('si_slot_positions, show_newsletter')
+    .select('si_slot_positions, show_newsletter, cosmetic_settings')
     .limit(1)
     .single()
 
-  const siSlotPositions: number[] = configData?.si_slot_positions ?? [6, 14, 20]
+  const siSlotPositions: number[] = configData?.si_slot_positions ?? [3, 9, 15, 21]
   const showNewsletter: boolean = configData?.show_newsletter ?? true
+  const cosmetic = configData?.cosmetic_settings || {}
+  const homeHeading = cosmetic.homeHeading || 'Grants & funding programs for Indian founders'
+  const homeHeadingSize = cosmetic.homeHeadingSize || 'clamp(32px, 5vw, 42px)'
 
   const siAds = await getActiveSoftInfra('listing-grid')
 
@@ -66,7 +69,7 @@ export default async function ListingPage() {
         {/* Kicker */}
         <p
           style={{
-            fontFamily: 'DM Sans, sans-serif',
+            fontFamily: 'var(--font-sans)',
             fontSize: '12px',
             fontWeight: 500,
             color: 'var(--accent)',
@@ -77,12 +80,12 @@ export default async function ListingPage() {
         >
           India Startup Funding · 2026
         </p>
-
+ 
         {/* H1 */}
         <h1
           style={{
-            fontFamily: 'DM Serif Display, serif',
-            fontSize: 'clamp(32px, 5vw, 42px)',
+            fontFamily: 'var(--font-serif)',
+            fontSize: homeHeadingSize,
             fontWeight: 400,
             color: 'var(--ink)',
             lineHeight: 1.15,
@@ -91,13 +94,19 @@ export default async function ListingPage() {
             maxWidth: '680px',
           }}
         >
-          Grants &amp; funding programs for <span style={{ color: 'var(--accent)', fontStyle: 'italic' }}>Indian founders</span>
+          {homeHeading.includes('Indian founders') ? (
+            <>
+              {homeHeading.split('Indian founders')[0]}
+              <span style={{ color: 'var(--accent)', fontStyle: 'italic' }}>Indian founders</span>
+              {homeHeading.split('Indian founders')[1]}
+            </>
+          ) : homeHeading}
         </h1>
 
         {/* Subtitle */}
         <p
           style={{
-            fontFamily: 'DM Sans, sans-serif',
+            fontFamily: 'var(--font-sans)',
             fontSize: '15px',
             fontWeight: 300,
             color: 'var(--ink-3)',
@@ -129,7 +138,7 @@ export default async function ListingPage() {
             borderRadius: '8px',
             padding: '16px 20px',
             marginBottom: '24px',
-            fontFamily: 'DM Sans, sans-serif',
+            fontFamily: 'var(--font-sans)',
             fontSize: '13px',
             color: '#7A4010',
           }}

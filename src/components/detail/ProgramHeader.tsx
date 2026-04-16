@@ -40,7 +40,7 @@ export function ProgramHeader({ program }: ProgramHeaderProps) {
           display: 'flex',
           alignItems: 'center',
           gap: '6px',
-          fontFamily: 'DM Sans, sans-serif',
+          fontFamily: 'var(--font-sans)',
           fontSize: '12px',
           color: 'var(--ink-4)',
           marginBottom: '20px',
@@ -68,7 +68,7 @@ export function ProgramHeader({ program }: ProgramHeaderProps) {
         <span
           style={{
             display: 'inline-block',
-            fontFamily: 'DM Sans, sans-serif',
+            fontFamily: 'var(--font-sans)',
             fontSize: '10.5px',
             fontWeight: 500,
             color: '#1E6E2E',
@@ -86,7 +86,7 @@ export function ProgramHeader({ program }: ProgramHeaderProps) {
         <span
           style={{
             display: 'inline-block',
-            fontFamily: 'DM Sans, sans-serif',
+            fontFamily: 'var(--font-sans)',
             fontSize: '10.5px',
             fontWeight: 500,
             color: typeColor.color,
@@ -103,9 +103,10 @@ export function ProgramHeader({ program }: ProgramHeaderProps) {
       {/* H1 */}
       <h1
         style={{
-          fontFamily: 'DM Serif Display, serif',
-          fontSize: 'clamp(24px, 4vw, 32px)',
-          fontWeight: 400,
+          fontFamily: 'var(--font-section), var(--font-serif), serif',
+          fontSize: 'var(--font-size-heading)',
+          fontWeight: 'var(--font-weight-heading)' as any,
+          fontStyle: 'var(--font-style-heading)' as any,
           color: 'var(--ink)',
           lineHeight: 1.2,
           letterSpacing: '-0.02em',
@@ -118,8 +119,8 @@ export function ProgramHeader({ program }: ProgramHeaderProps) {
       {/* Organisation */}
       <p
         style={{
-          fontFamily: 'DM Sans, sans-serif',
-          fontSize: '13.5px',
+          fontFamily: 'var(--font-sans)',
+          fontSize: 'var(--font-size-body)',
           fontWeight: 300,
           color: 'var(--ink-3)',
           marginBottom: '24px',
@@ -139,8 +140,8 @@ export function ProgramHeader({ program }: ProgramHeaderProps) {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            fontFamily: 'DM Sans, sans-serif',
-            fontSize: '13.5px',
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--font-size-body)',
             fontWeight: 500,
             color: 'var(--cream)',
             background: 'var(--ink)',

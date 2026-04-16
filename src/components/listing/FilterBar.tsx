@@ -82,9 +82,9 @@ export function FilterBar({
             onClick={() => onScopeChange(s)}
             className="scope-segment"
             style={{
-              fontFamily: 'DM Sans, sans-serif',
+              fontFamily: 'var(--font-sans)',
               fontSize: '12px',
-              fontWeight: 500,
+              fontWeight: scope === s ? 500 : 400,
               color: scope === s ? 'var(--white)' : 'var(--ink-4)',
               background: scope === s ? 'var(--ink)' : 'transparent',
               padding: '6px 18px',
@@ -121,8 +121,8 @@ export function FilterBar({
           value={localSearch}
           onChange={(e) => setLocalSearch(e.target.value)}
           style={{
-            fontFamily: 'DM Sans, sans-serif',
-            fontSize: '12.5px',
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--font-size-body)',
             fontWeight: 400,
             color: 'var(--ink)',
             background: 'var(--white)',
@@ -158,7 +158,7 @@ export function FilterBar({
               id={`type-filter-${tab.value}`}
               onClick={() => onTypeChange(tab.value)}
               style={{
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans)',
                 fontSize: '12px',
                 fontWeight: 500,
                 color: isActive ? 'var(--white)' : 'var(--ink-4)',
@@ -181,8 +181,8 @@ export function FilterBar({
       {/* ── Result count (right-aligned) ── */}
       <div
         style={{
-          fontFamily: 'DM Sans, sans-serif',
-          fontSize: '12px',
+          fontFamily: 'var(--font-sans)',
+          fontSize: 'var(--font-size-body)',
           fontWeight: 400,
           color: 'var(--ink-4)',
           whiteSpace: 'nowrap',

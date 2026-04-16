@@ -73,14 +73,15 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
       <div>
         {/* Organisation */}
         <p
+          className="org-name"
           style={{
-            fontFamily: 'DM Sans, sans-serif',
+            fontFamily: 'var(--font-sans)',
             fontSize: '11px',
             fontWeight: 500,
             color: 'var(--ink-4)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
-            marginBottom: '8px',
+            marginBottom: '4px',
           }}
         >
           {program.organisation}
@@ -89,12 +90,14 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
         {/* Title */}
         <h3
           style={{
-            fontFamily: 'DM Serif Display, serif',
-            fontSize: '15.5px',
-            fontWeight: 400,
+            fontFamily: 'var(--font-section), var(--font-serif), serif',
+            fontSize: 'var(--font-size-section)',
+            fontWeight: 'var(--font-weight-section)',
+            fontStyle: 'var(--font-style-section)',
             color: 'var(--ink)',
             lineHeight: 1.35,
             marginBottom: '10px',
+            marginTop: 0,
           }}
         >
           {program.title}
@@ -104,9 +107,10 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
         <p
           className="line-clamp-2"
           style={{
-            fontFamily: 'DM Sans, sans-serif',
-            fontSize: '13px',
-            fontWeight: 300,
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--font-size-body)',
+            fontWeight: 'var(--font-weight-body)',
+            fontStyle: 'var(--font-style-body)',
             color: 'var(--ink-2)',
             lineHeight: 1.55,
           }}
@@ -129,9 +133,9 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
           {/* Type badge pill */}
           <span
             style={{
-              fontFamily: 'DM Sans, sans-serif',
+              fontFamily: 'var(--font-sans)',
               fontSize: '10px',
-              fontWeight: 500,
+              fontWeight: 600,
               borderRadius: '4px',
               padding: '3px 9px',
               display: 'inline-block',
@@ -158,8 +162,9 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
               }}
             />
             <span
+              className="meta-text"
               style={{
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans)',
                 fontSize: '11px',
                 fontWeight: 500,
                 color: deadline.color,
@@ -174,18 +179,20 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
         {program.amount_display && (
           <div style={{ textAlign: 'right' }}>
             <div
+              className="amount-display"
               style={{
-                fontFamily: 'DM Serif Display, serif',
+                fontFamily: 'var(--font-section)',
                 fontSize: '16px',
-                fontWeight: 400,
+                fontWeight: 'var(--font-weight-section)',
                 color: 'var(--ink)',
               }}
             >
               {program.amount_display}
             </div>
             <div
+              className="meta-text"
               style={{
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans)',
                 fontSize: '10px',
                 fontWeight: 400,
                 color: 'var(--ink-4)',

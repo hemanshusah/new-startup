@@ -139,9 +139,10 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
           <Link
             href="/"
             style={{
-              fontFamily: 'DM Serif Display, serif',
+              fontFamily: 'var(--font-section), var(--font-serif), serif',
               fontSize: '18px',
-              fontWeight: 400,
+              fontWeight: 'var(--font-weight-section)' as any,
+              fontStyle: 'var(--font-style-section)' as any,
               textDecoration: 'none',
             }}
           >
@@ -150,8 +151,9 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
           </Link>
           <p
             style={{
-              fontFamily: 'DM Sans, sans-serif',
+              fontFamily: 'var(--font-sans), sans-serif',
               fontSize: '10px',
+              fontWeight: 'var(--font-weight-body)' as any,
               color: 'var(--ink-4)',
               marginTop: '2px',
             }}
@@ -179,9 +181,10 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
                   padding: '9px 11px',
                   borderRadius: '8px',
                   marginBottom: '2px',
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-section), var(--font-sans), sans-serif',
                   fontSize: '13px',
-                  fontWeight: isActive ? 500 : 400,
+                  fontWeight: isActive ? 600 : ('var(--font-weight-section)' as any),
+                  fontStyle: 'var(--font-style-section)' as any,
                   color: isActive ? 'var(--ink)' : 'var(--ink-3)',
                   background: isActive ? 'var(--cream)' : 'transparent',
                   textDecoration: 'none',
@@ -234,7 +237,7 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
             <div style={{ flex: 1, minWidth: 0 }}>
               <p
                 style={{
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-sans), sans-serif',
                   fontSize: '10px',
                   color: 'var(--ink-4)',
                   marginBottom: '1px',
@@ -246,7 +249,7 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
               </p>
               <p
                 style={{
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-sans), sans-serif',
                   fontSize: '12px',
                   fontWeight: 500,
                   color: 'var(--ink)',
@@ -266,7 +269,7 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
             onClick={handleSignOut}
             style={{
               width: '100%',
-              fontFamily: 'DM Sans, sans-serif',
+              fontFamily: 'var(--font-sans), sans-serif',
               fontSize: '12px',
               fontWeight: 500,
               color: 'var(--ink-3)',
@@ -333,10 +336,10 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
           }}>
             <span style={{ fontSize: '18px' }}>⚠️</span>
             <div>
-              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', fontWeight: 600, color: '#B01F1F', margin: 0 }}>
+              <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', fontWeight: 600, color: '#B01F1F', margin: 0 }}>
                 Restricted Access
               </p>
-              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12px', color: '#B01F1F', margin: '2px 0 0', opacity: 0.8 }}>
+              <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', color: '#B01F1F', margin: '2px 0 0', opacity: 0.8 }}>
                 Your account ({adminEmail}) is logged in, but might not have &quot;admin&quot; privileges in the database. some actions may fail.
               </p>
             </div>

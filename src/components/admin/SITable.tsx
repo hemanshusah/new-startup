@@ -72,7 +72,7 @@ export function SITable({ initialSI }: { initialSI: SoftInfra[] }) {
     <div>
       {/* Toast */}
       {toast && (
-        <div style={{ position: 'fixed', bottom: '24px', right: '24px', background: toast.ok ? '#1E6E2E' : '#B01F1F', color: '#fff', fontFamily: 'DM Sans, sans-serif', fontSize: '13px', padding: '12px 20px', borderRadius: '8px', zIndex: 200, boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }} role="status">
+        <div style={{ position: 'fixed', bottom: '24px', right: '24px', background: toast.ok ? '#1E6E2E' : '#B01F1F', color: '#fff', fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', padding: '12px 20px', borderRadius: '8px', zIndex: 200, boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }} role="status">
           {toast.msg}
         </div>
       )}
@@ -83,7 +83,7 @@ export function SITable({ initialSI }: { initialSI: SoftInfra[] }) {
           <thead>
             <tr>
               {['Advertiser', 'Format', 'Placements', 'Slot', 'Priority', 'Status', 'Impressions', 'Views', 'Clicks', 'CTR', 'Actions'].map((h) => (
-                <th key={h} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '10.5px', fontWeight: 500, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.07em', padding: '10px 14px', textAlign: 'left', background: 'var(--cream)', whiteSpace: 'nowrap' }}>
+                <th key={h} style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '10.5px', fontWeight: 500, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.07em', padding: '10px 14px', textAlign: 'left', background: 'var(--cream)', whiteSpace: 'nowrap' }}>
                   {h}
                 </th>
               ))}
@@ -92,7 +92,7 @@ export function SITable({ initialSI }: { initialSI: SoftInfra[] }) {
           <tbody>
             {siItems.length === 0 ? (
               <tr>
-                <td colSpan={11} style={{ padding: '40px', textAlign: 'center', fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink-4)' }}>
+                <td colSpan={11} style={{ padding: '40px', textAlign: 'center', fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink-4)' }}>
                   No items yet. <Link href="/admin/softinfra/new" style={{ color: 'var(--ink)', textDecoration: 'underline' }}>Create your first item.</Link>
                 </td>
               </tr>
@@ -104,22 +104,22 @@ export function SITable({ initialSI }: { initialSI: SoftInfra[] }) {
                 <td style={td}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     {si.icon_emoji && <span style={{ fontSize: '16px' }}>{si.icon_emoji}</span>}
-                    <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink)', fontWeight: 500 }}>{si.advertiser}</span>
+                    <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink)', fontWeight: 500 }}>{si.advertiser}</span>
                   </div>
-                  <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', color: 'var(--ink-4)', margin: '2px 0 0' }}>{si.headline.slice(0, 40)}{si.headline.length > 40 ? '…' : ''}</p>
+                  <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '11px', color: 'var(--ink-4)', margin: '2px 0 0' }}>{si.headline.slice(0, 40)}{si.headline.length > 40 ? '…' : ''}</p>
                 </td>
                 <td style={td}>
-                  <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '10.5px', fontWeight: 500, color: FORMAT_COLORS[si.format] ?? 'var(--ink-3)', background: 'var(--cream)', borderRadius: '4px', padding: '2px 7px' }}>{si.format}</span>
+                  <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '10.5px', fontWeight: 500, color: FORMAT_COLORS[si.format] ?? 'var(--ink-3)', background: 'var(--cream)', borderRadius: '4px', padding: '2px 7px' }}>{si.format}</span>
                 </td>
                 <td style={td}>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                     {(si.placement ?? []).map((p) => (
-                      <span key={p} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '10px', color: 'var(--ink-3)', background: 'var(--cream)', border: '1px solid var(--cream-border)', borderRadius: '4px', padding: '1px 5px' }}>{p}</span>
+                      <span key={p} style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '10px', color: 'var(--ink-3)', background: 'var(--cream)', border: '1px solid var(--cream-border)', borderRadius: '4px', padding: '1px 5px' }}>{p}</span>
                     ))}
                   </div>
                 </td>
-                <td style={td}><span style={{ fontFamily: 'DM Serif Display, serif', fontSize: '13px', color: 'var(--ink)' }}>{si.slot_index ?? 'Auto'}</span></td>
-                <td style={td}><span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink)' }}>{si.priority}</span></td>
+                <td style={td}><span style={{ fontFamily: 'var(--font-serif), serif', fontSize: '13px', color: 'var(--ink)' }}>{si.slot_index ?? 'Auto'}</span></td>
+                <td style={td}><span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink)' }}>{si.priority}</span></td>
                 <td style={td}>
                   <button
                     onClick={() => { toggleActive(si) }}
@@ -129,10 +129,10 @@ export function SITable({ initialSI }: { initialSI: SoftInfra[] }) {
                     <span style={{ position: 'absolute', top: '2px', left: si.is_active ? '18px' : '2px', width: '16px', height: '16px', borderRadius: '50%', background: 'var(--white)', transition: 'left 0.2s ease' }} />
                   </button>
                 </td>
-                <td style={td}><span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: 'var(--ink)' }}>{si.impression_count.toLocaleString()}</span></td>
-                <td style={td}><span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: 'var(--ink)' }}>{si.unique_view_count.toLocaleString()}</span></td>
-                <td style={td}><span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: 'var(--ink)' }}>{si.click_count.toLocaleString()}</span></td>
-                <td style={td}><span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: 'var(--ink)' }}>{ctr(si)}</span></td>
+                <td style={td}><span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', color: 'var(--ink)' }}>{si.impression_count.toLocaleString()}</span></td>
+                <td style={td}><span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', color: 'var(--ink)' }}>{si.unique_view_count.toLocaleString()}</span></td>
+                <td style={td}><span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', color: 'var(--ink)' }}>{si.click_count.toLocaleString()}</span></td>
+                <td style={td}><span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', color: 'var(--ink)' }}>{ctr(si)}</span></td>
                 <td style={td}>
                   <div style={{ display: 'flex', gap: '6px', flexWrap: 'nowrap' }}>
                     <Link href={`/admin/softinfra/${si.id}`} style={actionBtn}>Edit</Link>
@@ -150,5 +150,5 @@ export function SITable({ initialSI }: { initialSI: SoftInfra[] }) {
 }
 
 const td: React.CSSProperties = { padding: '12px 14px', verticalAlign: 'middle' }
-const actionBtn: React.CSSProperties = { fontFamily: 'DM Sans, sans-serif', fontSize: '11.5px', color: 'var(--ink)', textDecoration: 'none', border: '1px solid var(--cream-border)', borderRadius: '5px', padding: '3px 9px' }
-const actionBtnEl: React.CSSProperties = { fontFamily: 'DM Sans, sans-serif', fontSize: '11.5px', color: 'var(--ink-3)', background: 'none', border: '1px solid var(--cream-border)', borderRadius: '5px', padding: '3px 9px', cursor: 'pointer' }
+const actionBtn: React.CSSProperties = { fontFamily: 'var(--font-sans), sans-serif', fontSize: '11.5px', color: 'var(--ink)', textDecoration: 'none', border: '1px solid var(--cream-border)', borderRadius: '5px', padding: '3px 9px' }
+const actionBtnEl: React.CSSProperties = { fontFamily: 'var(--font-sans), sans-serif', fontSize: '11.5px', color: 'var(--ink-3)', background: 'none', border: '1px solid var(--cream-border)', borderRadius: '5px', padding: '3px 9px', cursor: 'pointer' }

@@ -8,7 +8,7 @@ export default async function NewProgramPage() {
     <div>
       <h1
         style={{
-          fontFamily: 'DM Serif Display, serif',
+          fontFamily: 'var(--font-serif), serif',
           fontSize: '24px',
           fontWeight: 400,
           color: 'var(--ink)',

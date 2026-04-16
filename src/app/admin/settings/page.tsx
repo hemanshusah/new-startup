@@ -6,7 +6,7 @@ async function loadOrCreateSiteConfigRow() {
   const supabase = createServiceClient()
   const { data: rows } = await supabase
     .from('site_config')
-    .select('id, field_schema, sectors')
+    .select('id, field_schema, sectors, cosmetic_settings')
     .limit(1)
 
   const row = rows?.[0]
@@ -22,8 +22,23 @@ async function loadOrCreateSiteConfigRow() {
       maintenance_mode: false,
       field_schema: {},
       sectors: SECTOR_DEFAULTS,
+      cosmetic_settings: {
+        colors: { 
+          accent: "#B8460A", 
+          accentLight: "#FDF0EA", 
+          bg: "#F5F2EB", 
+          text: "#1C1A16", 
+          border: "#DAD6CC", 
+          white: "#FDFCF9" 
+        },
+        fonts: { 
+          heading: 'DM Serif Display', 
+          body: 'DM Sans' 
+        },
+        borderRadius: "12px"
+      }
     })
-    .select('id, field_schema, sectors')
+    .select('id, field_schema, sectors, cosmetic_settings')
     .maybeSingle()
 
   return inserted ?? null
@@ -47,6 +62,7 @@ export default async function AdminSettingsPage() {
         settingsRowId={row?.id ?? null}
         initialFieldConfig={fieldConfig}
         initialSectors={sectors}
+        initialCosmeticSettings={row?.cosmetic_settings as any}
       />
     </div>
   )

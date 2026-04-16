@@ -50,7 +50,7 @@ function toSlug(title: string): string {
 
 function Label({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (
-    <label style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', fontWeight: 500, color: 'var(--ink)', display: 'block', marginBottom: '6px' }}>
+    <label style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 500, color: 'var(--ink)', display: 'block', marginBottom: '6px' }}>
       {children}{required && <span style={{ color: '#E03E2D', marginLeft: '3px' }}>*</span>}
     </label>
   )
@@ -60,13 +60,13 @@ function FieldWrap({ children, error }: { children: React.ReactNode; error?: str
   return (
     <div style={{ marginBottom: '18px' }}>
       {children}
-      {error && <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11.5px', color: '#E03E2D', marginTop: '4px' }}>{error}</p>}
+      {error && <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '11.5px', color: '#E03E2D', marginTop: '4px' }}>{error}</p>}
     </div>
   )
 }
 
 const inputStyle = (hasError?: boolean): React.CSSProperties => ({
-  fontFamily: 'DM Sans, sans-serif',
+  fontFamily: 'var(--font-sans), sans-serif',
   fontSize: '13px',
   width: '100%',
   border: `1px solid ${hasError ? '#E03E2D' : 'var(--cream-border)'}`,
@@ -95,7 +95,7 @@ function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: 
           background: 'var(--white)', transition: 'left 0.2s ease',
         }} />
       </button>
-      {label && <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink-2)' }}>{label}</span>}
+      {label && <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink-2)' }}>{label}</span>}
     </div>
   )
 }
@@ -118,14 +118,14 @@ function ListEditor({ value, onChange, placeholder }: { value: string[]; onChang
           placeholder={placeholder ?? 'Add item…'}
           style={{ ...inputStyle(), flex: 1 }}
         />
-        <button type="button" onClick={add} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: 'var(--ink)', background: 'var(--cream)', border: '1px solid var(--cream-border)', borderRadius: '7px', padding: '8px 14px', cursor: 'pointer' }}>
+        <button type="button" onClick={add} style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', color: 'var(--ink)', background: 'var(--cream)', border: '1px solid var(--cream-border)', borderRadius: '7px', padding: '8px 14px', cursor: 'pointer' }}>
           Add
         </button>
       </div>
       <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '6px' }}>
         {value.map((item, i) => (
           <li key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--cream)', borderRadius: '6px', padding: '7px 12px' }}>
-            <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: 'var(--ink)' }}>{item}</span>
+            <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', color: 'var(--ink)' }}>{item}</span>
             <button type="button" onClick={() => remove(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-4)', fontSize: '14px' }}>×</button>
           </li>
         ))}
@@ -144,7 +144,7 @@ function SectionHeader({ title, open, onToggle, always }: { title: string; open:
         marginBottom: '20px',
       }}
     >
-      <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12px', fontWeight: 600, color: 'var(--ink)', textTransform: 'uppercase', letterSpacing: '0.07em', margin: 0 }}>{title}</p>
+      <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', fontWeight: 600, color: 'var(--ink)', textTransform: 'uppercase', letterSpacing: '0.07em', margin: 0 }}>{title}</p>
       {!always && <span style={{ color: 'var(--ink-4)', fontSize: '14px' }}>{open ? '▲' : '▼'}</span>}
     </div>
   )
@@ -365,7 +365,7 @@ export function ProgramForm({
     <form onSubmit={(e) => e.preventDefault()} noValidate>
       {/* Toast */}
       {toast && (
-        <div style={{ position: 'fixed', bottom: '24px', right: '24px', background: toast.ok ? '#1E6E2E' : '#B01F1F', color: '#fff', fontFamily: 'DM Sans, sans-serif', fontSize: '13px', padding: '12px 20px', borderRadius: '8px', zIndex: 200, boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }} role="status">
+        <div style={{ position: 'fixed', bottom: '24px', right: '24px', background: toast.ok ? '#1E6E2E' : '#B01F1F', color: '#fff', fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', padding: '12px 20px', borderRadius: '8px', zIndex: 200, boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }} role="status">
           {toast.msg}
         </div>
       )}
@@ -378,7 +378,7 @@ export function ProgramForm({
             background: '#FFF8E8',
             border: '1px solid #E8D4A8',
             borderRadius: '10px',
-            fontFamily: 'DM Sans, sans-serif',
+            fontFamily: 'var(--font-sans), sans-serif',
             fontSize: '13px',
             color: 'var(--ink)',
             lineHeight: 1.55,
@@ -428,7 +428,7 @@ export function ProgramForm({
             <div style={{ display: 'flex', gap: '12px' }}>
               {[{ label: 'National (India)', val: true }, { label: 'International', val: false }].map(({ label, val }) => (
                 <button key={String(val)} type="button" onClick={() => setIsIndia(val)}
-                  style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', padding: '7px 16px', borderRadius: '7px', border: `1px solid ${isIndia === val ? 'var(--ink)' : 'var(--cream-border)'}`, background: isIndia === val ? 'var(--ink)' : 'var(--white)', color: isIndia === val ? 'var(--cream)' : 'var(--ink)', cursor: 'pointer' }}>
+                  style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', padding: '7px 16px', borderRadius: '7px', border: `1px solid ${isIndia === val ? 'var(--ink)' : 'var(--cream-border)'}`, background: isIndia === val ? 'var(--ink)' : 'var(--white)', color: isIndia === val ? 'var(--cream)' : 'var(--ink)', cursor: 'pointer' }}>
                   {label}
                 </button>
               ))}
@@ -482,7 +482,7 @@ export function ProgramForm({
             </FieldWrap>
           )}
           {!hasSectionBExtra && (
-            <p style={{ gridColumn: '1 / -1', fontFamily: 'DM Sans, sans-serif', fontSize: '12px', color: 'var(--ink-4)', margin: 0 }}>
+            <p style={{ gridColumn: '1 / -1', fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', color: 'var(--ink-4)', margin: 0 }}>
               Funding fields (amount, equity) are hidden in Settings → Field schema.
             </p>
           )}
@@ -571,7 +571,7 @@ export function ProgramForm({
                     <Label required={fs.sectors === 'required'}>
                       Focus sectors {fs.sectors !== 'required' && <span style={{ color: 'var(--ink-4)', fontWeight: 400 }}>(Optional)</span>}
                     </Label>
-                    <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', color: 'var(--ink-4)', margin: '0 0 8px' }}>
+                    <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '11px', color: 'var(--ink-4)', margin: '0 0 8px' }}>
                       Tags from Settings → Sector tags. Selected program sectors stay available even if you later remove a tag from Settings.
                     </p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 8px', marginBottom: '10px' }}>
@@ -579,7 +579,7 @@ export function ProgramForm({
                         <button key={s} type="button"
                           onClick={() => setSectors(sectors.includes(s) ? sectors.filter((x) => x !== s) : [...sectors, s])}
                           style={{
-                            fontFamily: 'DM Sans, sans-serif', fontSize: '11.5px', padding: '4px 12px',
+                            fontFamily: 'var(--font-sans), sans-serif', fontSize: '11.5px', padding: '4px 12px',
                             borderRadius: '20px', border: '1px solid var(--cream-border)', cursor: 'pointer',
                             background: sectors.includes(s) ? 'var(--ink)' : 'var(--cream)',
                             color: sectors.includes(s) ? 'var(--cream)' : 'var(--ink)',
@@ -614,7 +614,7 @@ export function ProgramForm({
                     style={{ ...inputStyle(!!errors.descriptionShort), resize: 'vertical' }}
                     placeholder="Used on listing cards (max 300 chars)"
                   />
-                  <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', color: 'var(--ink-4)' }}>{descriptionShort.length}/300</span>
+                  <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '11px', color: 'var(--ink-4)' }}>{descriptionShort.length}/300</span>
                 </FieldWrap>
               )}
               {vis('about') && (
@@ -658,16 +658,16 @@ export function ProgramForm({
       <div style={{ display: 'flex', gap: '12px', alignItems: 'center', justifyContent: 'flex-end', paddingTop: '8px' }}>
         {mode === 'edit' && (
           <button type="button" onClick={() => window.open(`/programs/${program?.slug}?preview=true`, '_blank')}
-            style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink-3)', background: 'none', border: '1px solid var(--cream-border)', borderRadius: '8px', padding: '9px 18px', cursor: 'pointer' }}>
+            style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink-3)', background: 'none', border: '1px solid var(--cream-border)', borderRadius: '8px', padding: '9px 18px', cursor: 'pointer' }}>
             Preview ↗
           </button>
         )}
         <button type="button" onClick={saveDraft} disabled={saving}
-          style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink)', background: 'var(--cream)', border: '1px solid var(--cream-border)', borderRadius: '8px', padding: '9px 18px', cursor: 'pointer' }}>
+          style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink)', background: 'var(--cream)', border: '1px solid var(--cream-border)', borderRadius: '8px', padding: '9px 18px', cursor: 'pointer' }}>
           {saving ? 'Saving…' : 'Save draft'}
         </button>
         <button type="button" onClick={publish} disabled={saving}
-          style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', fontWeight: 500, color: 'var(--cream)', background: 'var(--ink)', border: 'none', borderRadius: '8px', padding: '9px 22px', cursor: 'pointer' }}>
+          style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', fontWeight: 500, color: 'var(--cream)', background: 'var(--ink)', border: 'none', borderRadius: '8px', padding: '9px 22px', cursor: 'pointer' }}>
           {saving ? 'Publishing…' : 'Publish'}
         </button>
       </div>
@@ -677,22 +677,22 @@ export function ProgramForm({
         <div style={{ marginTop: '40px', borderTop: '1px solid var(--cream-border)', paddingTop: '24px' }}>
           {!showDelete ? (
             <button type="button" onClick={() => setShowDelete(true)}
-              style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: '#B01F1F', background: 'none', border: '1px solid #F0B8B8', borderRadius: '8px', padding: '8px 16px', cursor: 'pointer' }}>
+              style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: '#B01F1F', background: 'none', border: '1px solid #F0B8B8', borderRadius: '8px', padding: '8px 16px', cursor: 'pointer' }}>
               Delete program…
             </button>
           ) : (
             <div style={{ background: '#FFF5F5', border: '1px solid #F0B8B8', borderRadius: '10px', padding: '18px' }}>
-              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13.5px', color: '#B01F1F', marginBottom: '12px', fontWeight: 500 }}>
+              <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13.5px', color: '#B01F1F', marginBottom: '12px', fontWeight: 500 }}>
                 Type the program title to confirm deletion: <strong>{title}</strong>
               </p>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <input type="text" value={deleteConfirm} onChange={(e) => setDeleteConfirm(e.target.value)} placeholder="Type title here…" style={{ ...inputStyle(), flex: 1 }} />
                 <button type="button" onClick={handleDelete} disabled={deleteConfirm !== title || saving}
-                  style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: '#fff', background: '#B01F1F', border: 'none', borderRadius: '7px', padding: '9px 18px', cursor: deleteConfirm !== title ? 'not-allowed' : 'pointer', opacity: deleteConfirm !== title ? 0.5 : 1 }}>
+                  style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: '#fff', background: '#B01F1F', border: 'none', borderRadius: '7px', padding: '9px 18px', cursor: deleteConfirm !== title ? 'not-allowed' : 'pointer', opacity: deleteConfirm !== title ? 0.5 : 1 }}>
                   Delete permanently
                 </button>
                 <button type="button" onClick={() => { setShowDelete(false); setDeleteConfirm('') }}
-                  style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink)', background: 'none', border: '1px solid var(--cream-border)', borderRadius: '7px', padding: '9px 14px', cursor: 'pointer' }}>
+                  style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink)', background: 'none', border: '1px solid var(--cream-border)', borderRadius: '7px', padding: '9px 14px', cursor: 'pointer' }}>
                   Cancel
                 </button>
               </div>

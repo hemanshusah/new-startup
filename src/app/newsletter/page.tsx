@@ -25,7 +25,7 @@ export default function NewsletterPage() {
       <Link
         href="/"
         style={{
-          fontFamily: 'DM Serif Display, serif',
+          fontFamily: 'var(--font-serif), serif',
           fontSize: '22px',
           fontWeight: 400,
           marginBottom: '40px',
@@ -47,7 +47,7 @@ export default function NewsletterPage() {
       {/* Headline */}
       <h1
         style={{
-          fontFamily: 'DM Serif Display, serif',
+          fontFamily: 'var(--font-serif), serif',
           fontSize: 'clamp(28px, 5vw, 40px)',
           fontWeight: 400,
           color: 'var(--ink)',
@@ -62,7 +62,7 @@ export default function NewsletterPage() {
       {/* Value prop */}
       <p
         style={{
-          fontFamily: 'DM Sans, sans-serif',
+          fontFamily: 'var(--font-sans), sans-serif',
           fontSize: '15px',
           fontWeight: 300,
           color: 'var(--ink-2)',
@@ -80,7 +80,7 @@ export default function NewsletterPage() {
 
       <p
         style={{
-          fontFamily: 'DM Sans, sans-serif',
+          fontFamily: 'var(--font-sans), sans-serif',
           fontSize: '11px',
           color: 'var(--ink-4)',
           marginTop: '12px',
@@ -93,7 +93,7 @@ export default function NewsletterPage() {
       <Link
         href="/"
         style={{
-          fontFamily: 'DM Sans, sans-serif',
+          fontFamily: 'var(--font-sans), sans-serif',
           fontSize: '12px',
           color: 'var(--ink-3)',
           marginTop: '24px',

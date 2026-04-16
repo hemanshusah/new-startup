@@ -25,7 +25,7 @@ export default function DealsPage() {
       <Link
         href="/"
         style={{
-          fontFamily: 'DM Serif Display, serif',
+          fontFamily: 'var(--font-serif), serif',
           fontSize: '22px',
           fontWeight: 400,
           marginBottom: '40px',
@@ -47,7 +47,7 @@ export default function DealsPage() {
       {/* Headline */}
       <h1
         style={{
-          fontFamily: 'DM Serif Display, serif',
+          fontFamily: 'var(--font-serif), serif',
           fontSize: 'clamp(28px, 5vw, 40px)',
           fontWeight: 400,
           color: 'var(--ink)',
@@ -62,7 +62,7 @@ export default function DealsPage() {
       {/* Description */}
       <p
         style={{
-          fontFamily: 'DM Sans, sans-serif',
+          fontFamily: 'var(--font-sans), sans-serif',
           fontSize: '15px',
           fontWeight: 300,
           color: 'var(--ink-2)',
@@ -82,7 +82,7 @@ export default function DealsPage() {
       <Link
         href="/"
         style={{
-          fontFamily: 'DM Sans, sans-serif',
+          fontFamily: 'var(--font-sans), sans-serif',
           fontSize: '12px',
           color: 'var(--ink-3)',
           marginTop: '32px',

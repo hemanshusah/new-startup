@@ -15,7 +15,7 @@ function Num({ n }: { n: number }) {
         width: '28px', height: '28px', borderRadius: '50%',
         background: 'var(--accent)', color: '#fff',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontFamily: 'DM Serif Display, serif', fontSize: '12.5px', flexShrink: 0,
+        fontFamily: 'var(--font-serif), serif', fontSize: '12.5px', flexShrink: 0,
       }}
     >
       {n}
@@ -29,7 +29,7 @@ function SectionCard({ n, title, children }: { n: number; title: string; childre
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
         <Num n={n} />
         <h2 style={{
-          fontFamily: 'DM Serif Display, serif', fontSize: '1.2rem',
+          fontFamily: 'var(--font-serif), serif', fontSize: '1.2rem',
           fontWeight: 400, color: 'var(--ink)', letterSpacing: '-0.015em', lineHeight: 1.3,
         }}>
           {title}
@@ -60,23 +60,23 @@ export default function PrivacyPage() {
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
         </div>
-        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '14px' }}>
+        <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '14px' }}>
           Legal
         </p>
         <h1 style={{
-          fontFamily: 'DM Serif Display, serif', fontSize: 'clamp(32px, 5vw, 48px)',
+          fontFamily: 'var(--font-serif), serif', fontSize: 'clamp(32px, 5vw, 48px)',
           fontWeight: 400, color: 'var(--ink)', letterSpacing: '-0.025em',
           lineHeight: 1.1, marginBottom: '18px',
         }}>
           Privacy Policy
         </h1>
-        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '16px', fontWeight: 300, color: 'var(--ink-3)', lineHeight: 1.65, maxWidth: '460px', margin: '0 auto 24px' }}>
+        <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '16px', fontWeight: 300, color: 'var(--ink-3)', lineHeight: 1.65, maxWidth: '460px', margin: '0 auto 24px' }}>
           We built GrantsIndia on trust. Here&apos;s exactly what that means for your personal data.
         </p>
         <span style={{
           display: 'inline-block', background: 'var(--cream)', border: '1px solid var(--cream-border)',
           borderRadius: '20px', padding: '4px 16px',
-          fontFamily: 'DM Sans, sans-serif', fontSize: '12px', color: 'var(--ink-3)',
+          fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', color: 'var(--ink-3)',
         }}>
           Effective April 2026
         </span>
@@ -86,7 +86,7 @@ export default function PrivacyPage() {
       <div className="legal-body">
 
         {/* At a glance */}
-        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.13em', textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: '14px' }}>
+        <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.13em', textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: '14px' }}>
           Privacy at a glance
         </p>
         <div className="legal-glance-grid">
@@ -97,8 +97,8 @@ export default function PrivacyPage() {
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
             </div>
-            <p style={{ fontFamily: 'DM Serif Display, serif', fontSize: '1rem', color: 'var(--ink)', marginBottom: '6px' }}>Minimal collection</p>
-            <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink-3)', lineHeight: 1.6 }}>Just your email and profile basics. No phone numbers, no payment data.</p>
+            <p style={{ fontFamily: 'var(--font-serif), serif', fontSize: '1rem', color: 'var(--ink)', marginBottom: '6px' }}>Minimal collection</p>
+            <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink-3)', lineHeight: 1.6 }}>Just your email and profile basics. No phone numbers, no payment data.</p>
           </div>
           <div className="legal-glance-card">
             <div style={{ color: 'var(--accent)', marginBottom: '12px' }}>
@@ -107,8 +107,8 @@ export default function PrivacyPage() {
                 <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
               </svg>
             </div>
-            <p style={{ fontFamily: 'DM Serif Display, serif', fontSize: '1rem', color: 'var(--ink)', marginBottom: '6px' }}>Never sold</p>
-            <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink-3)', lineHeight: 1.6 }}>Your data is never sold to advertisers, data brokers, or third parties. Full stop.</p>
+            <p style={{ fontFamily: 'var(--font-serif), serif', fontSize: '1rem', color: 'var(--ink)', marginBottom: '6px' }}>Never sold</p>
+            <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink-3)', lineHeight: 1.6 }}>Your data is never sold to advertisers, data brokers, or third parties. Full stop.</p>
           </div>
           <div className="legal-glance-card">
             <div style={{ color: 'var(--accent)', marginBottom: '12px' }}>
@@ -117,8 +117,8 @@ export default function PrivacyPage() {
                 <circle cx="12" cy="7" r="4" />
               </svg>
             </div>
-            <p style={{ fontFamily: 'DM Serif Display, serif', fontSize: '1rem', color: 'var(--ink)', marginBottom: '6px' }}>You&apos;re in control</p>
-            <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink-3)', lineHeight: 1.6 }}>Delete your account, export your data, or unsubscribe anytime.</p>
+            <p style={{ fontFamily: 'var(--font-serif), serif', fontSize: '1rem', color: 'var(--ink)', marginBottom: '6px' }}>You&apos;re in control</p>
+            <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink-3)', lineHeight: 1.6 }}>Delete your account, export your data, or unsubscribe anytime.</p>
           </div>
         </div>
 
@@ -224,13 +224,13 @@ export default function PrivacyPage() {
 
         {/* Contact */}
         <div className="legal-contact-card">
-          <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.13em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '12px' }}>
+          <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.13em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '12px' }}>
             Section 11 — Contact
           </p>
-          <h2 style={{ fontFamily: 'DM Serif Display, serif', fontSize: 'clamp(22px, 3.5vw, 30px)', fontWeight: 400, color: '#fff', letterSpacing: '-0.02em', marginBottom: '10px' }}>
+          <h2 style={{ fontFamily: 'var(--font-serif), serif', fontSize: 'clamp(22px, 3.5vw, 30px)', fontWeight: 400, color: '#fff', letterSpacing: '-0.02em', marginBottom: '10px' }}>
             Questions about your privacy?
           </h2>
-          <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, marginBottom: '24px', maxWidth: '360px', margin: '0 auto 24px' }}>
+          <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '14px', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, marginBottom: '24px', maxWidth: '360px', margin: '0 auto 24px' }}>
             We&apos;re a small team. Reach out with any questions or requests and we&apos;ll respond within 30 days.
           </p>
           <a href={`mailto:${CONTACT_EMAIL}`} className="legal-email-btn">

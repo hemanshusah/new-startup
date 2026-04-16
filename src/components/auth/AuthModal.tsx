@@ -46,7 +46,7 @@ function GoogleIcon() {
 // ─── Input helpers ────────────────────────────────────────────────────────────
 
 const inputStyle: React.CSSProperties = {
-  fontFamily: 'DM Sans, sans-serif',
+  fontFamily: 'var(--font-sans), sans-serif',
   fontSize: '13.5px',
   color: 'var(--ink)',
   background: 'var(--white)',
@@ -315,7 +315,7 @@ export function AuthModal() {
             <h2
               id="auth-modal-title"
               style={{
-                fontFamily: 'DM Serif Display, serif',
+                fontFamily: 'var(--font-serif), serif',
                 fontSize: '20px',
                 fontWeight: 400,
                 color: 'var(--ink)',
@@ -326,7 +326,7 @@ export function AuthModal() {
             </h2>
             <p
               style={{
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans), sans-serif',
                 fontSize: '13px',
                 color: 'var(--ink-3)',
                 marginBottom: '24px',
@@ -350,7 +350,7 @@ export function AuthModal() {
                 border: '1px solid var(--cream-border)',
                 borderRadius: '8px',
                 background: 'var(--white)',
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans), sans-serif',
                 fontSize: '13.5px',
                 fontWeight: 500,
                 color: 'var(--ink)',
@@ -375,7 +375,7 @@ export function AuthModal() {
               <div style={{ flex: 1, height: '1px', background: 'var(--cream-border)' }} />
               <span
                 style={{
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-sans), sans-serif',
                   fontSize: '12px',
                   color: 'var(--ink-4)',
                 }}
@@ -419,7 +419,7 @@ export function AuthModal() {
                     background: 'none',
                     border: 'none',
                     cursor: 'pointer',
-                    fontFamily: 'DM Sans, sans-serif',
+                    fontFamily: 'var(--font-sans), sans-serif',
                     fontSize: '11px',
                     color: 'var(--ink-3)',
                     padding: '0',
@@ -434,7 +434,7 @@ export function AuthModal() {
               {error && (
                 <p
                   style={{
-                    fontFamily: 'DM Sans, sans-serif',
+                    fontFamily: 'var(--font-sans), sans-serif',
                     fontSize: '12.5px',
                     color: '#B01F1F',
                     margin: 0,
@@ -450,7 +450,7 @@ export function AuthModal() {
                 type="submit"
                 disabled={loading}
                 style={{
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-sans), sans-serif',
                   fontSize: '13.5px',
                   fontWeight: 500,
                   color: 'var(--cream)',
@@ -479,7 +479,7 @@ export function AuthModal() {
               <button
                 onClick={() => switchView('forgot')}
                 style={{
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-sans), sans-serif',
                   fontSize: '12px',
                   color: 'var(--ink-3)',
                   background: 'none',
@@ -494,7 +494,7 @@ export function AuthModal() {
                 id="switch-to-signup"
                 onClick={() => switchView('signup')}
                 style={{
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-sans), sans-serif',
                   fontSize: '12px',
                   color: 'var(--accent)',
                   background: 'none',
@@ -515,7 +515,7 @@ export function AuthModal() {
             <h2
               id="auth-modal-title"
               style={{
-                fontFamily: 'DM Serif Display, serif',
+                fontFamily: 'var(--font-serif), serif',
                 fontSize: '20px',
                 fontWeight: 400,
                 color: 'var(--ink)',
@@ -526,7 +526,7 @@ export function AuthModal() {
             </h2>
             <p
               style={{
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans), sans-serif',
                 fontSize: '13px',
                 color: 'var(--ink-3)',
                 marginBottom: '24px',
@@ -549,7 +549,7 @@ export function AuthModal() {
                 border: '1px solid var(--cream-border)',
                 borderRadius: '8px',
                 background: 'var(--white)',
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans), sans-serif',
                 fontSize: '13.5px',
                 fontWeight: 500,
                 color: 'var(--ink)',
@@ -564,7 +564,7 @@ export function AuthModal() {
             {/* "or" divider */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
               <div style={{ flex: 1, height: '1px', background: 'var(--cream-border)' }} />
-              <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12px', color: 'var(--ink-4)' }}>or</span>
+              <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', color: 'var(--ink-4)' }}>or</span>
               <div style={{ flex: 1, height: '1px', background: 'var(--cream-border)' }} />
             </div>
 
@@ -575,7 +575,7 @@ export function AuthModal() {
                   border: '1px solid #A8D4A0',
                   borderRadius: '8px',
                   padding: '14px 16px',
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-sans), sans-serif',
                   fontSize: '13px',
                   color: '#2A6620',
                 }}
@@ -623,7 +623,7 @@ export function AuthModal() {
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
-                      fontFamily: 'DM Sans, sans-serif',
+                      fontFamily: 'var(--font-sans), sans-serif',
                       fontSize: '11px',
                       color: 'var(--ink-3)',
                       padding: '0',
@@ -655,7 +655,7 @@ export function AuthModal() {
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
-                      fontFamily: 'DM Sans, sans-serif',
+                      fontFamily: 'var(--font-sans), sans-serif',
                       fontSize: '11px',
                       color: 'var(--ink-3)',
                       padding: '0',
@@ -667,7 +667,7 @@ export function AuthModal() {
                 </div>
 
                 {error && (
-                  <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: '#B01F1F', margin: 0 }}>
+                  <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', color: '#B01F1F', margin: 0 }}>
                     {error}
                   </p>
                 )}
@@ -677,7 +677,7 @@ export function AuthModal() {
                   type="submit"
                   disabled={loading}
                   style={{
-                    fontFamily: 'DM Sans, sans-serif',
+                    fontFamily: 'var(--font-sans), sans-serif',
                     fontSize: '13.5px',
                     fontWeight: 500,
                     color: 'var(--cream)',
@@ -700,7 +700,7 @@ export function AuthModal() {
                 id="switch-to-signin"
                 onClick={() => switchView('signin')}
                 style={{
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-sans), sans-serif',
                   fontSize: '12px',
                   color: 'var(--accent)',
                   background: 'none',
@@ -721,7 +721,7 @@ export function AuthModal() {
             <h2
               id="auth-modal-title"
               style={{
-                fontFamily: 'DM Serif Display, serif',
+                fontFamily: 'var(--font-serif), serif',
                 fontSize: '20px',
                 fontWeight: 400,
                 color: 'var(--ink)',
@@ -732,7 +732,7 @@ export function AuthModal() {
             </h2>
             <p
               style={{
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans), sans-serif',
                 fontSize: '13px',
                 color: 'var(--ink-3)',
                 marginBottom: '24px',
@@ -746,7 +746,7 @@ export function AuthModal() {
             <button
               onClick={() => setView('signin')}
               style={{
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans), sans-serif',
                 fontSize: '13.5px',
                 fontWeight: 500,
                 color: 'var(--cream)',
@@ -784,7 +784,7 @@ export function AuthModal() {
                 }}
                 disabled={loading}
                 style={{
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-sans), sans-serif',
                   fontSize: '12px',
                   color: loading ? 'var(--ink-4)' : 'var(--ink-3)',
                   background: 'none',
@@ -806,7 +806,7 @@ export function AuthModal() {
             <h2
               id="auth-modal-title"
               style={{
-                fontFamily: 'DM Serif Display, serif',
+                fontFamily: 'var(--font-serif), serif',
                 fontSize: '20px',
                 fontWeight: 400,
                 color: 'var(--ink)',
@@ -817,7 +817,7 @@ export function AuthModal() {
             </h2>
             <p
               style={{
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans), sans-serif',
                 fontSize: '13px',
                 color: 'var(--ink-3)',
                 marginBottom: '24px',
@@ -833,7 +833,7 @@ export function AuthModal() {
                   border: '1px solid #A8D4A0',
                   borderRadius: '8px',
                   padding: '14px 16px',
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-sans), sans-serif',
                   fontSize: '13px',
                   color: '#2A6620',
                 }}
@@ -863,7 +863,7 @@ export function AuthModal() {
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
-                      fontFamily: 'DM Sans, sans-serif',
+                      fontFamily: 'var(--font-sans), sans-serif',
                       fontSize: '11px',
                       color: 'var(--ink-3)',
                       padding: 0,
@@ -894,7 +894,7 @@ export function AuthModal() {
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
-                      fontFamily: 'DM Sans, sans-serif',
+                      fontFamily: 'var(--font-sans), sans-serif',
                       fontSize: '11px',
                       color: 'var(--ink-3)',
                       padding: 0,
@@ -905,7 +905,7 @@ export function AuthModal() {
                 </div>
 
                 {error && (
-                  <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: '#B01F1F', margin: 0 }}>
+                  <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', color: '#B01F1F', margin: 0 }}>
                     {error}
                   </p>
                 )}
@@ -915,7 +915,7 @@ export function AuthModal() {
                   type="submit"
                   disabled={loading}
                   style={{
-                    fontFamily: 'DM Sans, sans-serif',
+                    fontFamily: 'var(--font-sans), sans-serif',
                     fontSize: '13.5px',
                     fontWeight: 500,
                     color: 'var(--cream)',
@@ -941,7 +941,7 @@ export function AuthModal() {
             <h2
               id="auth-modal-title"
               style={{
-                fontFamily: 'DM Serif Display, serif',
+                fontFamily: 'var(--font-serif), serif',
                 fontSize: '20px',
                 fontWeight: 400,
                 color: 'var(--ink)',
@@ -952,7 +952,7 @@ export function AuthModal() {
             </h2>
             <p
               style={{
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans), sans-serif',
                 fontSize: '13px',
                 color: 'var(--ink-3)',
                 marginBottom: '24px',
@@ -968,7 +968,7 @@ export function AuthModal() {
                   border: '1px solid #A8D4A0',
                   borderRadius: '8px',
                   padding: '14px 16px',
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-sans), sans-serif',
                   fontSize: '13px',
                   color: '#2A6620',
                 }}
@@ -988,7 +988,7 @@ export function AuthModal() {
                 />
 
                 {error && (
-                  <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: '#B01F1F', margin: 0 }}>
+                  <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', color: '#B01F1F', margin: 0 }}>
                     {error}
                   </p>
                 )}
@@ -998,7 +998,7 @@ export function AuthModal() {
                   type="submit"
                   disabled={loading}
                   style={{
-                    fontFamily: 'DM Sans, sans-serif',
+                    fontFamily: 'var(--font-sans), sans-serif',
                     fontSize: '13.5px',
                     fontWeight: 500,
                     color: 'var(--cream)',
@@ -1019,7 +1019,7 @@ export function AuthModal() {
               <button
                 onClick={() => switchView('signin')}
                 style={{
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-sans), sans-serif',
                   fontSize: '12px',
                   color: 'var(--accent)',
                   background: 'none',

@@ -17,7 +17,7 @@ export default async function AdminProgramsPage() {
         <div>
           <h1
             style={{
-              fontFamily: 'DM Serif Display, serif',
+              fontFamily: 'var(--font-serif), serif',
               fontSize: '24px',
               fontWeight: 400,
               color: 'var(--ink)',
@@ -26,7 +26,7 @@ export default async function AdminProgramsPage() {
           >
             Programs
           </h1>
-          <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink-3)' }}>
+          <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink-3)' }}>
             {(programs ?? []).length} programs total
           </p>
         </div>
@@ -34,7 +34,7 @@ export default async function AdminProgramsPage() {
           href="/admin/programs/new"
           id="admin-programs-new-btn"
           style={{
-            fontFamily: 'DM Sans, sans-serif',
+            fontFamily: 'var(--font-sans), sans-serif',
             fontSize: '13px',
             fontWeight: 500,
             color: 'var(--cream)',

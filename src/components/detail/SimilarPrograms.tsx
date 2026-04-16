@@ -44,8 +44,8 @@ export function SimilarPrograms({ programs }: SimilarProgramsProps) {
       <h2
         id="similar-heading"
         style={{
-          fontFamily: 'DM Serif Display, serif',
-          fontSize: '22px',
+          fontFamily: 'var(--font-serif)',
+          fontSize: 'var(--font-size-heading)',
           fontWeight: 400,
           color: 'var(--ink)',
           marginBottom: '16px',
@@ -94,7 +94,7 @@ export function SimilarPrograms({ programs }: SimilarProgramsProps) {
               >
                 <span
                   style={{
-                    fontFamily: 'DM Serif Display, serif',
+                    fontFamily: 'var(--font-serif)',
                     fontSize: '16px',
                     fontWeight: 400,
                     color: 'var(--ink)',
@@ -106,7 +106,7 @@ export function SimilarPrograms({ programs }: SimilarProgramsProps) {
                 </span>
                 <span
                   style={{
-                    fontFamily: 'DM Sans, sans-serif',
+                    fontFamily: 'var(--font-sans)',
                     fontSize: '11.5px',
                     fontWeight: 600,
                     color: '#2A6620', // Greenish for match
@@ -132,7 +132,7 @@ export function SimilarPrograms({ programs }: SimilarProgramsProps) {
                 {/* Type badge */}
                 <span
                   style={{
-                    fontFamily: 'DM Sans, sans-serif',
+                    fontFamily: 'var(--font-sans)',
                     fontSize: '10px',
                     fontWeight: 500,
                     color: typeColor.color,
@@ -148,8 +148,8 @@ export function SimilarPrograms({ programs }: SimilarProgramsProps) {
                 {/* Deadline */}
                 <span
                   style={{
-                    fontFamily: 'DM Sans, sans-serif',
-                    fontSize: '12px',
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 'var(--font-size-body)',
                     color: deadline.color,
                     display: 'flex',
                     alignItems: 'center',
@@ -163,8 +163,8 @@ export function SimilarPrograms({ programs }: SimilarProgramsProps) {
                 {program.amount_display && (
                   <span
                     style={{
-                      fontFamily: 'DM Sans, sans-serif',
-                      fontSize: '12px',
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: 'var(--font-size-body)',
                       color: 'var(--ink-3)',
                       display: 'flex',
                       alignItems: 'center',

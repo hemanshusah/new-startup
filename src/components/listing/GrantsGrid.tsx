@@ -150,46 +150,71 @@ export function GrantsGrid({
           style={{
             textAlign: 'center',
             padding: '80px 24px',
-            fontFamily: 'DM Sans, sans-serif',
+            fontFamily: 'var(--font-sans)',
             color: 'var(--ink-3)',
-            fontSize: '14px',
+            fontSize: 'var(--font-size-body)',
           }}
         >
           No programs match your filters. Try adjusting the search or switching scope.
         </div>
       ) : (
         <>
-          <div
-            id="grants-grid"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: '1px',
-              background: 'var(--cream-border)',
-              border: '1px solid var(--cream-border)', // Outer container border
-              borderRadius: '12px',
-              overflow: 'hidden',
-            }}
-          >
-            {visible.map((program, index) => {
-              const elements = [
-                <GrantCard
-                  key={program.id}
-                  program={program}
-                  onClick={(e) => handleCardClick(e, program.slug)}
-                />
-              ]
+          {/* Render chunks of grids interleaved with standalone ad rows */}
+          <div id="grants-container">
+            {(() => {
+              const elements: React.ReactNode[] = []
+              let currentBatch: React.ReactNode[] = []
 
-              const pos = index + 1
+              const renderBatch = (batch: React.ReactNode[], key: string) => (
+                <div
+                  key={key}
+                  className="grants-batch-grid"
+                  style={{
+                    display: 'grid',
+                    gap: '1px',
+                    background: 'var(--cream-border)',
+                    border: '1px solid var(--cream-border)',
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {batch}
+                </div>
+              )
 
-              // Check if we inject a standard ad here (handles both Pinpoint and Flow logic)
-              const mappedAd = exactAdMapping.get(pos)
-              if (mappedAd) {
-                 elements.push(<SoftInfraCard key={`si-${pos}`} si={mappedAd} />)
+              visible.forEach((program, index) => {
+                const pos = index + 1
+                
+                // Add the current program card to the pending batch
+                currentBatch.push(
+                  <GrantCard
+                    key={program.id}
+                    program={program}
+                    onClick={(e) => handleCardClick(e, program.slug)}
+                  />
+                )
+
+                // Check if we have an ad mapped to this position
+                const mappedAd = exactAdMapping.get(pos)
+                if (mappedAd) {
+                  // If we have an ad, we finish the current batch and render it
+                  elements.push(renderBatch(currentBatch, `batch-${pos}`))
+                  currentBatch = [] // Reset batch
+                  
+                  // Render the full-width ad outside the grid
+                  elements.push(
+                    <SoftInfraCard key={`si-${pos}`} si={mappedAd} />
+                  )
+                }
+              })
+
+              // Final batch if any
+              if (currentBatch.length > 0) {
+                elements.push(renderBatch(currentBatch, 'batch-final'))
               }
 
               return elements
-            })}
+            })()}
           </div>
 
           {/* Result count + View more */}
@@ -207,8 +232,8 @@ export function GrantsGrid({
                 id="view-more-btn"
                 onClick={() => setPage((p) => p + 1)}
                 style={{
-                  fontFamily: 'DM Sans, sans-serif',
-                  fontSize: '13px',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--font-size-body)',
                   fontWeight: 500,
                   color: 'var(--ink)',
                   background: 'var(--white)',

@@ -40,7 +40,7 @@ export function WhatsAppLink({
         padding: '6px 14px',
         textDecoration: 'none',
         color: 'var(--ink-2)',
-        fontFamily: 'DM Sans, sans-serif',
+        fontFamily: 'var(--font-sans), sans-serif',
         fontSize: '12px',
         fontWeight: 500,
         transition: 'all 0.15s ease',

@@ -97,7 +97,7 @@ export function Navbar() {
           href="/"
           onClick={() => setMobileMenuOpen(false)}
           style={{
-            fontFamily: 'DM Serif Display, serif',
+            fontFamily: 'var(--font-serif)',
             fontSize: '20px',
             fontWeight: 400,
             letterSpacing: '-0.01em',
@@ -114,7 +114,7 @@ export function Navbar() {
             <Link
               href="/"
               style={{
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans)',
                 fontSize: '13px',
                 fontWeight: isActive('/') ? 500 : 400,
                 color: isActive('/') ? 'var(--ink)' : 'var(--ink-3)',
@@ -127,7 +127,7 @@ export function Navbar() {
             {/* <Link
               href="/events"
               style={{
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans)',
                 fontSize: '13px',
                 fontWeight: 400,
                 color: 'var(--ink-3)',
@@ -143,7 +143,7 @@ export function Navbar() {
             <Link
               href="/newsletter"
               style={{
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans)',
                 fontSize: '13px',
                 fontWeight: 400,
                 color: 'var(--ink-3)',
@@ -159,7 +159,7 @@ export function Navbar() {
             <Link
               href="mailto:deeksharai014@gmail.com?subject=Software%20Deals%20%20%3C%3E%20StartupProgram%20Site!"
               style={{
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans)',
                 fontSize: '13px',
                 fontWeight: 400,
                 color: 'var(--ink-3)',
@@ -215,7 +215,7 @@ export function Navbar() {
                   ) : (
                     <span
                       style={{
-                        fontFamily: 'DM Sans, sans-serif',
+                        fontFamily: 'var(--font-sans)',
                         fontSize: '12px',
                         fontWeight: 500,
                         color: 'var(--ink-2)',
@@ -261,7 +261,7 @@ export function Navbar() {
                       >
                         <p
                           style={{
-                            fontFamily: 'DM Sans, sans-serif',
+                            fontFamily: 'var(--font-sans)',
                             fontSize: '11px',
                             color: 'var(--ink-4)',
                             margin: 0,
@@ -271,7 +271,7 @@ export function Navbar() {
                         </p>
                         <p
                           style={{
-                            fontFamily: 'DM Sans, sans-serif',
+                            fontFamily: 'var(--font-sans)',
                             fontSize: '12px',
                             fontWeight: 500,
                             color: 'var(--ink)',
@@ -294,7 +294,7 @@ export function Navbar() {
                           display: 'block',
                           width: '100%',
                           textAlign: 'left',
-                          fontFamily: 'DM Sans, sans-serif',
+                          fontFamily: 'var(--font-sans)',
                           fontSize: '13px',
                           color: 'var(--ink)',
                           textDecoration: 'none',
@@ -318,7 +318,7 @@ export function Navbar() {
                             display: 'block',
                             width: '100%',
                             textAlign: 'left',
-                            fontFamily: 'DM Sans, sans-serif',
+                            fontFamily: 'var(--font-sans)',
                             fontSize: '13px',
                             color: 'var(--ink)',
                             textDecoration: 'none',
@@ -344,7 +344,7 @@ export function Navbar() {
                           display: 'block',
                           width: '100%',
                           textAlign: 'left',
-                          fontFamily: 'DM Sans, sans-serif',
+                          fontFamily: 'var(--font-sans)',
                           fontSize: '13px',
                           color: 'var(--accent)',
                           background: 'none',
@@ -367,7 +367,7 @@ export function Navbar() {
                 id="nav-login-btn"
                 onClick={() => openModal()}
                 style={{
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-sans)',
                   fontSize: '13px',
                   fontWeight: 400,
                   color: 'var(--ink)',
@@ -448,20 +448,20 @@ export function Navbar() {
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12px', fontWeight: 600, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Menu</span>
+              <span style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', fontWeight: 600, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Menu</span>
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
                 aria-label="Close menu"
-                style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '22px', lineHeight: 1, color: 'var(--ink-3)', padding: '4px 8px', background: 'none', border: 'none', cursor: 'pointer' }}
+                style={{ fontFamily: 'var(--font-sans)', fontSize: '22px', lineHeight: 1, color: 'var(--ink-3)', padding: '4px 8px', background: 'none', border: 'none', cursor: 'pointer' }}
               >
                 ×
               </button>
             </div>
-            <Link href="/" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', fontWeight: isActive('/') ? 500 : 400, color: isActive('/') ? 'var(--ink)' : 'var(--ink-2)', padding: '10px 0', borderBottom: '1px solid var(--cream-border)' }}>Grants &amp; Funding</Link>
-            {/* <Link href="/events" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Events <ComingSoonBadge label="Launching Soon" /></Link>
-            <Link href="/newsletter" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Newsletter <ComingSoonBadge label="Launching Soon" /></Link> */}
-            <Link href="mailto:deeksharai014@gmail.com?subject=Software%20Deals%20%20%3C%3E%20StartupProgram%20Site!" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Software Deals <ComingSoonBadge label="Coming Soon" /></Link>
+            <Link href="/" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: isActive('/') ? 500 : 400, color: isActive('/') ? 'var(--ink)' : 'var(--ink-2)', padding: '10px 0', borderBottom: '1px solid var(--cream-border)' }}>Grants &amp; Funding</Link>
+            {/* <Link href="/events" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Events <ComingSoonBadge label="Launching Soon" /></Link>
+            <Link href="/newsletter" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Newsletter <ComingSoonBadge label="Launching Soon" /></Link> */}
+            <Link href="mailto:deeksharai014@gmail.com?subject=Software%20Deals%20%20%3C%3E%20StartupProgram%20Site!" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Software Deals <ComingSoonBadge label="Coming Soon" /></Link>
             <WhatsAppLink
               onClick={() => setMobileMenuOpen(false)}
               style={{ marginTop: '8px' }}
@@ -469,9 +469,9 @@ export function Navbar() {
             <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid var(--cream-border)' }}>
               {user ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <Link href="/profile" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>My Profile</Link>
+                  <Link href="/profile" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>My Profile</Link>
                   {isAdmin && (
-                    <Link href="/admin/dashboard" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>Admin Dashboard</Link>
+                    <Link href="/admin/dashboard" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>Admin Dashboard</Link>
                   )}
                   <button
                     type="button"
@@ -479,7 +479,7 @@ export function Navbar() {
                       setMobileMenuOpen(false)
                       signOut()
                     }}
-                    style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', color: 'var(--accent)', textAlign: 'left', padding: '8px 0', background: 'none', border: 'none', cursor: 'pointer' }}
+                    style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--accent)', textAlign: 'left', padding: '8px 0', background: 'none', border: 'none', cursor: 'pointer' }}
                   >
                     Sign out
                   </button>
@@ -493,7 +493,7 @@ export function Navbar() {
                   }}
                   style={{
                     width: '100%',
-                    fontFamily: 'DM Sans, sans-serif',
+                    fontFamily: 'var(--font-sans)',
                     fontSize: '14px',
                     padding: '10px 14px',
                     border: '1px solid var(--cream-border)',
