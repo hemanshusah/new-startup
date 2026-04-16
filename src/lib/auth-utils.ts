@@ -7,6 +7,7 @@ export interface AuthenticatedUser {
   email: string
   type: 'next_auth' | 'supabase'
   role: string
+  image?: string | null
 }
 
 /**
@@ -17,7 +18,7 @@ export interface AuthenticatedUser {
  * based on their email.
  */
 export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
-  let authUser: { email: string; id: string; type: 'next_auth' | 'supabase' } | null = null
+  let authUser: { email: string; id: string; type: 'next_auth' | 'supabase'; image?: string | null } | null = null
 
   // 1. Check Auth.js session (primary for Google/OAuth)
   const session = await auth()
@@ -25,7 +26,8 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
     authUser = {
       email: session.user.email,
       id: session.user.id as string,
-      type: 'next_auth'
+      type: 'next_auth',
+      image: session.user.image
     }
   }
 
@@ -38,7 +40,8 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
       authUser = {
         email: user.email,
         id: user.id,
-        type: 'supabase'
+        type: 'supabase',
+        image: user.user_metadata?.avatar_url
       }
     }
   }
@@ -61,6 +64,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
     authId: authUser.id,
     email: authUser.email,
     type: authUser.type,
-    role: profile.role
+    role: profile.role,
+    image: (authUser as any).image
   }
 }
