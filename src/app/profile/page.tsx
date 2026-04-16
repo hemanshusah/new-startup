@@ -67,6 +67,7 @@ export default async function ProfilePage() {
           <ProfileView
             profile={profile}
             history={history}
+            userImage={user.image}
           />
         </Suspense>
       </div>

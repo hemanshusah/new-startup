@@ -74,7 +74,7 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = useMemo(() => createClient(), [])
-  const { signOut } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
   useEffect(() => {
@@ -205,30 +205,62 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
             background: 'var(--cream)',
           }}
         >
-          <p
-            style={{
-              fontFamily: 'DM Sans, sans-serif',
-              fontSize: '11px',
-              color: 'var(--ink-4)',
-              marginBottom: '2px',
-            }}
-          >
-            Signed in as
-          </p>
-          <p
-            style={{
-              fontFamily: 'DM Sans, sans-serif',
-              fontSize: '12px',
-              fontWeight: 500,
-              color: 'var(--ink)',
-              marginBottom: '10px',
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              background: 'var(--cream-dark)',
+              border: '1px solid var(--cream-border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {adminEmail ?? displayName}
-          </p>
+              flexShrink: 0,
+            }}>
+              {profile?.avatar_url || user?.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img 
+                  src={profile?.avatar_url || user?.image || ''} 
+                  alt="Avatar" 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
+              ) : (
+                <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--ink-4)' }}>
+                  {(adminEmail || user?.email || 'A').slice(0, 1).toUpperCase()}
+                </span>
+              )}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p
+                style={{
+                  fontFamily: 'DM Sans, sans-serif',
+                  fontSize: '10px',
+                  color: 'var(--ink-4)',
+                  marginBottom: '1px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em'
+                }}
+              >
+                Signed in as
+              </p>
+              <p
+                style={{
+                  fontFamily: 'DM Sans, sans-serif',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  color: 'var(--ink)',
+                  margin: 0,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+                title={adminEmail ?? displayName}
+              >
+                {adminEmail ?? displayName}
+              </p>
+            </div>
+          </div>
           <button
             id="admin-sign-out-btn"
             onClick={handleSignOut}
