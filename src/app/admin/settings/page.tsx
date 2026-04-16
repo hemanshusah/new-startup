@@ -12,10 +12,21 @@ async function loadOrCreateSiteConfigRow() {
   const row = rows?.[0]
   if (row) return row
 
-  if (!error && inserted) return inserted
+  // Create default if missing
+  const { data: inserted } = await supabase
+    .from('site_config')
+    .insert({
+      site_name: 'GrantsIndia',
+      programs_per_page: 12,
+      si_slot_positions: [6, 14, 20],
+      maintenance_mode: false,
+      field_schema: {},
+      sectors: SECTOR_DEFAULTS,
+    })
+    .select('id, field_schema, sectors')
+    .maybeSingle()
 
-  const { data: retry } = await supabase.from('site_config').select('id, field_schema, sectors').limit(1)
-  return retry?.[0] ?? null
+  return inserted ?? null
 }
 
 export default async function AdminSettingsPage() {
