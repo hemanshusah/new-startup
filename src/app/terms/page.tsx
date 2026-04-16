@@ -15,7 +15,7 @@ function Num({ n }: { n: number }) {
         width: '28px', height: '28px', borderRadius: '50%',
         background: 'var(--accent)', color: '#fff',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontFamily: 'DM Serif Display, serif', fontSize: '12.5px', flexShrink: 0,
+        fontFamily: 'var(--font-serif), serif', fontSize: '12.5px', flexShrink: 0,
       }}
     >
       {n}
@@ -29,7 +29,7 @@ function SectionCard({ n, title, children }: { n: number; title: string; childre
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
         <Num n={n} />
         <h2 style={{
-          fontFamily: 'DM Serif Display, serif', fontSize: '1.2rem',
+          fontFamily: 'var(--font-serif), serif', fontSize: '1.2rem',
           fontWeight: 400, color: 'var(--ink)', letterSpacing: '-0.015em', lineHeight: 1.3,
         }}>
           {title}
@@ -54,23 +54,23 @@ export default function TermsPage() {
             <polyline points="10 9 9 9 8 9" />
           </svg>
         </div>
-        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '14px' }}>
+        <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '14px' }}>
           Legal
         </p>
         <h1 style={{
-          fontFamily: 'DM Serif Display, serif', fontSize: 'clamp(32px, 5vw, 48px)',
+          fontFamily: 'var(--font-serif), serif', fontSize: 'clamp(32px, 5vw, 48px)',
           fontWeight: 400, color: 'var(--ink)', letterSpacing: '-0.025em',
           lineHeight: 1.1, marginBottom: '18px',
         }}>
           Terms &amp; Conditions
         </h1>
-        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '16px', fontWeight: 300, color: 'var(--ink-3)', lineHeight: 1.65, maxWidth: '460px', margin: '0 auto 24px' }}>
+        <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '16px', fontWeight: 300, color: 'var(--ink-3)', lineHeight: 1.65, maxWidth: '460px', margin: '0 auto 24px' }}>
           Plain-language terms for a platform built for founders. Please read before using GrantsIndia.
         </p>
         <span style={{
           display: 'inline-block', background: 'var(--cream)', border: '1px solid var(--cream-border)',
           borderRadius: '20px', padding: '4px 16px',
-          fontFamily: 'DM Sans, sans-serif', fontSize: '12px', color: 'var(--ink-3)',
+          fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', color: 'var(--ink-3)',
         }}>
           Effective April 2026
         </span>
@@ -80,7 +80,7 @@ export default function TermsPage() {
       <div className="legal-body">
 
         {/* Quick summary */}
-        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.13em', textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: '14px' }}>
+        <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.13em', textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: '14px' }}>
           Good to know
         </p>
         <div className="legal-glance-grid">
@@ -90,8 +90,8 @@ export default function TermsPage() {
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
               </svg>
             </div>
-            <p style={{ fontFamily: 'DM Serif Display, serif', fontSize: '1rem', color: 'var(--ink)', marginBottom: '6px' }}>Free platform</p>
-            <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink-3)', lineHeight: 1.6 }}>Core listings and search are completely free. No hidden fees.</p>
+            <p style={{ fontFamily: 'var(--font-serif), serif', fontSize: '1rem', color: 'var(--ink)', marginBottom: '6px' }}>Free platform</p>
+            <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink-3)', lineHeight: 1.6 }}>Core listings and search are completely free. No hidden fees.</p>
           </div>
           <div className="legal-glance-card">
             <div style={{ color: 'var(--accent)', marginBottom: '12px' }}>
@@ -100,8 +100,8 @@ export default function TermsPage() {
                 <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
               </svg>
             </div>
-            <p style={{ fontFamily: 'DM Serif Display, serif', fontSize: '1rem', color: 'var(--ink)', marginBottom: '6px' }}>Curated, not certified</p>
-            <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink-3)', lineHeight: 1.6 }}>We curate listings from public sources. Always verify details directly with the organiser.</p>
+            <p style={{ fontFamily: 'var(--font-serif), serif', fontSize: '1rem', color: 'var(--ink)', marginBottom: '6px' }}>Curated, not certified</p>
+            <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink-3)', lineHeight: 1.6 }}>We curate listings from public sources. Always verify details directly with the organiser.</p>
           </div>
           <div className="legal-glance-card">
             <div style={{ color: 'var(--accent)', marginBottom: '12px' }}>
@@ -112,8 +112,8 @@ export default function TermsPage() {
                 <path d="M16 3.13a4 4 0 0 1 0 7.75" />
               </svg>
             </div>
-            <p style={{ fontFamily: 'DM Serif Display, serif', fontSize: '1rem', color: 'var(--ink)', marginBottom: '6px' }}>Mutual respect</p>
-            <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink-3)', lineHeight: 1.6 }}>Use the platform fairly and lawfully. We commit to maintaining it responsibly.</p>
+            <p style={{ fontFamily: 'var(--font-serif), serif', fontSize: '1rem', color: 'var(--ink)', marginBottom: '6px' }}>Mutual respect</p>
+            <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink-3)', lineHeight: 1.6 }}>Use the platform fairly and lawfully. We commit to maintaining it responsibly.</p>
           </div>
         </div>
 
@@ -184,16 +184,16 @@ export default function TermsPage() {
         <SectionCard n={10} title="Disclaimers">
           <div className="legal-disclaimer-grid">
             <div className="legal-disclaimer-item">
-              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', fontWeight: 600, color: 'var(--ink)', marginBottom: '5px' }}>No professional advice</p>
-              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13.5px', color: 'var(--ink-2)', lineHeight: 1.65 }}>Nothing on GrantsIndia constitutes legal, financial, investment, or business advice. Consult qualified professionals before making decisions based on information found here.</p>
+              <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 600, color: 'var(--ink)', marginBottom: '5px' }}>No professional advice</p>
+              <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13.5px', color: 'var(--ink-2)', lineHeight: 1.65 }}>Nothing on GrantsIndia constitutes legal, financial, investment, or business advice. Consult qualified professionals before making decisions based on information found here.</p>
             </div>
             <div className="legal-disclaimer-item">
-              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', fontWeight: 600, color: 'var(--ink)', marginBottom: '5px' }}>No guarantee of results</p>
-              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13.5px', color: 'var(--ink-2)', lineHeight: 1.65 }}>Listing a program on GrantsIndia does not increase or decrease your chances of receiving funding. We have no involvement in or influence over any program&apos;s selection process.</p>
+              <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 600, color: 'var(--ink)', marginBottom: '5px' }}>No guarantee of results</p>
+              <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13.5px', color: 'var(--ink-2)', lineHeight: 1.65 }}>Listing a program on GrantsIndia does not increase or decrease your chances of receiving funding. We have no involvement in or influence over any program&apos;s selection process.</p>
             </div>
             <div className="legal-disclaimer-item">
-              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', fontWeight: 600, color: 'var(--ink)', marginBottom: '5px' }}>Platform availability</p>
-              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13.5px', color: 'var(--ink-2)', lineHeight: 1.65 }}>We aim to keep GrantsIndia available at all times but do not guarantee uninterrupted access. The platform may be unavailable for maintenance, technical issues, or circumstances beyond our control.</p>
+              <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', fontWeight: 600, color: 'var(--ink)', marginBottom: '5px' }}>Platform availability</p>
+              <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13.5px', color: 'var(--ink-2)', lineHeight: 1.65 }}>We aim to keep GrantsIndia available at all times but do not guarantee uninterrupted access. The platform may be unavailable for maintenance, technical issues, or circumstances beyond our control.</p>
             </div>
           </div>
         </SectionCard>
@@ -222,13 +222,13 @@ export default function TermsPage() {
 
         {/* Contact */}
         <div className="legal-contact-card">
-          <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.13em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '12px' }}>
+          <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '11px', fontWeight: 600, letterSpacing: '0.13em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '12px' }}>
             Section 15 — Contact
           </p>
-          <h2 style={{ fontFamily: 'DM Serif Display, serif', fontSize: 'clamp(22px, 3.5vw, 30px)', fontWeight: 400, color: '#fff', letterSpacing: '-0.02em', marginBottom: '10px' }}>
+          <h2 style={{ fontFamily: 'var(--font-serif), serif', fontSize: 'clamp(22px, 3.5vw, 30px)', fontWeight: 400, color: '#fff', letterSpacing: '-0.02em', marginBottom: '10px' }}>
             Questions about these terms?
           </h2>
-          <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '14px', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, maxWidth: '360px', margin: '0 auto 24px' }}>
+          <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '14px', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, maxWidth: '360px', margin: '0 auto 24px' }}>
             We&apos;re happy to clarify anything. Drop us a line and we&apos;ll get back to you.
           </p>
           <a href={`mailto:${CONTACT_EMAIL}`} className="legal-email-btn">

@@ -86,7 +86,7 @@ export default async function AdminDashboard() {
       <div style={{ marginBottom: '28px' }}>
         <h1
           style={{
-            fontFamily: 'DM Serif Display, serif',
+            fontFamily: 'var(--font-serif), serif',
             fontSize: '26px',
             fontWeight: 400,
             color: 'var(--ink)',
@@ -95,7 +95,7 @@ export default async function AdminDashboard() {
         >
           Dashboard
         </h1>
-        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink-3)' }}>
+        <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink-3)' }}>
           Overview of your GrantsIndia platform.
         </p>
       </div>
@@ -138,7 +138,7 @@ export default async function AdminDashboard() {
         >
           <p
             style={{
-              fontFamily: 'DM Sans, sans-serif',
+              fontFamily: 'var(--font-sans), sans-serif',
               fontSize: '11px',
               fontWeight: 500,
               color: 'var(--ink-4)',
@@ -156,7 +156,7 @@ export default async function AdminDashboard() {
               id="admin-new-program-btn"
               style={{
                 display: 'block',
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans), sans-serif',
                 fontSize: '13px',
                 fontWeight: 500,
                 color: 'var(--cream)',
@@ -174,7 +174,7 @@ export default async function AdminDashboard() {
               id="admin-new-ad-btn"
               style={{
                 display: 'block',
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans), sans-serif',
                 fontSize: '13px',
                 fontWeight: 500,
                 color: 'var(--ink)',
@@ -199,7 +199,7 @@ export default async function AdminDashboard() {
               <Link
                 href="/admin/programs?deadline=7d"
                 style={{
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-sans), sans-serif',
                   fontSize: '12.5px',
                   color: '#D4820E',
                   textDecoration: 'none',
@@ -215,7 +215,7 @@ export default async function AdminDashboard() {
               <Link
                 href="/admin/programs?published=false"
                 style={{
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-sans), sans-serif',
                   fontSize: '12.5px',
                   color: 'var(--ink-3)',
                   textDecoration: 'none',
@@ -243,7 +243,7 @@ export default async function AdminDashboard() {
         >
           <p
             style={{
-              fontFamily: 'DM Sans, sans-serif',
+              fontFamily: 'var(--font-sans), sans-serif',
               fontSize: '11px',
               fontWeight: 500,
               color: 'var(--ink-4)',
@@ -258,7 +258,7 @@ export default async function AdminDashboard() {
           {!auditLog || auditLog.length === 0 ? (
             <p
               style={{
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans), sans-serif',
                 fontSize: '13px',
                 color: 'var(--ink-4)',
                 textAlign: 'center',
@@ -283,7 +283,7 @@ export default async function AdminDashboard() {
                 >
                   <span
                     style={{
-                      fontFamily: 'DM Sans, sans-serif',
+                      fontFamily: 'var(--font-sans), sans-serif',
                       fontSize: '10px',
                       fontWeight: 500,
                       color: ACTION_COLORS[entry.action] ?? 'var(--ink-3)',
@@ -300,7 +300,7 @@ export default async function AdminDashboard() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p
                       style={{
-                        fontFamily: 'DM Sans, sans-serif',
+                        fontFamily: 'var(--font-sans), sans-serif',
                         fontSize: '12.5px',
                         color: 'var(--ink)',
                         margin: '0 0 2px',
@@ -313,7 +313,7 @@ export default async function AdminDashboard() {
                     </p>
                     <p
                       style={{
-                        fontFamily: 'DM Sans, sans-serif',
+                        fontFamily: 'var(--font-sans), sans-serif',
                         fontSize: '11px',
                         color: 'var(--ink-4)',
                         margin: 0,

@@ -1,17 +1,19 @@
 import type { Program } from '@/types/program'
 
 const sectionHeadingStyle: React.CSSProperties = {
-  fontFamily: 'DM Serif Display, serif',
-  fontSize: '22px',
-  fontWeight: 400,
+  fontFamily: 'var(--font-section), var(--font-serif)',
+  fontSize: 'calc(var(--font-size-heading) * 0.7)',
+  fontWeight: 'var(--font-weight-section)' as any,
+  fontStyle: 'var(--font-style-section)' as any,
   color: 'var(--ink)',
   marginBottom: '14px',
 }
 
 const bodyTextStyle: React.CSSProperties = {
-  fontFamily: 'DM Sans, sans-serif',
-  fontSize: '14px',
-  fontWeight: 300,
+  fontFamily: 'var(--font-sans)',
+  fontSize: 'var(--font-size-body)',
+  fontWeight: 'var(--font-weight-body)' as any,
+  fontStyle: 'var(--font-style-body)' as any,
   color: 'var(--ink-2)',
   lineHeight: 1.7,
   margin: 0,
@@ -67,8 +69,8 @@ export function ContentSections({ program, applyUrl, excludeAbout = false }: Con
             <li
               key={i}
               style={{
-                fontFamily: 'DM Sans, sans-serif',
-                fontSize: '14px',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--font-size-body)',
                 fontWeight: 300,
                 color: 'var(--ink-2)',
                 lineHeight: 1.65,
@@ -108,8 +110,8 @@ export function ContentSections({ program, applyUrl, excludeAbout = false }: Con
             <li
               key={i}
               style={{
-                fontFamily: 'DM Sans, sans-serif',
-                fontSize: '14px',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--font-size-body)',
                 fontWeight: 300,
                 color: 'var(--ink-2)',
                 lineHeight: 1.65,
@@ -144,7 +146,7 @@ export function ContentSections({ program, applyUrl, excludeAbout = false }: Con
             <span
               key={sector}
               style={{
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans)',
                 fontSize: '12px',
                 fontWeight: 500,
                 color: 'var(--ink-2)',
@@ -184,8 +186,8 @@ export function ContentSections({ program, applyUrl, excludeAbout = false }: Con
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              fontFamily: 'DM Sans, sans-serif',
-              fontSize: '13.5px',
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--font-size-body)',
               fontWeight: 500,
               color: 'var(--cream)',
               background: 'var(--ink)',

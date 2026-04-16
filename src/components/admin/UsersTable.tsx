@@ -68,7 +68,7 @@ export function UsersTable({ initialUsers }: { initialUsers: UserRow[] }) {
   return (
     <div>
       {toast && (
-        <div style={{ position: 'fixed', bottom: '24px', right: '24px', background: toast.ok ? '#1E6E2E' : '#B01F1F', color: '#fff', fontFamily: 'DM Sans, sans-serif', fontSize: '13px', padding: '12px 20px', borderRadius: '8px', zIndex: 200 }} role="status">
+        <div style={{ position: 'fixed', bottom: '24px', right: '24px', background: toast.ok ? '#1E6E2E' : '#B01F1F', color: '#fff', fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', padding: '12px 20px', borderRadius: '8px', zIndex: 200 }} role="status">
           {toast.msg}
         </div>
       )}
@@ -76,13 +76,13 @@ export function UsersTable({ initialUsers }: { initialUsers: UserRow[] }) {
       {/* Controls */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', alignItems: 'center' }}>
         <input id="admin-users-search" type="text" placeholder="Search name or email…" value={search} onChange={(e) => setSearch(e.target.value)}
-          style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', border: '1px solid var(--cream-border)', borderRadius: '7px', padding: '8px 12px', width: '260px', background: 'var(--white)', outline: 'none' }} />
+          style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', border: '1px solid var(--cream-border)', borderRadius: '7px', padding: '8px 12px', width: '260px', background: 'var(--white)', outline: 'none' }} />
         <select value={sortBy} onChange={(e) => setSortBy(e.target.value as 'created_at' | 'total_views')}
-          style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', border: '1px solid var(--cream-border)', borderRadius: '7px', padding: '7px 10px', background: 'var(--white)', outline: 'none', cursor: 'pointer' }}>
+          style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', border: '1px solid var(--cream-border)', borderRadius: '7px', padding: '7px 10px', background: 'var(--white)', outline: 'none', cursor: 'pointer' }}>
           <option value="created_at">Sort by joined date</option>
           <option value="total_views">Sort by view count</option>
         </select>
-        <button onClick={exportCsv} style={{ marginLeft: 'auto', fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: 'var(--ink)', background: 'var(--white)', border: '1px solid var(--cream-border)', borderRadius: '7px', padding: '7px 14px', cursor: 'pointer' }}>
+        <button onClick={exportCsv} style={{ marginLeft: 'auto', fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', color: 'var(--ink)', background: 'var(--white)', border: '1px solid var(--cream-border)', borderRadius: '7px', padding: '7px 14px', cursor: 'pointer' }}>
           Export CSV
         </button>
       </div>
@@ -93,37 +93,37 @@ export function UsersTable({ initialUsers }: { initialUsers: UserRow[] }) {
           <thead>
             <tr>
               {['Name', 'Email', 'Joined', 'Total views', 'Last active', 'Role', 'Actions'].map((h) => (
-                <th key={h} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '10.5px', fontWeight: 500, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.07em', padding: '10px 14px', textAlign: 'left', background: 'var(--cream)', whiteSpace: 'nowrap' }}>{h}</th>
+                <th key={h} style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '10.5px', fontWeight: 500, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.07em', padding: '10px 14px', textAlign: 'left', background: 'var(--cream)', whiteSpace: 'nowrap' }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan={7} style={{ padding: '40px', textAlign: 'center', fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink-4)' }}>No users found.</td></tr>
+              <tr><td colSpan={7} style={{ padding: '40px', textAlign: 'center', fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink-4)' }}>No users found.</td></tr>
             ) : filtered.map((u) => (
               <tr key={u.id} style={{ borderTop: '1px solid var(--cream-border)' }}>
                 <td style={{ padding: '12px 14px' }}>
-                  <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink)', fontWeight: 500 }}>
+                  <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink)', fontWeight: 500 }}>
                     {u.full_name ?? u.email.split('@')[0]}
                   </span>
                 </td>
                 <td style={{ padding: '12px 14px' }}>
-                  <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: 'var(--ink-3)' }}>
+                  <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', color: 'var(--ink-3)' }}>
                     {u.email}
                   </span>
                 </td>
                 <td style={{ padding: '12px 14px' }}>
-                  <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: 'var(--ink)' }}>
+                  <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', color: 'var(--ink)' }}>
                     {formatDate(u.created_at)}
                   </span>
                 </td>
                 <td style={{ padding: '12px 14px' }}>
-                  <span style={{ fontFamily: 'DM Serif Display, serif', fontSize: '14px', color: 'var(--ink)' }}>
+                  <span style={{ fontFamily: 'var(--font-serif), serif', fontSize: '14px', color: 'var(--ink)' }}>
                     {u.total_views.toLocaleString()}
                   </span>
                 </td>
                 <td style={{ padding: '12px 14px' }}>
-                  <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12px', color: 'var(--ink-4)' }}>
+                  <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', color: 'var(--ink-4)' }}>
                     {u.last_active ? formatDate(u.last_active) : '—'}
                   </span>
                 </td>
@@ -131,14 +131,14 @@ export function UsersTable({ initialUsers }: { initialUsers: UserRow[] }) {
                   <select
                     value={u.role}
                     onChange={(e) => updateRole(u.id, e.target.value)}
-                    style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12px', border: '1px solid var(--cream-border)', borderRadius: '6px', padding: '4px 8px', background: 'var(--white)', cursor: 'pointer', color: u.role === 'admin' ? '#B01F1F' : 'var(--ink)' }}
+                    style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', border: '1px solid var(--cream-border)', borderRadius: '6px', padding: '4px 8px', background: 'var(--white)', cursor: 'pointer', color: u.role === 'admin' ? '#B01F1F' : 'var(--ink)' }}
                   >
                     <option value="user">user</option>
                     <option value="admin">admin</option>
                   </select>
                 </td>
                 <td style={{ padding: '12px 14px' }}>
-                  <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '11.5px', color: 'var(--ink-4)' }}>—</span>
+                  <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '11.5px', color: 'var(--ink-4)' }}>—</span>
                 </td>
               </tr>
             ))}

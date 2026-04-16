@@ -88,7 +88,7 @@ export function InlineSI({ si }: InlineSIProps) {
           <div style={{ flex: 1, minWidth: 0 }}>
             <p
               style={{
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans), sans-serif',
                 fontSize: '10px',
                 fontWeight: 500,
                 color: 'var(--ink-4)',
@@ -101,7 +101,7 @@ export function InlineSI({ si }: InlineSIProps) {
             </p>
             <p
               style={{
-                fontFamily: 'DM Serif Display, serif',
+                fontFamily: 'var(--font-serif), serif',
                 fontSize: '15.5px',
                 fontWeight: 400,
                 color: 'var(--ink)',
@@ -113,7 +113,7 @@ export function InlineSI({ si }: InlineSIProps) {
             </p>
             <p
               style={{
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: 'var(--font-sans), sans-serif',
                 fontSize: '12.5px',
                 fontWeight: 300,
                 color: 'var(--ink-2)',
@@ -129,7 +129,7 @@ export function InlineSI({ si }: InlineSIProps) {
           <div
             style={{
               flexShrink: 0,
-              fontFamily: 'DM Sans, sans-serif',
+              fontFamily: 'var(--font-sans), sans-serif',
               fontSize: '12px',
               fontWeight: 500,
               color: 'var(--accent)',

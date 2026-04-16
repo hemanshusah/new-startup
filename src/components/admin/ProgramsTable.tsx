@@ -308,7 +308,7 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
     <th
       onClick={() => handleSort(col)}
       style={{
-        fontFamily: 'DM Sans, sans-serif',
+        fontFamily: 'var(--font-sans), sans-serif',
         fontSize: '11px',
         fontWeight: 500,
         color: 'var(--ink-4)',
@@ -337,7 +337,7 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
             right: '24px',
             background: toast.ok ? '#1E6E2E' : '#B01F1F',
             color: '#fff',
-            fontFamily: 'DM Sans, sans-serif',
+            fontFamily: 'var(--font-sans), sans-serif',
             fontSize: '13px',
             padding: '12px 20px',
             borderRadius: '8px',
@@ -359,7 +359,7 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(0) }}
           style={{
-            fontFamily: 'DM Sans, sans-serif',
+            fontFamily: 'var(--font-sans), sans-serif',
             fontSize: '13px',
             border: '1px solid var(--cream-border)',
             borderRadius: '7px',
@@ -461,7 +461,7 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
           <tbody>
             {paginated.length === 0 ? (
               <tr>
-                <td colSpan={10} style={{ padding: '40px', textAlign: 'center', fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink-4)' }}>
+                <td colSpan={10} style={{ padding: '40px', textAlign: 'center', fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink-4)' }}>
                   No programs match your filters.
                 </td>
               </tr>
@@ -484,18 +484,18 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
                   <td style={tdBase}>
                     <span
                       title={p.title}
-                      style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink)', fontWeight: 500 }}
+                      style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink)', fontWeight: 500 }}
                     >
                       {p.title.length > 50 ? p.title.slice(0, 50) + '…' : p.title}
                     </span>
                   </td>
                   {/* Type */}
                   <td style={tdBase}>
-                    <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '10.5px', fontWeight: 500, background: tc.bg, color: tc.color, borderRadius: '4px', padding: '2px 7px', textTransform: 'capitalize' }}>{p.type}</span>
+                    <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '10.5px', fontWeight: 500, background: tc.bg, color: tc.color, borderRadius: '4px', padding: '2px 7px', textTransform: 'capitalize' }}>{p.type}</span>
                   </td>
                   {/* Status */}
                   <td style={tdBase}>
-                    <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12px', color: STATUS_COLORS[p.status] ?? 'var(--ink)', textTransform: 'capitalize' }}>{p.status}</span>
+                    <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', color: STATUS_COLORS[p.status] ?? 'var(--ink)', textTransform: 'capitalize' }}>{p.status}</span>
                   </td>
                   {/* Published toggle */}
                   <td style={tdBase}>
@@ -530,25 +530,25 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
                   </td>
                   {/* Deadline */}
                   <td style={tdBase}>
-                    <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: deadlineColor(p.deadline) }}>
+                    <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', color: deadlineColor(p.deadline) }}>
                       {formatDate(p.deadline)}
                     </span>
                   </td>
                   {/* Scope */}
                   <td style={tdBase}>
-                    <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12px', color: 'var(--ink-3)' }}>
+                    <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', color: 'var(--ink-3)' }}>
                       {p.is_india ? 'National' : 'International'}
                     </span>
                   </td>
                   {/* Funding */}
                   <td style={tdBase}>
-                    <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12.5px', color: 'var(--ink)' }}>
+                    <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12.5px', color: 'var(--ink)' }}>
                       {p.amount_display ?? 'TBA'}
                     </span>
                   </td>
                   {/* Updated */}
                   <td style={tdBase}>
-                    <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12px', color: 'var(--ink-4)' }}>
+                    <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', color: 'var(--ink-4)' }}>
                       {relativeTime(p.updated_at)}
                     </span>
                   </td>
@@ -557,13 +557,13 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <Link
                         href={`/admin/programs/${p.id}`}
-                        style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12px', color: 'var(--ink)', textDecoration: 'none', border: '1px solid var(--cream-border)', borderRadius: '5px', padding: '3px 9px' }}
+                        style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', color: 'var(--ink)', textDecoration: 'none', border: '1px solid var(--cream-border)', borderRadius: '5px', padding: '3px 9px' }}
                       >
                         Edit
                       </Link>
                       <button
                         onClick={() => deleteProgram(p)}
-                        style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12px', color: '#B01F1F', background: 'none', border: '1px solid #F0B8B8', borderRadius: '5px', padding: '3px 9px', cursor: 'pointer' }}
+                        style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', color: '#B01F1F', background: 'none', border: '1px solid #F0B8B8', borderRadius: '5px', padding: '3px 9px', cursor: 'pointer' }}
                       >
                         Delete
                       </button>
@@ -580,7 +580,7 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
       {totalPages > 1 && (
         <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '20px' }}>
           <button disabled={page === 0} onClick={() => setPage(page - 1)} style={pageBtn}>← Prev</button>
-          <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '12px', color: 'var(--ink-3)', padding: '6px 12px' }}>
+          <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', color: 'var(--ink-3)', padding: '6px 12px' }}>
             Page {page + 1} of {totalPages}
           </span>
           <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} style={pageBtn}>Next →</button>
@@ -593,7 +593,7 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
 // ── Shared styles ─────────────────────────────────────────────────
 
 const selectStyle: React.CSSProperties = {
-  fontFamily: 'DM Sans, sans-serif',
+  fontFamily: 'var(--font-sans), sans-serif',
   fontSize: '12.5px',
   border: '1px solid var(--cream-border)',
   borderRadius: '7px',
@@ -605,7 +605,7 @@ const selectStyle: React.CSSProperties = {
 }
 
 const btnLight: React.CSSProperties = {
-  fontFamily: 'DM Sans, sans-serif',
+  fontFamily: 'var(--font-sans), sans-serif',
   fontSize: '12.5px',
   color: 'var(--ink)',
   background: 'var(--white)',
@@ -616,7 +616,7 @@ const btnLight: React.CSSProperties = {
 }
 
 const linkBtn: React.CSSProperties = {
-  fontFamily: 'DM Sans, sans-serif',
+  fontFamily: 'var(--font-sans), sans-serif',
   fontSize: '12px',
   color: 'var(--ink-3)',
   background: 'none',
@@ -627,7 +627,7 @@ const linkBtn: React.CSSProperties = {
 }
 
 const thBase: React.CSSProperties = {
-  fontFamily: 'DM Sans, sans-serif',
+  fontFamily: 'var(--font-sans), sans-serif',
   fontSize: '11px',
   fontWeight: 500,
   color: 'var(--ink-4)',
@@ -645,7 +645,7 @@ const tdBase: React.CSSProperties = {
 }
 
 const pageBtn: React.CSSProperties = {
-  fontFamily: 'DM Sans, sans-serif',
+  fontFamily: 'var(--font-sans), sans-serif',
   fontSize: '12px',
   color: 'var(--ink)',
   background: 'var(--white)',

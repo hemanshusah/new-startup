@@ -171,7 +171,7 @@ export default async function ProgramDetailPage({ params }: Props) {
                 <h2
                   id="section-about"
                   style={{
-                    fontFamily: 'DM Serif Display, serif',
+                    fontFamily: 'var(--font-serif), serif',
                     fontSize: '22px',
                     fontWeight: 400,
                     color: 'var(--ink)',
@@ -184,7 +184,7 @@ export default async function ProgramDetailPage({ params }: Props) {
                   <p
                     key={i}
                     style={{
-                      fontFamily: 'DM Sans, sans-serif',
+                      fontFamily: 'var(--font-sans), sans-serif',
                       fontSize: '14px',
                       fontWeight: 300,
                       color: 'var(--ink-2)',

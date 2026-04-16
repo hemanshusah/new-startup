@@ -9,6 +9,7 @@ import { AuthProvider } from '@/components/auth/AuthProvider'
 import { DM_Sans, DM_Serif_Display } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { AuthModalLazy } from '@/components/auth/AuthModalLazy'
+import { ThemeInjection } from '@/components/theme/ThemeInjection'
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
@@ -45,6 +46,9 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Suspense fallback={null}>
+          <ThemeInjection />
+        </Suspense>
       </head>
       <body
         className={`${dmSans.variable} ${dmSerif.variable}`}

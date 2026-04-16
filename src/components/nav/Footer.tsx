@@ -21,7 +21,7 @@ export function Footer() {
           {/* Brand & Socials */}
           <div>
             <Link href="/" style={{
-              fontFamily: 'DM Serif Display, serif',
+              fontFamily: 'var(--font-serif)',
               fontSize: '22px',
               color: 'var(--ink)',
               textDecoration: 'none',
@@ -31,7 +31,7 @@ export function Footer() {
               StartupGrantsIndia
             </Link>
             <p style={{
-              fontFamily: 'DM Sans, sans-serif',
+              fontFamily: 'var(--font-sans)',
               fontSize: '14px',
               lineHeight: '1.6',
               color: 'var(--ink-3)',
@@ -91,7 +91,7 @@ export function Footer() {
 
           {/* Founders */}
           <div>
-            <h4 style={headerStyle}>FOR FOUNDERS</h4>
+            <h4 className="footer-header" style={headerStyle}>FOR FOUNDERS</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <Link href="/" style={linkStyle}>Browse Grants</Link>
               {/* <Link href="/newsletter" style={linkStyle}>Newsletter</Link>
@@ -102,7 +102,7 @@ export function Footer() {
 
           {/* Partners */}
           <div>
-            <h4 style={headerStyle}>FOR PARTNERS</h4>
+            <h4 className="footer-header" style={headerStyle}>FOR PARTNERS</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <Link href="mailto:deeksharai014@gmail.com?subject=Advertise%20with%20Us%20%3C%3E%20StartupProgram%20Site!" style={linkStyle}>Advertise With Us</Link>
               <Link href="mailto:deeksharai014@gmail.com?subject=Submit%20a%20Program%20%3C%3E%20StartupProgram%20Site!" style={linkStyle}>Submit a Program</Link>
@@ -113,7 +113,7 @@ export function Footer() {
 
           {/* Legal */}
           <div>
-            <h4 style={headerStyle}>LEGAL</h4>
+            <h4 className="footer-header" style={headerStyle}>LEGAL</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <Link href="/terms" style={linkStyle}>Terms &amp; Conditions</Link>
               <Link href="/privacy" style={linkStyle}>Privacy Policy</Link>
@@ -153,7 +153,7 @@ export function Footer() {
               borderRadius: '100px',
               color: '#D4820E',
               fontSize: '11px',
-              fontFamily: 'DM Sans, sans-serif',
+              fontFamily: 'var(--font-sans)',
             }}
           >
             <span style={{ width: '6px', height: '6px', background: '#D4820E', borderRadius: '50%', flexShrink: 0 }} />
@@ -166,9 +166,10 @@ export function Footer() {
 }
 
 const headerStyle = {
-  fontFamily: 'DM Sans, sans-serif',
+  fontFamily: 'var(--font-section), var(--font-sans)',
   fontSize: '10px',
-  fontWeight: 700,
+  fontWeight: 'var(--font-weight-section)' as any,
+  fontStyle: 'var(--font-style-section)' as any,
   color: 'var(--ink-4)',
   letterSpacing: '0.1em',
   marginBottom: '24px',
@@ -176,7 +177,7 @@ const headerStyle = {
 }
 
 const linkStyle = {
-  fontFamily: 'DM Sans, sans-serif',
+  fontFamily: 'var(--font-sans)',
   fontSize: '13.5px',
   fontWeight: 400,
   color: 'var(--ink-2)',

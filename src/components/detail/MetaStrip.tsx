@@ -86,7 +86,7 @@ export function MetaStrip({ program }: MetaStripProps) {
         >
           <p
             style={{
-              fontFamily: 'DM Sans, sans-serif',
+              fontFamily: 'var(--font-sans), sans-serif',
               fontSize: '10px',
               fontWeight: 500,
               color: 'var(--ink-4)',
@@ -99,7 +99,7 @@ export function MetaStrip({ program }: MetaStripProps) {
           </p>
           <p
             style={{
-              fontFamily: 'DM Sans, sans-serif',
+              fontFamily: 'var(--font-sans), sans-serif',
               fontSize: '13.5px',
               fontWeight: 400,
               color: item.color ?? 'var(--ink)',

@@ -31,8 +31,8 @@ export default async function AdminUsersPage() {
   return (
     <div>
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontFamily: 'DM Serif Display, serif', fontSize: '24px', fontWeight: 400, color: 'var(--ink)', marginBottom: '4px' }}>Users</h1>
-        <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink-3)' }}>{users.length} registered users</p>
+        <h1 style={{ fontFamily: 'var(--font-serif), serif', fontSize: '24px', fontWeight: 400, color: 'var(--ink)', marginBottom: '4px' }}>Users</h1>
+        <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink-3)' }}>{users.length} registered users</p>
       </div>
       <UsersTable initialUsers={users} />
     </div>

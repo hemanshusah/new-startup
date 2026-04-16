@@ -19,7 +19,7 @@ export function EmailCapture({ id, buttonLabel = 'Notify me' }: EmailCaptureProp
         placeholder="you@startup.com"
         style={{
           flex: 1,
-          fontFamily: 'DM Sans, sans-serif',
+          fontFamily: 'var(--font-sans), sans-serif',
           fontSize: '13px',
           color: 'var(--ink)',
           background: 'var(--white)',
@@ -32,7 +32,7 @@ export function EmailCapture({ id, buttonLabel = 'Notify me' }: EmailCaptureProp
       <button
         type="submit"
         style={{
-          fontFamily: 'DM Sans, sans-serif',
+          fontFamily: 'var(--font-sans), sans-serif',
           fontSize: '13px',
           fontWeight: 500,
           color: 'var(--cream)',

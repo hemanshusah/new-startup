@@ -56,7 +56,7 @@ export function SidebarSI({ si }: SidebarSIProps) {
           {/* Sponsored label */}
           <p
             style={{
-              fontFamily: 'DM Sans, sans-serif',
+              fontFamily: 'var(--font-sans), sans-serif',
               fontSize: '9.5px',
               fontWeight: 500,
               color: 'var(--ink-4)',
@@ -97,7 +97,7 @@ export function SidebarSI({ si }: SidebarSIProps) {
           {/* Headline */}
           <p
             style={{
-              fontFamily: 'DM Serif Display, serif',
+              fontFamily: 'var(--font-serif), serif',
               fontSize: '14.5px',
               fontWeight: 400,
               color: 'var(--ink)',
@@ -111,7 +111,7 @@ export function SidebarSI({ si }: SidebarSIProps) {
           {/* Sub-text */}
           <p
             style={{
-              fontFamily: 'DM Sans, sans-serif',
+              fontFamily: 'var(--font-sans), sans-serif',
               fontSize: '12px',
               fontWeight: 300,
               color: 'var(--ink-2)',
@@ -126,7 +126,7 @@ export function SidebarSI({ si }: SidebarSIProps) {
           <div
             style={{
               display: 'inline-block',
-              fontFamily: 'DM Sans, sans-serif',
+              fontFamily: 'var(--font-sans), sans-serif',
               fontSize: '12px',
               fontWeight: 500,
               color: 'var(--cream)',

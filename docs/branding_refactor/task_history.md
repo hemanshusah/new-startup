@@ -1,0 +1,5 @@
+- [x] Update `globals.css` with responsive grid classes
+- [x] Migrate `GrantsGrid.tsx` to use CSS classes instead of inline grid styles
+- [x] Update `SICard.tsx` for enhanced mobile layout
+- [x] Verify responsiveness on desktop, tablet, and mobile breakpoints
+- [x] Update `walkthrough.md`

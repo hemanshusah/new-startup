@@ -72,7 +72,7 @@ export function DetailSidebar({
       <div style={cardStyle}>
         <p
           style={{
-            fontFamily: 'DM Sans, sans-serif',
+            fontFamily: 'var(--font-sans)',
             fontSize: '11px',
             fontWeight: 500,
             color: 'var(--ink-4)',
@@ -100,7 +100,7 @@ export function DetailSidebar({
             >
               <dt
                 style={{
-                  fontFamily: 'DM Sans, sans-serif',
+                  fontFamily: 'var(--font-sans)',
                   fontSize: '12px',
                   color: 'var(--ink-3)',
                   flexShrink: 0,
@@ -110,8 +110,8 @@ export function DetailSidebar({
               </dt>
               <dd
                 style={{
-                  fontFamily: 'DM Sans, sans-serif',
-                  fontSize: '12.5px',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--font-size-body)',
                   fontWeight: 500,
                   color: color ?? 'var(--ink)',
                   margin: 0,
@@ -133,8 +133,8 @@ export function DetailSidebar({
             style={{
               display: 'block',
               textAlign: 'center',
-              fontFamily: 'DM Sans, sans-serif',
-              fontSize: '13px',
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--font-size-body)',
               fontWeight: 500,
               color: 'var(--cream)',
               background: 'var(--ink)',
@@ -161,7 +161,7 @@ export function DetailSidebar({
         <div style={{ ...cardStyle, marginBottom: '16px' }}>
           <p
             style={{
-              fontFamily: 'DM Sans, sans-serif',
+              fontFamily: 'var(--font-sans)',
               fontSize: '11px',
               fontWeight: 500,
               color: 'var(--ink-4)',
@@ -192,8 +192,8 @@ export function DetailSidebar({
                     <p
                       className="sidebar-program-title"
                       style={{
-                        fontFamily: 'DM Sans, sans-serif',
-                        fontSize: '14px',
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--font-size-body)',
                         fontWeight: 400,
                         margin: '0 0 3px',
                         lineHeight: 1.4,
@@ -203,7 +203,7 @@ export function DetailSidebar({
                     </p>
                     <p
                       style={{
-                        fontFamily: 'DM Sans, sans-serif',
+                        fontFamily: 'var(--font-sans)',
                         fontSize: '11.5px',
                         color: dl.color,
                         margin: 0,
