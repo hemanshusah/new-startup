@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/server'
 import { ProgramForm } from '@/components/admin/ProgramForm'
 import type { Program } from '@/types/program'
 import { getProgramFormSiteConfig } from '@/lib/site-config'
@@ -10,7 +10,7 @@ export default async function EditProgramPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const supabase = await createClient()
+  const supabase = createServiceClient()
 
   const { data: program } = await supabase
     .from('programs')

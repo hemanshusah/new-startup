@@ -1,9 +1,9 @@
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/server'
 import { SITable } from '@/components/admin/SITable'
 
 export default async function AdminSIPage() {
-  const supabase = await createClient()
+  const supabase = createServiceClient()
   const { data: siItems } = await supabase.from('softinfra').select('*').order('priority', { ascending: true })
 
   return (

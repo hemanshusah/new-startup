@@ -1,9 +1,9 @@
-import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/server'
 import { SettingsForm, type FieldConfig } from '@/components/admin/SettingsForm'
 import { SECTOR_DEFAULTS, normalizeSectorsFromDb } from '@/lib/site-field-schema'
 
 async function loadOrCreateSiteConfigRow() {
-  const supabase = await createClient()
+  const supabase = createServiceClient()
   const { data: rows } = await supabase
     .from('site_config')
     .select('id, field_schema, sectors')
@@ -12,8 +12,8 @@ async function loadOrCreateSiteConfigRow() {
   const row = rows?.[0]
   if (row) return row
 
-  const service = createServiceClient()
-  const { data: inserted, error } = await service
+  // Create default if missing
+  const { data: inserted } = await supabase
     .from('site_config')
     .insert({
       site_name: 'GrantsIndia',
@@ -24,13 +24,9 @@ async function loadOrCreateSiteConfigRow() {
       sectors: SECTOR_DEFAULTS,
     })
     .select('id, field_schema, sectors')
-    .limit(1)
     .maybeSingle()
 
-  if (!error && inserted) return inserted
-
-  const { data: retry } = await supabase.from('site_config').select('id, field_schema, sectors').limit(1)
-  return retry?.[0] ?? null
+  return inserted ?? null
 }
 
 export default async function AdminSettingsPage() {
