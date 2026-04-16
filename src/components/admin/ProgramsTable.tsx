@@ -1,9 +1,11 @@
 'use client'
 
-import { useCallback, useEffect, useState, useTransition } from 'react'
+import { useCallback, useEffect, useState, useTransition, useRef } from 'react'
 import Link from 'next/link'
+import Papa from 'papaparse'
 import { createClient } from '@/lib/supabase/client'
 import { updateProgramPublished } from '@/app/admin/program-actions'
+import { bulkImportPrograms } from '@/app/admin/program-import-actions'
 import type { Program } from '@/types/program'
 
 type SortCol = 'title' | 'type' | 'status' | 'deadline' | 'updated_at'
@@ -52,19 +54,54 @@ function formatDate(dateStr: string): string {
 
 /** Convert filtered programs to CSV and trigger download */
 function exportCsv(rows: Program[]) {
-  const headers = ['Title', 'Type', 'Status', 'Published', 'Deadline', 'Scope', 'Funding', 'Updated']
+  const headers = [
+    'ID', 'Slug', 'Title', 'Organisation', 'Type', 'Status', 'Published', 
+    'Deadline', 'Amount Min', 'Amount Max', 'Amount Display', 'Equity', 
+    'Mode', 'Stage', 'Duration', 'Cohort Size', 'Description Short', 
+    'About', 'What You Get', 'Eligibility', 'How to Apply', 'Apply URL', 
+    'Sectors', 'State', 'Is India', 'Is Featured', 'Created At', 'Updated At'
+  ]
+
+  const escape = (val: any) => {
+    if (val === null || val === undefined) return '""'
+    if (Array.isArray(val)) return `"${val.join('; ').replace(/"/g, '""')}"`
+    // Escape quotes and remove newlines to keep row structure
+    const s = String(val).replace(/"/g, '""').replace(/\r?\n/g, ' ')
+    return `"${s}"`
+  }
+
   const csv = [
     headers.join(','),
     ...rows.map((p) =>
       [
-        `"${p.title}"`,
-        p.type,
-        p.status,
+        escape(p.id),
+        escape(p.slug),
+        escape(p.title),
+        escape(p.organisation),
+        escape(p.type),
+        escape(p.status),
         p.published ? 'Yes' : 'No',
-        p.deadline,
-        p.is_india ? 'National' : 'International',
-        p.amount_display ?? 'TBA',
-        p.updated_at,
+        escape(p.deadline),
+        escape(p.amount_min),
+        escape(p.amount_max),
+        escape(p.amount_display),
+        escape(p.equity),
+        escape(p.mode),
+        escape(p.stage),
+        escape(p.duration),
+        escape(p.cohort_size),
+        escape(p.description_short),
+        escape(p.about),
+        escape(p.what_you_get),
+        escape(p.eligibility),
+        escape(p.how_to_apply),
+        escape(p.apply_url),
+        escape(p.sectors),
+        escape(p.state),
+        p.is_india ? 'Yes' : 'No',
+        p.is_featured ? 'Yes' : 'No',
+        escape(p.created_at),
+        escape(p.updated_at),
       ].join(',')
     ),
   ].join('\n')
@@ -73,7 +110,7 @@ function exportCsv(rows: Program[]) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = 'programs.csv'
+  a.download = `programs-export-${new Date().toISOString().split('T')[0]}.csv`
   a.click()
   URL.revokeObjectURL(url)
 }
@@ -96,6 +133,8 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
   const [page, setPage] = useState(0)
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null)
   const [, startTransition] = useTransition()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isImporting, setIsImporting] = useState(false)
 
   const PAGE_SIZE = 25
 
@@ -196,6 +235,74 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
     setSelected(new Set(paginated.map((p) => p.id)))
 
   const clearSelect = () => setSelected(new Set())
+
+  const handleImportCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsImporting(true)
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (results) => {
+        try {
+          const rawData = results.data as any[]
+          
+          // Map CSV headers back to Program fields
+          const programsToImport = rawData.map(row => ({
+            title: row['Title'],
+            organisation: row['Organisation'],
+            type: (row['Type'] || 'grant').toLowerCase(),
+            status: (row['Status'] || 'active').toLowerCase(),
+            published: row['Published'] === 'Yes',
+            deadline: row['Deadline'],
+            amount_min: row['Amount Min'] ? parseFloat(row['Amount Min']) : null,
+            amount_max: row['Amount Max'] ? parseFloat(row['Amount Max']) : null,
+            amount_display: row['Amount Display'],
+            equity: row['Equity'],
+            mode: row['Mode'],
+            stage: row['Stage'],
+            duration: row['Duration'],
+            cohort_size: row['Cohort Size'],
+            description_short: row['Description Short'],
+            about: row['About'],
+            what_you_get: row['What You Get'] ? row['What You Get'].split(';').map((s: any) => s.trim()).filter(Boolean) : [],
+            eligibility: row['Eligibility'] ? row['Eligibility'].split(';').map((s: any) => s.trim()).filter(Boolean) : [],
+            how_to_apply: row['How to Apply'],
+            apply_url: row['Apply URL'],
+            sectors: row['Sectors'] ? row['Sectors'].split(';').map((s: any) => s.trim()).filter(Boolean) : [],
+            state: row['State'],
+            is_india: row['Is India'] === 'Yes',
+            is_featured: row['Is Featured'] === 'Yes',
+          })).filter(p => p.title && p.organisation)
+
+          if (programsToImport.length === 0) {
+            showToast('No valid programs found in CSV.', false)
+            setIsImporting(false)
+            return
+          }
+
+          const res = await bulkImportPrograms(programsToImport as any)
+          if (res.ok) {
+            showToast(`Imported ${res.count} programs. ${programsToImport.length - res.count} skipped as duplicates.`)
+            // Brief delay then refresh to show new data
+            setTimeout(() => window.location.reload(), 1500)
+          } else {
+            showToast(`Import failed: ${res.error}`, false)
+          }
+        } catch (err: any) {
+          showToast(`Error processing CSV: ${err.message}`, false)
+        } finally {
+          setIsImporting(false)
+          if (fileInputRef.current) fileInputRef.current.value = ''
+        }
+      },
+      error: (err) => {
+        setIsImporting(false)
+        showToast(`CSV Parsing Error: ${err.message}`, false)
+      }
+    })
+  }
 
   const colHeader = (label: string, col: SortCol) => (
     <th
@@ -306,6 +413,20 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
               </button>
             </>
           )}
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleImportCSV} 
+            accept=".csv" 
+            style={{ display: 'none' }} 
+          />
+          <button 
+            onClick={() => fileInputRef.current?.click()} 
+            disabled={isImporting}
+            style={{ ...btnLight, opacity: isImporting ? 0.6 : 1 }}
+          >
+            {isImporting ? 'Importing...' : 'Bulk Import'}
+          </button>
           <button onClick={() => exportCsv(filtered)} style={btnLight}>
             Export CSV
           </button>
