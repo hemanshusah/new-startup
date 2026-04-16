@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { updateProgramPublished } from '@/app/admin/program-actions'
 import type { Program } from '@/types/program'
 
 type SortCol = 'title' | 'type' | 'status' | 'deadline' | 'updated_at'
@@ -139,20 +140,19 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
     setPrograms((prev) =>
       prev.map((p) => (p.id === program.id ? { ...p, published: newVal } : p))
     )
-    const { error } = await supabase
-      .from('programs')
-      .update({ published: newVal })
-      .eq('id', program.id)
-    if (error) {
+    
+    const res = await updateProgramPublished(program.id, newVal)
+    
+    if (!res.ok) {
       // Roll back
       setPrograms((prev) =>
         prev.map((p) => (p.id === program.id ? { ...p, published: program.published } : p))
       )
-      showToast(`Failed to update: ${error.message}`, false)
+      showToast(`Failed to update: ${res.error}`, false)
     } else {
       showToast(`"${program.title}" ${newVal ? 'published' : 'unpublished'}.`)
     }
-  }, [supabase])
+  }, [])
 
   // ── Delete ────────────────────────────────────────────────────
   const deleteProgram = useCallback(async (program: Program) => {
