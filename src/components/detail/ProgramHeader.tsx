@@ -71,15 +71,15 @@ export function ProgramHeader({ program }: ProgramHeaderProps) {
             fontFamily: 'var(--font-sans)',
             fontSize: '10.5px',
             fontWeight: 500,
-            color: '#1E6E2E',
-            background: '#EDF5EA',
-            border: '1px solid #A8D4A0',
+            color: days < 0 ? 'var(--ink-4)' : '#1E6E2E',
+            background: days < 0 ? 'var(--cream-dark)' : '#EDF5EA',
+            border: `1px solid ${days < 0 ? 'var(--cream-border)' : '#A8D4A0'}`,
             borderRadius: '4px',
             padding: '3px 8px',
             textTransform: 'capitalize',
           }}
         >
-          ● {program.status}
+          ● {days < 0 ? 'Closed' : program.status} {days >= 0 && <span style={{ opacity: 0.8 }}>• ({days === 0 ? 'Last day' : `${days} days left`})</span>}
         </span>
 
         {/* Type badge */}

@@ -15,7 +15,7 @@ function getDeadlineInfo(deadline: string) {
   )
 
   if (diffDays < 0) {
-    return { label: 'CLOSED', color: 'var(--ink-4)', dot: 'var(--ink-4)' }
+    return { label: 'CLOSED', color: 'var(--ink-4)', dot: 'var(--ink-4)', daysLeft: null }
   }
 
   const label = new Date(deadline).toLocaleDateString('en-IN', {
@@ -25,7 +25,12 @@ function getDeadlineInfo(deadline: string) {
   })
   
   // Force deadlines to RED as requested
-  return { label, color: '#E03E2D', dot: '#E03E2D' }
+  return { 
+    label, 
+    color: '#E03E2D', 
+    dot: '#E03E2D',
+    daysLeft: diffDays === 0 ? 'Last day' : `${diffDays} days left`
+  }
 }
 
 /** Type badge colours (editorial palette, not from spec — fills gap spec doesn't detail) */
@@ -170,7 +175,7 @@ export function GrantCard({ program, onClick }: GrantCardProps) {
                 color: deadline.color,
               }}
             >
-              {deadline.label}
+              {deadline.label} {deadline.daysLeft && <span style={{ opacity: 0.8, fontSize: '10px' }}>• ({deadline.daysLeft})</span>}
             </span>
           </div>
         </div>
