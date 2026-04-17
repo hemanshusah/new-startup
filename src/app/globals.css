@@ -8,7 +8,10 @@
   /* Dynamic Branding Tokens (Managed in Admin Dashboard) */
   --accent:       #B8460A;
   --accent-light: #FDF0EA;
-  --cream:        #F5F2EB;
+  --bg:           #F5F2EB;
+  --cream:        var(--bg);
+  --header-bg:    #F5F2EB;
+  --footer-bg:    #F5F2EB;
   --cream-dark:   #EDE9DF;
   --cream-border: #DAD6CC;
   --cream-hover:  #EAE5D9;
@@ -48,7 +51,7 @@ html {
 }
 
 body {
-  background: var(--cream);
+  background: var(--bg);
   color: var(--ink);
   font-family: var(--font-sans);
   font-weight: 400;
@@ -139,6 +142,36 @@ button {
   }
 }
 
+.si-card-standalone {
+  margin: 24px 0;
+}
+
+/* Desktop Defaults for Filter Bar (Interacts with flex shell) */
+.filter-mobile-bottom-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.filter-mobile-type-selector {
+  display: none;
+}
+
+.filter-mobile-divider {
+  display: block;
+  width: 1px;
+  height: 18px;
+  background: var(--cream-border);
+  margin: 0 4px;
+}
+
+@media (min-width: 768px) {
+  .filter-mobile-divider {
+    display: none !important;
+  }
+}
+
 /* Mobile: ≤ 767px → 1 column (covers all phones + small tablets in portrait) */
 @media (max-width: 767px) {
   #grants-grid,
@@ -146,17 +179,98 @@ button {
     grid-template-columns: 1fr !important;
   }
 
+  /* Program Page Summary Responsiveness */
+  .meta-strip-container {
+    flex-direction: column !important;
+    border-radius: 8px !important;
+  }
+  .meta-strip-item {
+    border-left: none !important;
+    border-bottom: 1px solid var(--cream-border);
+    padding: 12px 16px !important;
+  }
+  .meta-strip-item:last-child {
+    border-bottom: none;
+  }
+  .meta-strip-value {
+    white-space: normal !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Profile Responsiveness */
+  .profile-layout-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+  aside.profile-sidebar {
+    position: static !important;
+    width: 100% !important;
+  }
+
   /* Adjust SoftInfra (Inline Ads) for mobile */
   .si-card-standalone {
     flex-direction: column !important;
     align-items: flex-start !important;
     padding: 24px 20px !important;
-    margin: 24px 0 !important;
+    margin: 16px 0 !important;
   }
 
   .si-card-standalone .si-cta-button {
     margin-top: 20px !important;
     margin-left: 0 !important;
+  }
+
+  /* Premium Filter Bar Responsiveness */
+  .filter-bar-shell {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    margin-bottom: 24px !important;
+  }
+
+  .filter-search-container {
+    order: -1; /* Search strictly on top */
+    width: 100% !important;
+    max-width: none !important;
+  }
+  .filter-search-input {
+    max-width: none !important;
+    width: 100% !important;
+  }
+
+  .filter-mobile-bottom-row {
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    gap: 0;
+    justify-content: space-between !important;
+    width: 100%;
+  }
+
+  .filter-chips-scroll {
+    display: none !important;
+  }
+
+  .filter-mobile-type-selector {
+    display: block !important;
+    flex: 1;
+    max-width: 140px;
+    margin-left: auto;
+  }
+
+  .filter-mobile-type-selector select {
+    width: 100%;
+    outline: none;
+  }
+
+  .filter-mobile-divider {
+    display: none !important; /* Divider not needed with space-between */
+  }
+
+  .filter-result-count {
+    font-size: 11px !important;
+    margin-top: 4px !important;
+    order: 10;
   }
 }
 

@@ -72,7 +72,7 @@ export function Navbar() {
   return (
     <header
       style={{
-        background: 'var(--cream)',
+        background: 'var(--header-bg)',
         borderBottom: '1px solid var(--cream-border)',
         position: 'sticky',
         top: 0,

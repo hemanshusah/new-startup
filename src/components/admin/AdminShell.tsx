@@ -96,7 +96,7 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
     : 'Admin'
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--cream)' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)' }}>
       {mobileSidebarOpen && (
         <div
           className="admin-sidebar-backdrop"
@@ -116,7 +116,7 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
         style={{
           width: '220px',
           flexShrink: 0,
-          background: 'var(--white)',
+          background: 'var(--header-bg)',
           borderRight: '1px solid var(--cream-border)',
           display: 'flex',
           flexDirection: 'column',
@@ -205,7 +205,7 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
           style={{
             padding: '14px 14px',
             borderTop: '1px solid var(--cream-border)',
-            background: 'var(--cream)',
+            background: 'var(--header-bg)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
