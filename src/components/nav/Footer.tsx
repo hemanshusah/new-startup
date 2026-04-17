@@ -6,7 +6,7 @@ import { WhatsAppLink } from './WhatsAppLink'
 export function Footer() {
   return (
     <footer style={{
-      background: 'var(--cream)',
+      background: 'var(--footer-bg)',
       borderTop: '1px solid var(--cream-border)',
       padding: '80px 24px 40px',
       marginTop: 'auto',

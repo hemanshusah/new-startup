@@ -159,7 +159,7 @@ export default async function AdminDashboard() {
                 fontFamily: 'var(--font-sans), sans-serif',
                 fontSize: '13px',
                 fontWeight: 500,
-                color: 'var(--cream)',
+                color: 'var(--white)',
                 background: 'var(--ink)',
                 borderRadius: '8px',
                 padding: '10px 16px',

@@ -74,7 +74,16 @@ export function SettingsForm({
   )
   const [sectors, setSectors] = useState<string[]>(initialSectors)
   const [cosmetic, setCosmetic] = useState<any>(initialCosmeticSettings || {
-    colors: { accent: '#B8460A', accentLight: '#FDF0EA', bg: '#F5F2EB', text: '#1C1A16', border: '#DAD6CC', white: '#FDFCF9' },
+    colors: { 
+      accent: '#B8460A', 
+      accentLight: '#FDF0EA', 
+      bg: '#F5F2EB', 
+      headerBg: '#F5F2EB',
+      footerBg: '#F5F2EB',
+      text: '#1C1A16', 
+      border: '#DAD6CC', 
+      white: '#FDFCF9' 
+    },
     fonts: { 
       heading: { family: 'DM Serif Display', size: '28px', weight: '400', style: 'normal' },
       section: { family: 'DM Serif Display', size: '16px', weight: '400', style: 'normal' },
@@ -361,7 +370,9 @@ export function SettingsForm({
                 <div style={{ gridTemplateColumns: 'repeat(2, 1fr)', display: 'grid', gap: '16px' }}>
                   {colorInput('Accent (Primary)', 'colors', 'accent')}
                   {colorInput('Accent Light', 'colors', 'accentLight')}
-                  {colorInput('Background', 'colors', 'bg')}
+                  {colorInput('Main Background', 'colors', 'bg')}
+                  {colorInput('Header Background', 'colors', 'headerBg')}
+                  {colorInput('Footer Background', 'colors', 'footerBg')}
                   {colorInput('Main Text (Ink)', 'colors', 'text')}
                   {colorInput('Borders', 'colors', 'border')}
                   {colorInput('Card Background', 'colors', 'white')}
@@ -439,8 +450,12 @@ export function SettingsForm({
                     '--font-style-body': cosmetic.fonts.body.style,
                     '--ink': cosmetic.colors.text,
                     '--ink-border': cosmetic.colors.border,
+                    '--cream-border': cosmetic.colors.border,
                     '--white': cosmetic.colors.white,
                     '--accent': cosmetic.colors.accent,
+                    '--header-bg': cosmetic.colors.headerBg || cosmetic.colors.bg,
+                    '--footer-bg': cosmetic.colors.footerBg || cosmetic.colors.bg,
+                    '--bg': cosmetic.colors.bg,
                     '--radius-lg': cosmetic.borderRadius
                   } as any}
                 >

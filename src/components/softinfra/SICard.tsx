@@ -32,7 +32,7 @@ export function SoftInfraCard({ si }: SoftInfraCardProps) {
       href={`/api/softinfra/click?id=${si.id}&url=${encodeURIComponent(si.cta_url)}`}
       target="_blank"
       rel="noopener noreferrer sponsored"
-      className={`si-card-link ${isInline ? 'si-card-standalone' : ''}`}
+      className={`si-card-link ${isInline ? 'si-card-standalone' : ''} ${si.is_image_only ? 'is-image-only' : ''}`}
       style={{
         display: 'flex',
         flexDirection: isInline ? 'row' : 'column',
@@ -40,24 +40,25 @@ export function SoftInfraCard({ si }: SoftInfraCardProps) {
         justifyContent: 'space-between',
         padding: si.is_image_only ? '0' : (isInline ? '24px 32px' : '24px'),
         textDecoration: 'none',
-        background: isDark ? 'var(--ink)' : 'var(--cream-dark)',
+        background: si.is_image_only ? 'transparent' : (isDark ? 'var(--ink)' : 'var(--cream-dark)'),
         // Standard cards stay in grid, Inline ads break out in GrantsGrid
         gridColumn: isInline ? '1 / -1' : (isWide ? 'span 2' : 'span 1'),
         border: (isDark || si.is_image_only) ? 'none' : '1px solid var(--cream-border)',
+        boxShadow: si.is_image_only ? 'none' : 'none', // Explicitly none for clear images
         borderRadius: isInline ? '12px' : '0', 
-        margin: isInline ? '32px 0' : '0',
         position: 'relative',
         overflow: 'hidden',
-        minHeight: (isInline && !si.is_image_only) ? 'auto' : '280px',
+        minHeight: (isInline && !si.is_image_only) ? 'auto' : (si.is_image_only ? 'auto' : '280px'),
       }}
       aria-label={`Sponsored: ${si.headline}`}
     >
       {si.is_image_only && si.image_url ? (
-        <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
+        <div style={{ position: 'relative', width: '100%', zIndex: 1 }} className="si-image-only-wrapper">
           <img 
             src={si.image_url} 
+            className="si-main-image"
             alt={si.headline || si.advertiser} 
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            style={{ width: '100%', height: 'auto', display: 'block' }} 
           />
         </div>
       ) : (

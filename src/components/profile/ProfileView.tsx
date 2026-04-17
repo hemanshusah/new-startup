@@ -128,7 +128,7 @@ export function ProfileView({
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '40px', alignItems: 'start' }}>
+    <div className="profile-layout-grid" style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '40px', alignItems: 'start' }}>
 
       {/* ── Left Column: Avatar & Overview ── */}
       <aside style={{

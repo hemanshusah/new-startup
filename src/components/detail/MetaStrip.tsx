@@ -62,6 +62,7 @@ export function MetaStrip({ program }: MetaStripProps) {
 
   return (
     <div
+      className="meta-strip-container"
       style={{
         display: 'flex',
         border: '1px solid var(--cream-border)',
@@ -77,6 +78,7 @@ export function MetaStrip({ program }: MetaStripProps) {
         <div
           key={item.label}
           role="listitem"
+          className="meta-strip-item"
           style={{
             flex: 1,
             padding: '10px 16px',
@@ -98,6 +100,7 @@ export function MetaStrip({ program }: MetaStripProps) {
             {item.label}
           </p>
           <p
+            className="meta-strip-value"
             style={{
               fontFamily: 'var(--font-sans), sans-serif',
               fontSize: '13.5px',

@@ -37,7 +37,7 @@ export default async function AdminProgramsPage() {
             fontFamily: 'var(--font-sans), sans-serif',
             fontSize: '13px',
             fontWeight: 500,
-            color: 'var(--cream)',
+            color: 'var(--white)',
             background: 'var(--ink)',
             borderRadius: '8px',
             padding: '9px 18px',

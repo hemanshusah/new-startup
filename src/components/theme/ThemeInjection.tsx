@@ -58,8 +58,10 @@ export async function ThemeInjection() {
           --accent: ${colors.accent};
           --accent-light: ${colors.accentLight};
           --bg: ${colors.bg};
+          --header-bg: ${colors.headerBg || colors.bg};
+          --footer-bg: ${colors.footerBg || colors.bg};
           --ink: ${colors.text};
-          --ink-border: ${colors.border};
+          --cream-border: ${colors.border};
           --white: ${colors.white};
           
           --font-serif: "${h.family}", serif;
@@ -138,6 +140,10 @@ export async function ThemeInjection() {
 
         .card, [style*="borderRadius"] {
           border-radius: var(--radius-lg) !important;
+        }
+
+        body {
+          background-color: var(--bg) !important;
         }
       `}} />
     </>
