@@ -92,7 +92,56 @@ export function DocLayout({
       {searchOpen && (
         <SchoolSearchModal onClose={() => setSearchOpen(false)} />
       )}
+      <DocLayoutStyles />
     </div>
+  )
+}
+
+/** Global hover styles for DocLayout components */
+function DocLayoutStyles() {
+  return (
+    <style dangerouslySetInnerHTML={{ __html: `
+      .school-sidebar-link {
+        transition: all 0.2s ease !important;
+      }
+      .school-sidebar-link:hover:not(.active) {
+        background: var(--bg) !important;
+        color: var(--ink) !important;
+        transform: translateX(4px);
+      }
+      .school-topnav a, .school-topnav button {
+        transition: all 0.2s ease !important;
+      }
+      .school-topnav a:hover {
+        color: var(--accent) !important;
+      }
+      .school-desktop-search button {
+        transition: all 0.2s ease !important;
+      }
+      .school-desktop-search button:hover {
+        border-color: var(--cream-border) !important;
+        background: var(--white) !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      }
+      .school-toc-link {
+        transition: all 0.2s ease !important;
+      }
+      .school-toc-link:hover:not(.active) {
+        color: var(--ink) !important;
+        padding-left: 4px !important;
+      }
+      .school-hamburger:hover {
+        background: var(--bg) !important;
+        border-color: var(--ink-4) !important;
+      }
+      .search-result-item {
+        transition: all 0.2s ease !important;
+      }
+      .search-result-item:hover {
+        background: var(--bg) !important;
+        transform: translateX(4px);
+      }
+    `}} />
   )
 }
 
@@ -476,6 +525,7 @@ function SchoolSearchModal({ onClose }: { onClose: () => void }) {
               key={r.item.id}
               href={`/school/${r.item.moduleSlug}/${r.item.slug}`}
               onClick={onClose}
+              className="search-result-item"
               style={{
                 display: 'block',
                 padding: '10px 12px',

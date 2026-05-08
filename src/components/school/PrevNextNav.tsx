@@ -29,7 +29,11 @@ export function PrevNextNav({ currentSlug, currentModuleSlug, flatLessons }: Pre
     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
       {/* Previous */}
       {prev ? (
-        <Link href={`/school/${prev.moduleSlug}/${prev.slug}`} style={cardStyle}>
+        <Link 
+          href={`/school/${prev.moduleSlug}/${prev.slug}`} 
+          style={cardStyle}
+          className="school-nav-card"
+        >
           <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', color: 'var(--ink-4)', marginBottom: '4px' }}>
             ← Previous
           </p>
@@ -43,7 +47,11 @@ export function PrevNextNav({ currentSlug, currentModuleSlug, flatLessons }: Pre
 
       {/* Next */}
       {next ? (
-        <Link href={`/school/${next.moduleSlug}/${next.slug}`} style={{ ...cardStyle, textAlign: 'right' }}>
+        <Link 
+          href={`/school/${next.moduleSlug}/${next.slug}`} 
+          style={{ ...cardStyle, textAlign: 'right' }}
+          className="school-nav-card"
+        >
           <p style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', color: 'var(--ink-4)', marginBottom: '4px' }}>
             Next →
           </p>
@@ -54,6 +62,18 @@ export function PrevNextNav({ currentSlug, currentModuleSlug, flatLessons }: Pre
       ) : (
         <div style={{ flex: 1 }} />
       )}
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .school-nav-card {
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+        .school-nav-card:hover {
+          border-color: var(--accent) !important;
+          background: var(--white) !important;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          transform: translateY(-2px);
+        }
+      `}} />
     </div>
   )
 }
