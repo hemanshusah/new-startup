@@ -1,5 +1,10 @@
 'use client'
 
+/**
+ * Admin form for creating and editing Startup School lessons.
+ * Includes a markdown editor with custom YouTube embed support and auto-slug generation.
+ */
+
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'

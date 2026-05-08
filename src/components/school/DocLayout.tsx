@@ -12,6 +12,16 @@ interface DocLayoutProps {
   currentSlug?: string
 }
 
+/**
+ * Core layout for the Startup School curriculum.
+ * Features a triple-column design:
+ * 1. Fixed Sidebar for navigation (Left)
+ * 2. Content Area for reading (Center)
+ * 3. Table of Contents (Right)
+ * 
+ * Includes mobile responsiveness, keyboard shortcuts (Cmd+K for search),
+ * and scroll-synchronized TOC.
+ */
 export function DocLayout({
   children,
   navigation,
@@ -88,6 +98,10 @@ export function DocLayout({
 
 // ── TopNav Sub-component ─────────────────────────────────────
 
+/**
+ * Horizontal navigation bar for Startup School.
+ * Displays the product logo, search trigger, and top-level module tabs.
+ */
 function SchoolTopNav({
   modules,
   currentSection,
@@ -222,6 +236,10 @@ function SchoolTopNav({
 
 // ── Sidebar Sub-component ────────────────────────────────────
 
+/**
+ * Vertical sidebar navigation for the active module.
+ * Groups lessons by their `group_label` and highlights the current lesson.
+ */
 function SchoolSidebar({
   modules,
   currentSection,
@@ -297,6 +315,10 @@ function SchoolSidebar({
 
 // ── TOC Sub-component ────────────────────────────────────────
 
+/**
+ * Auto-generated Table of Contents for the current lesson.
+ * Scans the DOM for H2/H3 tags and uses IntersectionObserver to highlight active sections.
+ */
 function SchoolTOC() {
   const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([])
   const [activeId, setActiveId] = useState<string>('')
@@ -381,6 +403,10 @@ function SchoolTOC() {
 
 // ── Search Modal Sub-component ───────────────────────────────
 
+/**
+ * Full-screen search modal.
+ * Loads a JSON search index on demand and uses Fuse.js for fuzzy matching.
+ */
 function SchoolSearchModal({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<any[]>([])

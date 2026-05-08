@@ -1,3 +1,7 @@
+/**
+ * Logic for fetching and structuring Startup School navigation data.
+ * Provides hierarchal (Module -> Lesson) and flat structures.
+ */
 import { createServiceClient } from '@/lib/supabase/server'
 
 export interface SchoolLesson {

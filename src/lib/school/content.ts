@@ -1,3 +1,6 @@
+/**
+ * Logic for fetching detailed lesson content and search index data.
+ */
 import { createServiceClient } from '@/lib/supabase/server'
 
 export interface FullLesson {

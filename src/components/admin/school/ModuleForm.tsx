@@ -1,5 +1,10 @@
 'use client'
 
+/**
+ * Admin form for creating and editing Startup School modules.
+ * Handles metadata and auto-slug generation.
+ */
+
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createModule, updateModule } from '@/app/admin/school/actions'
