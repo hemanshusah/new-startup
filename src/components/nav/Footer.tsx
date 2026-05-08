@@ -2,8 +2,17 @@
 
 import Link from 'next/link'
 import { WhatsAppLink } from './WhatsAppLink'
+import { usePathname } from 'next/navigation'
+import { PRODUCTS, DEFAULT_PRODUCT } from '@/config/products'
 
 export function Footer() {
+  const pathname = usePathname()
+  
+  // Determine current product based on path
+  const product = Object.values(PRODUCTS).find(p => 
+    p.slug !== 'grants' && pathname?.startsWith(`/${p.slug}`)
+  ) || DEFAULT_PRODUCT
+
   return (
     <footer style={{
       background: 'var(--footer-bg)',
@@ -20,7 +29,7 @@ export function Footer() {
         }}>
           {/* Brand & Socials */}
           <div>
-            <Link href="/" style={{
+            <Link href={product.slug === 'grants' ? '/' : `/${product.slug}`} style={{
               fontFamily: 'var(--font-serif)',
               fontSize: '22px',
               color: 'var(--ink)',
@@ -28,7 +37,7 @@ export function Footer() {
               display: 'block',
               marginBottom: '12px'
             }}>
-              StartupGrantsIndia
+              {product.name}
             </Link>
             <p style={{
               fontFamily: 'var(--font-sans)',
@@ -94,6 +103,7 @@ export function Footer() {
             <h4 className="footer-header" style={headerStyle}>FOR FOUNDERS</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <Link href="/" style={linkStyle}>Browse Grants</Link>
+              <Link href="/school" style={linkStyle}>Startup School</Link>
               {/* <Link href="/newsletter" style={linkStyle}>Newsletter</Link>
               <Link href="/events" style={linkStyle}>Startup Events</Link> */}
               <Link href="mailto:deeksharai014@gmail.com?subject=Software%20Deals%20%20%3C%3E%20StartupProgram%20Site!" style={linkStyle}>Software Deals</Link>

@@ -448,6 +448,7 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
             <tr>
               <th style={{ ...thBase, width: '36px' }}><input type="checkbox" checked={selected.size === paginated.length && paginated.length > 0} onChange={(e) => e.target.checked ? selectAll() : clearSelect()} /></th>
               {colHeader('Title', 'title')}
+              <th style={thBase}>Product</th>
               {colHeader('Type', 'type')}
               {colHeader('Status', 'status')}
               <th style={thBase}>Published</th>
@@ -487,6 +488,12 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
                       style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink)', fontWeight: 500 }}
                     >
                       {p.title.length > 50 ? p.title.slice(0, 50) + '…' : p.title}
+                    </span>
+                  </td>
+                  {/* Product */}
+                  <td style={tdBase}>
+                    <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', color: 'var(--ink-3)', textTransform: 'capitalize' }}>
+                      {(p as any).product_slug || 'grants'}
                     </span>
                   </td>
                   {/* Type */}

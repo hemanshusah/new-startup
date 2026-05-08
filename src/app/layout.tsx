@@ -14,11 +14,10 @@ import { ThemeInjection } from '@/components/theme/ThemeInjection'
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: 'GrantsIndia — Top 2026 Grants & Funding for Indian Startups',
-    template: '%s — GrantsIndia',
+    default: 'Startup Platform',
+    template: '%s',
   },
-  description:
-    'Discover government and private sector grants, incubation programs, accelerators, and contests for Indian founders. Updated weekly.',
+  description: 'Shared platform for startup resources.',
 }
 
 import { FooterWrapper } from '@/components/nav/FooterWrapper'

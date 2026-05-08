@@ -8,21 +8,6 @@ import { getSiteUrl } from '@/lib/site-url'
 // ISR: revalidate every 5 minutes (CONTEXT.md §11)
 export const revalidate = 300
 
-export const metadata: Metadata = {
-  title: 'GrantsIndia — Top 2026 Grants & Funding for Indian Startups',
-  description:
-    'Discover government and private sector grants, incubation programs, accelerators, and contests for Indian founders. Updated weekly.',
-  openGraph: {
-    title: 'GrantsIndia — Top 2026 Grants & Funding for Indian Startups',
-    description:
-      'Discover government and private sector grants, incubation programs, accelerators, and contests for Indian founders. Updated weekly.',
-    images: ['/og-default.png'],
-  },
-  alternates: {
-    canonical: `${getSiteUrl()}/`,
-  },
-}
-
 export default async function ListingPage() {
   // Fetch ALL published active programs — specific columns only (CONTEXT.md §11)
   // Full array sent to client; pagination & filtering done entirely client-side
@@ -35,6 +20,7 @@ export default async function ListingPage() {
     )
     .eq('published', true)
     .eq('status', 'active')
+    .eq('product_slug', 'grants') // Filter by product
     .order('is_featured', { ascending: false })
     .order('deadline', { ascending: true })
 
@@ -44,6 +30,7 @@ export default async function ListingPage() {
   const { data: configData } = await supabase
     .from('site_config')
     .select('si_slot_positions, show_newsletter, cosmetic_settings')
+    .eq('product_slug', 'grants') // Filter by product
     .limit(1)
     .single()
 

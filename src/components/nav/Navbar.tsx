@@ -6,6 +6,7 @@ import { useState, useEffect, useSyncExternalStore } from 'react'
 import { ComingSoonBadge } from './ComingSoonBadge'
 import { WhatsAppLink } from './WhatsAppLink'
 import { useAuth } from '../auth/AuthProvider'
+import { PRODUCTS, DEFAULT_PRODUCT } from '@/config/products'
 
 const COMPACT_NAV_MQ = '(max-width: 1024px)'
 
@@ -52,6 +53,11 @@ export function Navbar() {
   const initials = user ? getInitials(user) : ''
   const isAdmin = profile?.role === 'admin'
 
+  // Determine current product based on path
+  const product = Object.values(PRODUCTS).find(p => 
+    p.slug !== 'grants' && pathname?.startsWith(`/${p.slug}`)
+  ) || DEFAULT_PRODUCT
+
   useEffect(() => {
     if (mobileMenuOpen) {
       const prev = document.body.style.overflow
@@ -94,7 +100,7 @@ export function Navbar() {
       >
         {/* Logo */}
         <Link
-          href="/"
+          href={product.slug === 'grants' ? '/' : `/${product.slug}`}
           onClick={() => setMobileMenuOpen(false)}
           style={{
             fontFamily: 'var(--font-serif)',
@@ -104,73 +110,32 @@ export function Navbar() {
             flexShrink: 0,
           }}
         >
-          <span style={{ color: 'var(--ink)' }}>Grants</span>
-          <span style={{ color: 'var(--accent)' }}>India</span>
+          <span style={{ color: 'var(--ink)' }}>{product.logo.first}</span>
+          <span style={{ color: product.primaryColor }}>{product.logo.second}</span>
         </Link>
 
         {/* Nav links — desktop (hidden on compact: burger + drawer instead) */}
         {!isCompactNav && (
           <div className="nav-desktop-links" style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1 }}>
-            <Link
-              href="/"
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: '13px',
-                fontWeight: isActive('/') ? 500 : 400,
-                color: isActive('/') ? 'var(--ink)' : 'var(--ink-3)',
-                transition: 'color 0.15s ease',
-              }}
-            >
-              Grants &amp; Funding
-            </Link>
-
-            {/* <Link
-              href="/events"
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: '13px',
-                fontWeight: 400,
-                color: 'var(--ink-3)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}
-            >
-              Events
-              <ComingSoonBadge label="Launching Soon" />
-            </Link>
-
-            <Link
-              href="/newsletter"
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: '13px',
-                fontWeight: 400,
-                color: 'var(--ink-3)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}
-            >
-              Newsletter
-              <ComingSoonBadge label="Launching Soon" />
-            </Link> */}
-
-            <Link
-              href="mailto:deeksharai014@gmail.com?subject=Software%20Deals%20%20%3C%3E%20StartupProgram%20Site!"
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: '13px',
-                fontWeight: 400,
-                color: 'var(--ink-3)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}
-            >
-              Software Deals
-              <ComingSoonBadge label="Coming Soon" />
-            </Link>
+            {product.navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '13px',
+                  fontWeight: isActive(link.href) ? 500 : 400,
+                  color: isActive(link.href) ? 'var(--ink)' : 'var(--ink-3)',
+                  transition: 'color 0.15s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                {link.label}
+                {link.badge && <ComingSoonBadge label={link.badge} />}
+              </Link>
+            ))}
           </div>
         )}
 
@@ -458,10 +423,27 @@ export function Navbar() {
                 ×
               </button>
             </div>
-            <Link href="/" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: isActive('/') ? 500 : 400, color: isActive('/') ? 'var(--ink)' : 'var(--ink-2)', padding: '10px 0', borderBottom: '1px solid var(--cream-border)' }}>Grants &amp; Funding</Link>
-            {/* <Link href="/events" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Events <ComingSoonBadge label="Launching Soon" /></Link>
-            <Link href="/newsletter" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Newsletter <ComingSoonBadge label="Launching Soon" /></Link> */}
-            <Link href="mailto:deeksharai014@gmail.com?subject=Software%20Deals%20%20%3C%3E%20StartupProgram%20Site!" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', padding: '10px 0', borderBottom: '1px solid var(--cream-border)', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-2)' }}>Software Deals <ComingSoonBadge label="Coming Soon" /></Link>
+            {product.navLinks.map((link) => (
+              <Link 
+                key={link.href}
+                href={link.href} 
+                onClick={() => setMobileMenuOpen(false)} 
+                style={{ 
+                  fontFamily: 'var(--font-sans)', 
+                  fontSize: '14px', 
+                  fontWeight: isActive(link.href) ? 500 : 400, 
+                  color: isActive(link.href) ? 'var(--ink)' : 'var(--ink-2)', 
+                  padding: '10px 0', 
+                  borderBottom: '1px solid var(--cream-border)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                {link.label}
+                {link.badge && <ComingSoonBadge label={link.badge} />}
+              </Link>
+            ))}
             <WhatsAppLink
               onClick={() => setMobileMenuOpen(false)}
               style={{ marginTop: '8px' }}
