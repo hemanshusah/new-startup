@@ -108,6 +108,7 @@ export default async function ProgramDetailPage({ params }: Props) {
     .select('id,slug,title,organisation,type,deadline,amount_display,description_short,is_featured,sectors,stage,is_india,amount_min,amount_max,state')
     .eq('published', true)
     .eq('status', 'active')
+    .eq('product_slug', 'grants') // Filter by product
     .neq('slug', slug)
 
   const allPrograms: ProgramListItem[] = allProgramsRaw ?? []

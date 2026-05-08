@@ -8,7 +8,6 @@ import { useMemo, useRef, useState, useEffect } from 'react'
 import { PageTransition } from '@/components/ui/PageTransition'
 
 const NAV_ITEMS = [
-  // ... (keep navigation items)
   {
     label: 'Dashboard',
     href: '/admin/dashboard',
@@ -42,6 +41,35 @@ const NAV_ITEMS = [
       </svg>
     ),
   },
+]
+
+// School nav group — collapsible section between SoftInfra and Users
+const SCHOOL_NAV_ITEMS = [
+  {
+    label: 'Modules',
+    href: '/admin/school/modules',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor" opacity="0.7" />
+        <rect x="9" y="2" width="5" height="5" rx="1" fill="currentColor" opacity="0.7" />
+        <rect x="2" y="9" width="5" height="5" rx="1" fill="currentColor" opacity="0.7" />
+        <rect x="9" y="9" width="5" height="5" rx="1" fill="currentColor" opacity="0.4" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Lessons',
+    href: '/admin/school/lessons',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M3 2h10a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.4" />
+        <path d="M5 5h6M5 8h6M5 11h3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+]
+
+const BOTTOM_NAV_ITEMS = [
   {
     label: 'Users',
     href: '/admin/users',
@@ -76,6 +104,8 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
   const supabase = useMemo(() => createClient(), [])
   const { user, profile, signOut } = useAuth()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const isSchoolRoute = pathname.startsWith('/admin/school')
+  const [schoolOpen, setSchoolOpen] = useState(isSchoolRoute)
 
   useEffect(() => {
     if (mobileSidebarOpen) {
@@ -169,6 +199,113 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
               item.href === '/admin/dashboard'
                 ? pathname === '/admin/dashboard' || pathname === '/admin'
                 : pathname.startsWith(item.href)
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileSidebarOpen(false)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '9px 11px',
+                  borderRadius: '8px',
+                  marginBottom: '2px',
+                  fontFamily: 'var(--font-section), var(--font-sans), sans-serif',
+                  fontSize: '13px',
+                  fontWeight: isActive ? 600 : ('var(--font-weight-section)' as any),
+                  fontStyle: 'var(--font-style-section)' as any,
+                  color: isActive ? 'var(--ink)' : 'var(--ink-3)',
+                  background: isActive ? 'var(--cream)' : 'transparent',
+                  textDecoration: 'none',
+                  transition: 'background 0.12s ease, color 0.12s ease',
+                }}
+              >
+                <span style={{ color: isActive ? 'var(--ink)' : 'var(--ink-4)', flexShrink: 0 }}>
+                  {item.icon}
+                </span>
+                {item.label}
+              </Link>
+            )
+          })}
+
+          {/* ── School collapsible group ── */}
+          <div style={{ marginTop: '4px', marginBottom: '4px' }}>
+            <button
+              type="button"
+              onClick={() => setSchoolOpen((o) => !o)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                width: '100%',
+                padding: '9px 11px',
+                borderRadius: '8px',
+                marginBottom: '2px',
+                fontFamily: 'var(--font-section), var(--font-sans), sans-serif',
+                fontSize: '13px',
+                fontWeight: isSchoolRoute ? 600 : ('var(--font-weight-section)' as any),
+                fontStyle: 'var(--font-style-section)' as any,
+                color: isSchoolRoute ? 'var(--ink)' : 'var(--ink-3)',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'background 0.12s ease, color 0.12s ease',
+              }}
+            >
+              <span style={{ color: isSchoolRoute ? 'var(--ink)' : 'var(--ink-4)', flexShrink: 0 }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M8 1L1 5l7 4 7-4-7-4z" fill="currentColor" opacity="0.8" />
+                  <path d="M1 8l7 4 7-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M1 11l7 4 7-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+              School
+              <span style={{ marginLeft: 'auto', fontSize: '10px', color: 'var(--ink-4)', transition: 'transform 0.15s ease', transform: schoolOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                ▼
+              </span>
+            </button>
+            {schoolOpen && (
+              <div style={{ paddingLeft: '12px' }}>
+                {SCHOOL_NAV_ITEMS.map((item) => {
+                  const isActive = pathname.startsWith(item.href)
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileSidebarOpen(false)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '8px 11px',
+                        borderRadius: '8px',
+                        marginBottom: '1px',
+                        fontFamily: 'var(--font-section), var(--font-sans), sans-serif',
+                        fontSize: '12.5px',
+                        fontWeight: isActive ? 600 : ('var(--font-weight-section)' as any),
+                        fontStyle: 'var(--font-style-section)' as any,
+                        color: isActive ? 'var(--ink)' : 'var(--ink-3)',
+                        background: isActive ? 'var(--cream)' : 'transparent',
+                        textDecoration: 'none',
+                        transition: 'background 0.12s ease, color 0.12s ease',
+                      }}
+                    >
+                      <span style={{ color: isActive ? 'var(--ink)' : 'var(--ink-4)', flexShrink: 0 }}>
+                        {item.icon}
+                      </span>
+                      {item.label}
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* ── Bottom nav items (Users, Settings) ── */}
+          {BOTTOM_NAV_ITEMS.map((item) => {
+            const isActive = pathname.startsWith(item.href)
             return (
               <Link
                 key={item.href}

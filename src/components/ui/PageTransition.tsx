@@ -11,6 +11,12 @@ export function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname()
   const prefersReducedMotion = useReducedMotion()
 
+  const isSchool = pathname?.startsWith('/school')
+
+  if (isSchool) {
+    return <>{children}</>
+  }
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
