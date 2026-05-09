@@ -2,228 +2,229 @@
 
 import Link from 'next/link'
 import { ProgramListItem } from '@/types/program'
-import React from 'react'
-
-/** Deadline colour logic per CONTEXT.md §3 */
-function getDeadlineInfo(deadline: string) {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const deadlineDate = new Date(deadline)
-  deadlineDate.setHours(0, 0, 0, 0)
-  const diffDays = Math.ceil(
-    (deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-  )
-
-  if (diffDays < 0) {
-    return { label: 'CLOSED', color: 'var(--ink-4)', dot: 'var(--ink-4)', daysLeft: null }
-  }
-
-  const label = new Date(deadline).toLocaleDateString('en-IN', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
-  
-  // Force deadlines to RED as requested
-  return { 
-    label, 
-    color: '#E03E2D', 
-    dot: '#E03E2D',
-    daysLeft: diffDays === 0 ? 'Last day' : `${diffDays} days left`
-  }
-}
-
-/** Type badge colours (editorial palette, not from spec — fills gap spec doesn't detail) */
-const TYPE_STYLES: Record<string, { bg: string; color: string }> = {
-  grant:       { bg: '#EDF5EA', color: '#2A6620' },
-  incubation:  { bg: '#EBF1FF', color: '#1A4FA3' },
-  accelerator: { bg: '#F2EBFF', color: '#5B21A8' },
-  contest:     { bg: '#FFF3E6', color: '#A05205' },
-  funding:     { bg: '#FFEBEB', color: '#B01F1F' },
-  seed:        { bg: '#E9FFF4', color: '#1A7A4D' },
-}
+import React, { useState } from 'react'
+import { ArrowUpRight, Calendar, Bookmark } from 'lucide-react'
+import { useAuth } from '@/components/auth/AuthProvider'
+import { toggleBookmark } from '@/lib/bookmarks/actions'
 
 interface GrantCardProps {
   program: ProgramListItem
-  /** onClick — used for auth gate in Phase 3; defaults to href navigation */
   onClick?: (e: React.MouseEvent) => void
+  isBookmarkedInitial?: boolean
 }
 
-export function GrantCard({ program, onClick }: GrantCardProps) {
-  const deadline = getDeadlineInfo(program.deadline)
-  const typeStyle = TYPE_STYLES[program.type] ?? { bg: 'var(--cream-dark)', color: 'var(--ink-2)' }
+export function GrantCard({ program, onClick, isBookmarkedInitial = false }: GrantCardProps) {
+  const { user, openModal } = useAuth()
+  const [isBookmarked, setIsBookmarked] = useState(isBookmarkedInitial)
+  const [isToggling, setIsToggling] = useState(false)
+
+  // Sync state with props and handle auth changes
+  React.useEffect(() => {
+    if (!user) {
+      setIsBookmarked(false)
+    } else {
+      setIsBookmarked(isBookmarkedInitial)
+    }
+  }, [isBookmarkedInitial, user])
+
+  const deadlineDate = new Date(program.deadline)
+  const formattedDeadline = deadlineDate.toLocaleDateString('en-IN', {
+    day: 'numeric',
+    month: 'short'
+  })
+
+  const handleBookmarkClick = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!user) {
+      openModal()
+      return
+    }
+
+    if (isToggling) return
+
+    setIsToggling(true)
+    // Optimistic update
+    setIsBookmarked(!isBookmarked)
+
+    try {
+      const result = await toggleBookmark(program.id)
+      if (result.error) {
+        // Revert on error
+        setIsBookmarked(isBookmarked)
+        console.error('Bookmark toggle failed:', result.error)
+      }
+    } catch (err) {
+      setIsBookmarked(isBookmarked)
+      console.error('Bookmark toggle error:', err)
+    } finally {
+      setIsToggling(false)
+    }
+  }
 
   return (
-    <Link
-      href={`/programs/${program.slug}`}
-      onClick={onClick}
-      onKeyDown={(e) => e.key === 'Enter' && onClick?.(e as unknown as React.MouseEvent)}
-      className="grant-card"
-      style={{
-        background: 'var(--white)',
-        padding: '32px 28px 28px',
-        minHeight: '240px',
-        borderRadius: 0, 
-        cursor: 'pointer',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        position: 'relative',
-        transition: 'background 0.1s ease',
-        textDecoration: 'none', // Critical for Link
-      }}
-      aria-label={`${program.title} by ${program.organisation}`}
-    >
-      {/* Top section */}
-      <div>
-        {/* Organisation */}
-        <p
-          className="org-name"
-          style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: '11px',
-            fontWeight: 500,
-            color: 'var(--ink-4)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-            marginBottom: '4px',
-          }}
-        >
-          {program.organisation}
-        </p>
-
-        {/* Title */}
-        <h3
-          style={{
-            fontFamily: 'var(--font-section), var(--font-serif), serif',
-            fontSize: 'var(--font-size-section)',
-            fontWeight: 'var(--font-weight-section)',
-            fontStyle: 'var(--font-style-section)',
-            color: 'var(--ink)',
-            lineHeight: 1.35,
-            marginBottom: '10px',
-            marginTop: 0,
-          }}
-        >
-          {program.title}
-        </h3>
-
-        {/* Description — 2-line clamp */}
-        <p
-          className="line-clamp-2"
-          style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--font-size-body)',
-            fontWeight: 'var(--font-weight-body)',
-            fontStyle: 'var(--font-style-body)',
-            color: 'var(--ink-2)',
-            lineHeight: 1.55,
-          }}
-        >
-          {program.description_short}
-        </p>
-      </div>
-
-      {/* Bottom row */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-end',
-          justifyContent: 'space-between',
-          marginTop: '16px',
-        }}
+    <div className="grant-card-unified-wrapper" style={{ position: 'relative' }}>
+      <Link
+        href={`/programs/${program.slug}`}
+        onClick={onClick}
+        className="grant-card-unified"
+        style={{ textDecoration: 'none', display: 'block' }}
+        aria-label={`${program.title} by ${program.organisation}`}
       >
-        {/* Left: badge + deadline */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          {/* Type badge pill */}
-          <span
-            style={{
-              fontFamily: 'var(--font-sans)',
+        <div className="card-inner" style={{
+          background: 'var(--white)',
+          border: '1px solid var(--cream-border)',
+          borderRadius: '16px',
+          padding: '24px',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          position: 'relative'
+        }}>
+          {/* Top row: Type Badge & Arrow */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+            <span style={{
               fontSize: '10px',
               fontWeight: 600,
-              borderRadius: '4px',
-              padding: '3px 9px',
-              display: 'inline-block',
-              background: typeStyle.bg,
-              color: typeStyle.color,
               textTransform: 'uppercase',
-              letterSpacing: '0.04em',
-              lineHeight: 1,
-            }}
-          >
-            {program.type}
-          </span>
-
-          {/* Deadline */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <span
-              style={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                background: deadline.dot,
-                flexShrink: 0,
-                display: 'inline-block',
-              }}
-            />
-            <span
-              className="meta-text"
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: '11px',
-                fontWeight: 500,
-                color: deadline.color,
-              }}
-            >
-              {deadline.label} {deadline.daysLeft && <span style={{ opacity: 0.8, fontSize: '10px' }}>• ({deadline.daysLeft})</span>}
+              letterSpacing: '0.05em',
+              background: 'var(--bg)',
+              padding: '4px 10px',
+              borderRadius: '100px',
+              color: 'var(--ink-3)'
+            }}>
+              {program.type}
             </span>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <button
+                onClick={handleBookmarkClick}
+                disabled={isToggling}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  padding: '4px',
+                  cursor: 'pointer',
+                  color: isBookmarked ? 'var(--accent)' : 'var(--ink-4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease',
+                  borderRadius: '50%',
+                }}
+                className="bookmark-btn"
+                title={isBookmarked ? "Remove bookmark" : "Bookmark program"}
+              >
+                <Bookmark
+                  size={18}
+                  fill={isBookmarked ? 'currentColor' : 'none'}
+                  strokeWidth={2}
+                />
+              </button>
+              <ArrowUpRight size={18} className="card-arrow" style={{ color: 'var(--ink-4)', transition: 'all 0.3s ease' }} />
+            </div>
+          </div>
+
+          {/* Content Section */}
+          <div style={{ flex: 1 }}>
+            <h4 style={{
+              fontFamily: 'var(--font-sans), sans-serif',
+              fontSize: '16px',
+              fontWeight: 600,
+              color: 'var(--ink)',
+              marginBottom: '6px',
+              lineHeight: 1.4
+            }}>
+              {program.title}
+            </h4>
+
+            <p style={{
+              fontSize: '13px',
+              color: 'var(--ink-4)',
+              marginBottom: '16px',
+              fontFamily: 'var(--font-sans), sans-serif'
+            }}>
+              {program.organisation}
+            </p>
+
+            <p style={{
+              fontSize: '13.5px',
+              lineHeight: '1.6',
+              color: 'var(--ink-2)',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              marginBottom: '20px'
+            }}>
+              {program.description_short}
+            </p>
+          </div>
+
+          {/* Footer info: Amount & Deadline */}
+          <div style={{
+            marginTop: 'auto',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            borderTop: '1px solid var(--bg)',
+            paddingTop: '16px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--ink)' }}>
+                {program.amount_display || 'Grant'}
+              </span>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Calendar size={14} color="var(--ink-4)" />
+                <span style={{ fontSize: '12px', color: 'var(--ink-3)', fontWeight: 500 }}>
+                  {formattedDeadline}
+                </span>
+              </div>
+              {(() => {
+                const now = new Date()
+                const diffTime = deadlineDate.getTime() - now.getTime()
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+                if (diffDays > 0) {
+                  return (
+                    <span style={{
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      color: '#d93025',
+                      background: '#fef2f2',
+                      padding: '2px 6px',
+                      borderRadius: '4px'
+                    }}>
+                      {diffDays} days left
+                    </span>
+                  )
+                }
+                return null
+              })()}
+            </div>
           </div>
         </div>
 
-        {/* Right: amount */}
-        {program.amount_display && (
-          <div style={{ textAlign: 'right' }}>
-            <div
-              className="amount-display"
-              style={{
-                fontFamily: 'var(--font-section)',
-                fontSize: '16px',
-                fontWeight: 'var(--font-weight-section)',
-                color: 'var(--ink)',
-              }}
-            >
-              {program.amount_display}
-            </div>
-            <div
-              className="meta-text"
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: '10px',
-                fontWeight: 400,
-                color: 'var(--ink-4)',
-                marginTop: '1px',
-              }}
-            >
-              Available
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Hover arrow — fades in on hover via CSS (.grant-card:hover .hover-arrow) */}
-      <span
-        className="hover-arrow"
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          top: '20px',
-          right: '20px',
-          fontSize: '14px',
-          color: 'var(--ink-3)',
-        }}
-      >
-        ↗
-      </span>
-    </Link>
+        <style dangerouslySetInnerHTML={{
+          __html: `
+          .grant-card-unified:hover .card-inner {
+            border-color: var(--accent) !important;
+            box-shadow: 0 12px 32px rgba(184, 70, 10, 0.08);
+            transform: translateY(-4px);
+          }
+          .grant-card-unified:hover .card-arrow {
+            color: var(--accent) !important;
+            transform: translate(2px, -2px);
+          }
+          .bookmark-btn:hover {
+            background: var(--bg) !important;
+            transform: scale(1.1);
+          }
+        `}} />
+      </Link>
+    </div>
   )
 }

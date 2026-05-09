@@ -43,7 +43,7 @@ export default async function SchoolPage() {
           </h1>
           <p style={{ 
             fontFamily: 'var(--font-sans), sans-serif',
-            fontSize: '1.15rem',
+            fontSize: '1.15rem', 
             color: 'var(--ink-3)',
             lineHeight: 1.6,
             maxWidth: '600px',

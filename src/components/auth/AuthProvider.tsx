@@ -11,21 +11,13 @@ import React, {
 import { useRouter } from 'next/navigation'
 import { SessionProvider, useSession, signOut as nextAuthSignOut } from 'next-auth/react'
 import { createClient } from '@/lib/supabase/client'
+import type { Profile } from '@/types/profile'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface AuthContextValue {
   user: any | null // Transitioning from Supabase User to Auth.js User
-  profile: {
-    id: string
-    role: 'user' | 'admin'
-    full_name?: string
-    avatar_url?: string
-    phone?: string
-    startup_name?: string
-    startup_website?: string
-    startup_email?: string
-  } | null
+  profile: Profile | null
   isModalOpen: boolean
   /** Open the auth modal; pass a redirect path to navigate there after sign-in */
   openModal: (redirectTo?: string) => void
@@ -110,11 +102,14 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
   }, [])
 
   const signOut = useCallback(async () => {
-    await nextAuthSignOut({ redirect: false })
+    await Promise.all([
+      nextAuthSignOut({ redirect: false }),
+      supabase.auth.signOut()
+    ])
     setProfile(null)
     router.push('/')
     router.refresh()
-  }, [router])
+  }, [router, supabase])
 
   return (
     <AuthContext.Provider

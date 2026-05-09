@@ -15,17 +15,21 @@ interface GrantsGridProps {
   programs: ProgramListItem[]
   siSlotPositions?: number[]
   siAds?: SoftInfra[]
+  bookmarkedIds?: string[]
+  hideFilters?: boolean
 }
 
 export function GrantsGrid({ 
   programs, 
   siSlotPositions = [6, 14, 20], 
-  siAds = []
+  siAds = [],
+  bookmarkedIds = [],
+  hideFilters = false
 }: GrantsGridProps) {
   const { user, openModal } = useAuth()
 
   // Filter state
-  const [scope, setScope] = useState<ScopeFilter>('national')
+  const [scope, setScope] = useState<ScopeFilter | 'all'>(hideFilters ? 'all' : 'national')
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1) // how many PAGE_SIZE batches to show
@@ -40,8 +44,10 @@ export function GrantsGrid({
   const filtered = useMemo(() => {
     return programs.filter((p) => {
       // Scope filter
-      if (scope === 'national' && !p.is_india) return false
-      if (scope === 'international' && p.is_india) return false
+      if (scope !== 'all') {
+        if (scope === 'national' && !p.is_india) return false
+        if (scope === 'international' && p.is_india) return false
+      }
 
       // Type filter
       if (typeFilter !== 'all' && p.type !== typeFilter) return false
@@ -133,16 +139,18 @@ export function GrantsGrid({
   return (
     <div>
       {/* Filter bar */}
-      <FilterBar
-        scope={scope}
-        onScopeChange={handleScopeChange}
-        typeFilter={typeFilter}
-        onTypeChange={handleTypeChange}
-        search={search}
-        onSearchChange={handleSearchChange}
-        totalShown={visible.length}
-        totalFiltered={filtered.length}
-      />
+      {!hideFilters && (
+        <FilterBar
+          scope={scope as ScopeFilter}
+          onScopeChange={handleScopeChange}
+          typeFilter={typeFilter}
+          onTypeChange={handleTypeChange}
+          search={search}
+          onSearchChange={handleSearchChange}
+          totalShown={visible.length}
+          totalFiltered={filtered.length}
+        />
+      )}
 
       {/* 3-column grid — gap: 1px creates hairline border via background on wrapper */}
       {filtered.length === 0 ? (
@@ -171,11 +179,8 @@ export function GrantsGrid({
                   className="grants-batch-grid"
                   style={{
                     display: 'grid',
-                    gap: '1px',
-                    background: 'var(--cream-border)',
-                    border: '1px solid var(--cream-border)',
-                    borderRadius: '12px',
-                    overflow: 'hidden',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                    gap: '24px',
                   }}
                 >
                   {batch}
@@ -191,6 +196,7 @@ export function GrantsGrid({
                     key={program.id}
                     program={program}
                     onClick={(e) => handleCardClick(e, program.slug)}
+                    isBookmarkedInitial={bookmarkedIds.includes(program.id)}
                   />
                 )
 

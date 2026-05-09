@@ -4,25 +4,45 @@ import { ProgramListItem } from '@/types/program'
 import { GrantsGrid } from '@/components/listing/GrantsGrid'
 import { getActiveSoftInfra } from '@/lib/softinfra'
 import { getSiteUrl } from '@/lib/site-url'
+import { getCurrentProfile } from '@/components/auth/auth-actions'
+import { calculateCompletion } from '@/lib/school/profile-completion'
+import { getRecommendedPrograms } from '@/lib/school/recommendations'
+import { PersonalizationSection } from '@/components/dashboard/PersonalizationSection'
+import type { Profile } from '@/types/profile'
+import { getBookmarkedProgramIds } from '@/lib/bookmarks/actions'
 
-// ISR: revalidate every 5 minutes (CONTEXT.md §11)
-export const revalidate = 300
+// Ensure the page is always dynamic to reflect auth state (CONTEXT.md §11)
+export const dynamic = 'force-dynamic'
 
 export default async function ListingPage() {
   // Fetch ALL published active programs — specific columns only (CONTEXT.md §11)
   // Full array sent to client; pagination & filtering done entirely client-side
   const supabase = await createClient()
 
+  const [sessionProfile, siAds] = await Promise.all([
+    getCurrentProfile(),
+    getActiveSoftInfra('listing-grid'),
+  ])
+
+  const profile = sessionProfile as Profile | null
+  const completion = calculateCompletion(profile)
+  const isUnlocked = completion >= 80
+  const recommendations = isUnlocked ? await getRecommendedPrograms(profile) : []
+
   const { data, error } = await supabase
     .from('programs')
     .select(
       'id, slug, title, organisation, type, deadline, amount_display, description_short, is_featured, sectors, stage, is_india, amount_min, amount_max, state'
     )
-    .eq('published', true)
-    .eq('status', 'active')
-    .eq('product_slug', 'grants') // Filter by product
+    .match({
+      published: true,
+      status: 'active',
+      product_slug: 'grants'
+    })
+    .gte('deadline', new Date().toISOString().split('T')[0]) // Filter out closed programs
     .order('is_featured', { ascending: false })
     .order('deadline', { ascending: true })
+
 
   const programs: ProgramListItem[] = data ?? []
 
@@ -40,7 +60,8 @@ export default async function ListingPage() {
   const homeHeading = cosmetic.homeHeading || 'Grants & funding programs for Indian founders'
   const homeHeadingSize = cosmetic.homeHeadingSize || 'clamp(32px, 5vw, 42px)'
 
-  const siAds = await getActiveSoftInfra('listing-grid')
+
+  const bookmarkedIds = await getBookmarkedProgramIds()
 
   return (
     <div
@@ -106,6 +127,14 @@ export default async function ListingPage() {
         </p>
       </header>
 
+      {/* Profile Health & Recommendations (Logged-in only) */}
+      {profile && (
+        <PersonalizationSection 
+          profile={profile} 
+          recommendations={recommendations} 
+        />
+      )}
+
       {/* Horizontal Line — Aesthetic Refresh */}
       <div
         style={{
@@ -141,9 +170,8 @@ export default async function ListingPage() {
         programs={programs}
         siSlotPositions={siSlotPositions}
         siAds={siAds}
+        bookmarkedIds={bookmarkedIds}
       />
     </div>
   )
 }
-
-// Build sync

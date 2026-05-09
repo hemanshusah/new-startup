@@ -103,7 +103,7 @@ export function Footer() {
             <h4 className="footer-header" style={headerStyle}>FOR FOUNDERS</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <Link href="/" style={linkStyle}>Browse Grants</Link>
-              <Link href="/school" style={linkStyle}>Startup School</Link>
+              <Link href="/school" style={{ ...linkStyle, display: 'var(--school-visibility, flex)' }}>Startup School</Link>
               {/* <Link href="/newsletter" style={linkStyle}>Newsletter</Link>
               <Link href="/events" style={linkStyle}>Startup Events</Link> */}
               <Link href="mailto:deeksharai014@gmail.com?subject=Software%20Deals%20%20%3C%3E%20StartupProgram%20Site!" style={linkStyle}>Software Deals</Link>

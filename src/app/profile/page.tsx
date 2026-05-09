@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { getAuthenticatedUser } from '@/lib/auth-utils'
 import { createServiceClient } from '@/lib/supabase/server'
 import { ProfileView, type HistoryItem } from '@/components/profile/ProfileView'
+import { getProgramFormSiteConfig } from '@/lib/site-config'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,6 +15,9 @@ export default async function ProfilePage() {
   }
 
   const supabase = createServiceClient()
+
+  // 1. Fetch sectors and field schema
+  const { sectors: sectorOptions } = await getProgramFormSiteConfig('grants')
 
   // 2. Fetch Profile (Full) by email to bridge from Supabase Auth
   const { data: profile } = await supabase
@@ -68,6 +72,7 @@ export default async function ProfilePage() {
             profile={profile}
             history={history}
             userImage={user.image}
+            sectorOptions={sectorOptions}
           />
         </Suspense>
       </div>

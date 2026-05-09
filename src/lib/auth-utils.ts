@@ -65,6 +65,6 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
     email: authUser.email,
     type: authUser.type,
     role: profile.role,
-    image: (authUser as any).image
+    image: authUser.image || null
   }
 }
