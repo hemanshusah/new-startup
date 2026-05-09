@@ -81,5 +81,14 @@ export async function GET(request: NextRequest) {
   }
 
   // Fallback to error
-  return NextResponse.redirect(new URL('/error', origin))
+  const errorUrl = new URL('/', origin)
+  
+  if (next.includes('view=reset') || request.url.includes('type=recovery') || view === 'reset') {
+    errorUrl.searchParams.set('view', 'reset')
+    errorUrl.searchParams.set('error', 'The_password_reset_link_is_invalid_or_has_expired._Please_request_a_new_one.')
+  } else {
+    errorUrl.searchParams.set('error', 'The_verification_link_is_invalid_or_has_expired.')
+  }
+
+  return NextResponse.redirect(errorUrl)
 }
