@@ -1,9 +1,11 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
+import { auth } from '@/auth'
 import { getSchoolNavigation, getFlatLessonList } from '@/lib/school/navigation'
 import { getLessonBySlug } from '@/lib/school/content'
 import { DocLayout } from '@/components/school/DocLayout'
 import { ContentArea } from '@/components/school/ContentArea'
+import { LockedContent } from '@/components/school/LockedContent'
 
 interface PageProps {
   params: Promise<{ section: string; slug: string }>
@@ -21,7 +23,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function SchoolLessonPage({ params }: PageProps) {
   const { section, slug } = await params
-  const [lesson, navigation, flatLessons] = await Promise.all([
+  const [session, lesson, navigation, flatLessons] = await Promise.all([
+    auth(),
     getLessonBySlug(section, slug),
     getSchoolNavigation(),
     getFlatLessonList(),
@@ -35,7 +38,14 @@ export default async function SchoolLessonPage({ params }: PageProps) {
       currentSection={section}
       currentSlug={slug}
     >
-      <ContentArea lesson={lesson} flatLessons={flatLessons} />
+      {session ? (
+        <ContentArea lesson={lesson} flatLessons={flatLessons} />
+      ) : (
+        <LockedContent 
+          lessonTitle={lesson.title} 
+          moduleTitle={lesson.module.title} 
+        />
+      )}
     </DocLayout>
   )
 }

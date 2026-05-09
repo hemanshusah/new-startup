@@ -12,12 +12,19 @@ import { useEffect } from 'react'
 interface Profile {
   id: string
   email: string
-  full_name: string
-  avatar_url: string
-  phone: string
-  startup_name: string
-  startup_website: string
-  startup_email: string
+  full_name: string | null
+  avatar_url: string | null
+  phone: string | null
+  startup_name: string | null
+  startup_website: string | null
+  startup_email: string | null
+  startup_sectors: string[] | null
+  startup_stage: string | null
+  startup_state: string | null
+  startup_city: string | null
+  startup_description: string | null
+  revenue_status: string | null
+  funding_status: string | null
   role: string
   created_at: string
 }
@@ -38,14 +45,29 @@ export interface HistoryItem {
 export function ProfileView({ 
   profile: initialProfile, 
   history, 
-  userImage 
+  userImage,
+  sectorOptions = []
 }: { 
   profile: Profile; 
   history: HistoryItem[]; 
-  userImage?: string | null 
+  userImage?: string | null;
+  sectorOptions?: string[];
 }) {
   const supabase = createClient()
-  const [profile, setProfile] = useState<Profile>(initialProfile)
+  const [profile, setProfile] = useState<Profile>({
+    ...initialProfile,
+    startup_sectors: initialProfile.startup_sectors || [],
+    startup_stage: initialProfile.startup_stage || null,
+    startup_state: initialProfile.startup_state || null,
+    startup_city: initialProfile.startup_city || null,
+    startup_description: initialProfile.startup_description || null,
+    revenue_status: initialProfile.revenue_status || null,
+    funding_status: initialProfile.funding_status || null,
+    startup_name: initialProfile.startup_name || null,
+    startup_website: initialProfile.startup_website || null,
+    startup_email: initialProfile.startup_email || null,
+    phone: initialProfile.phone || null
+  })
   const [isEditing, setIsEditing] = useState(false)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
@@ -81,11 +103,19 @@ export function ProfileView({
       const { error } = await supabase
         .from('profiles')
         .update({
-          full_name: profile.full_name,
-          phone: profile.phone,
-          startup_name: profile.startup_name,
-          startup_website: profile.startup_website,
-          startup_email: profile.startup_email,
+          full_name: profile.full_name || null,
+          avatar_url: profile.avatar_url || null,
+          phone: profile.phone || null,
+          startup_name: profile.startup_name || null,
+          startup_website: profile.startup_website || null,
+          startup_email: profile.startup_email || null,
+          startup_sectors: profile.startup_sectors && profile.startup_sectors.length > 0 ? profile.startup_sectors : null,
+          startup_stage: profile.startup_stage || null,
+          startup_state: profile.startup_state || null,
+          startup_city: profile.startup_city || null,
+          startup_description: profile.startup_description || null,
+          revenue_status: profile.revenue_status || null,
+          funding_status: profile.funding_status || null,
         })
         .eq('id', profile.id)
 
@@ -157,7 +187,7 @@ export function ProfileView({
                 // eslint-disable-next-line @next/next/no-img-element
                 <img 
                   src={profile.avatar_url || userImage || ''} 
-                  alt={profile.full_name} 
+                  alt={profile.full_name || 'Profile'} 
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                 />
               ) : (
@@ -331,6 +361,20 @@ export function ProfileView({
                     />
                   </div>
                   <div className="form-group">
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, marginBottom: '6px' }}>Official Startup Email</label>
+                    <input
+                      type="email"
+                      className="profile-input"
+                      value={profile.startup_email || ''}
+                      onChange={e => setProfile(p => ({ ...p, startup_email: e.target.value }))}
+                      style={inputStyle}
+                      placeholder="hello@yourstartup.com"
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                  <div className="form-group">
                     <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, marginBottom: '6px' }}>Startup Website</label>
                     <input
                       type="url"
@@ -343,14 +387,106 @@ export function ProfileView({
                   </div>
                 </div>
 
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                  <div className="form-group">
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, marginBottom: '6px' }}>Startup Stage</label>
+                    <select
+                      value={profile.startup_stage || ''}
+                      onChange={e => setProfile(p => ({ ...p, startup_stage: e.target.value }))}
+                      style={inputStyle}
+                    >
+                      <option value="">Select Stage</option>
+                      <option value="idea">Idea / Pre-seed</option>
+                      <option value="mvp">MVP / Early Prototype</option>
+                      <option value="early-traction">Early Traction</option>
+                      <option value="scaling">Scaling</option>
+                      <option value="mature">Mature / Established</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, marginBottom: '6px' }}>Revenue Status</label>
+                    <select
+                      value={profile.revenue_status || ''}
+                      onChange={e => setProfile(p => ({ ...p, revenue_status: e.target.value }))}
+                      style={inputStyle}
+                    >
+                      <option value="">Select Status</option>
+                      <option value="pre-revenue">Pre-revenue</option>
+                      <option value="revenue-generating">Revenue Generating</option>
+                      <option value="profitable">Profitable</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                  <div className="form-group">
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, marginBottom: '6px' }}>Funding Status</label>
+                    <select
+                      value={profile.funding_status || ''}
+                      onChange={e => setProfile(p => ({ ...p, funding_status: e.target.value || null }))}
+                      style={inputStyle}
+                    >
+                      <option value="">Select Status</option>
+                      <option value="bootstrapped">Bootstrapped</option>
+                      <option value="angel-funded">Angel Funded</option>
+                      <option value="seed-funded">Seed Funded</option>
+                      <option value="series-a">Series A</option>
+                      <option value="series-b+">Series B+</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, marginBottom: '6px' }}>State / Location</label>
+                    <input
+                      type="text"
+                      className="profile-input"
+                      value={profile.startup_state || ''}
+                      onChange={e => setProfile(p => ({ ...p, startup_state: e.target.value }))}
+                      style={inputStyle}
+                      placeholder="e.g. Maharashtra"
+                    />
+                  </div>
+                </div>
+
                 <div className="form-group">
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, marginBottom: '6px' }}>Startup Contact Email</label>
-                  <input
-                    type="email"
-                    className="profile-input"
-                    value={profile.startup_email || ''}
-                    onChange={e => setProfile(p => ({ ...p, startup_email: e.target.value }))}
-                    style={inputStyle}
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, marginBottom: '6px' }}>Focus Sectors</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+                    {sectorOptions.length > 0 ? sectorOptions.map(sector => (
+                      <button
+                        key={sector}
+                        type="button"
+                        onClick={() => {
+                          const current = profile.startup_sectors || []
+                          const updated = current.includes(sector) 
+                            ? current.filter(s => s !== sector)
+                            : [...current, sector]
+                          setProfile(p => ({ ...p, startup_sectors: updated }))
+                        }}
+                        style={{
+                          padding: '6px 14px',
+                          borderRadius: '100px',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          border: '1px solid var(--cream-border)',
+                          background: profile.startup_sectors?.includes(sector) ? 'var(--ink)' : 'var(--white)',
+                          color: profile.startup_sectors?.includes(sector) ? 'var(--white)' : 'var(--ink-2)',
+                        }}
+                      >
+                        {sector}
+                      </button>
+                    )) : (
+                      <p style={{ fontSize: '12px', color: 'var(--ink-4)' }}>No sectors defined by admin.</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, marginBottom: '6px' }}>Startup Description</label>
+                  <textarea
+                    value={profile.startup_description || ''}
+                    onChange={e => setProfile(p => ({ ...p, startup_description: e.target.value }))}
+                    style={{ ...inputStyle, height: '100px', resize: 'vertical' }}
+                    placeholder="Briefly describe what your startup does..."
                   />
                 </div>
 
@@ -398,6 +534,10 @@ export function ProfileView({
                     <p style={valueStyle}>{profile.startup_name || '—'}</p>
                   </div>
                   <div style={infoBoxStyle}>
+                    <label style={labelStyle}>Official Email</label>
+                    <p style={valueStyle}>{profile.startup_email || '—'}</p>
+                  </div>
+                  <div style={infoBoxStyle}>
                     <label style={labelStyle}>Website</label>
                     <p style={valueStyle}>
                       {profile.startup_website ? (
@@ -408,10 +548,33 @@ export function ProfileView({
                     </p>
                   </div>
                   <div style={infoBoxStyle}>
-                    <label style={labelStyle}>Startup Email</label>
-                    <p style={valueStyle}>{profile.startup_email || '—'}</p>
+                    <label style={labelStyle}>Stage</label>
+                    <p style={valueStyle}>{profile.startup_stage || '—'}</p>
+                  </div>
+                  <div style={infoBoxStyle}>
+                    <label style={labelStyle}>Funding</label>
+                    <p style={valueStyle}>{profile.funding_status || '—'}</p>
+                  </div>
+                  <div style={infoBoxStyle}>
+                    <label style={labelStyle}>Sectors</label>
+                    <p style={valueStyle}>{profile.startup_sectors?.join(', ') || '—'}</p>
+                  </div>
+                  <div style={infoBoxStyle}>
+                    <label style={labelStyle}>Location</label>
+                    <p style={valueStyle}>{profile.startup_state || '—'}</p>
+                  </div>
+                  <div style={infoBoxStyle}>
+                    <label style={labelStyle}>Revenue</label>
+                    <p style={valueStyle}>{profile.revenue_status || '—'}</p>
                   </div>
                 </div>
+
+                {profile.startup_description && (
+                  <div style={infoBoxStyle}>
+                    <label style={labelStyle}>Description</label>
+                    <p style={{ ...valueStyle, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{profile.startup_description}</p>
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>

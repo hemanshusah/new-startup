@@ -28,6 +28,24 @@ export async function updateProgramPublished(
     return { ok: false, error: 'Forbidden' }
   }
 
+  // Fetch program to check deadline and status
+  const { data: program } = await supabase
+    .from('programs')
+    .select('status, deadline')
+    .eq('id', programId)
+    .single()
+
+  if (published && program) {
+    // Safety check: Prevent publishing programs that have already passed their deadline
+    if (program.deadline && new Date(program.deadline) < new Date(new Date().setHours(0, 0, 0, 0))) {
+      return { ok: false, error: 'Cannot publish a program that has already expired. Please update the deadline first.' }
+    }
+    const today = new Date().toISOString().split('T')[0]
+    if (program.status === 'active' && program.deadline && program.deadline < today) {
+      return { ok: false, error: 'Cannot publish an active program with a past deadline. Please update the deadline first.' }
+    }
+  }
+
   const { error } = await supabase
     .from('programs')
     .update({ published, updated_at: new Date().toISOString() })

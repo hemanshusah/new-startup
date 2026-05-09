@@ -43,7 +43,7 @@ export default async function SchoolPage() {
           </h1>
           <p style={{ 
             fontFamily: 'var(--font-sans), sans-serif',
-            fontSize: '1.15rem',
+            fontSize: '1.15rem', 
             color: 'var(--ink-3)',
             lineHeight: 1.6,
             maxWidth: '600px',
@@ -173,20 +173,35 @@ export default async function SchoolPage() {
 
       {/* Footer link back to main site */}
       <footer style={{ padding: '40px 24px', textAlign: 'center', borderTop: '1px solid var(--cream-border)', background: 'var(--white)' }}>
-        <Link href="/" style={{ color: 'var(--ink-3)', fontSize: '13px', textDecoration: 'none' }}>
+        <Link href="/" className="back-link" style={{ color: 'var(--ink-3)', fontSize: '13px', textDecoration: 'none' }}>
            &larr; Back to GrantsIndia
         </Link>
       </footer>
 
       {/* Inline styles for hover effects since we can't do them easily in inline style objects */}
       <style dangerouslySetInnerHTML={{ __html: `
+        .module-card {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
         .module-card:hover {
           border-color: var(--accent) !important;
-          box-shadow: 0 4px 12px rgba(184, 70, 10, 0.05);
+          box-shadow: 0 12px 24px rgba(184, 70, 10, 0.08);
+          transform: translateY(-4px);
         }
         .module-card:hover .card-arrow {
           background: var(--accent) !important;
           color: white !important;
+          transform: translateX(4px);
+        }
+        .back-link {
+          transition: all 0.2s ease;
+          opacity: 0.8;
+        }
+        .back-link:hover {
+          opacity: 1;
+          color: var(--accent) !important;
+          transform: translateX(-4px);
+          display: inline-block;
         }
       `}} />
     </div>

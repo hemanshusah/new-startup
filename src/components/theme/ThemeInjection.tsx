@@ -69,6 +69,9 @@ export async function ThemeInjection() {
           --font-section: "${s.family}", sans-serif;
           
           --radius-lg: ${borderRadius};
+          
+          --school-visibility: ${settings?.enabledProducts?.showSchool === false ? 'none' : 'flex'};
+          --personalization-visibility: ${settings?.enabledProducts?.showPersonalization === false ? 'none' : 'block'};
 
           --font-size-heading: ${h.size};
           --font-weight-heading: ${h.weight};

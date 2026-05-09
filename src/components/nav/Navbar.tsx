@@ -127,7 +127,7 @@ export function Navbar() {
                   fontWeight: isActive(link.href) ? 500 : 400,
                   color: isActive(link.href) ? 'var(--ink)' : 'var(--ink-3)',
                   transition: 'color 0.15s ease',
-                  display: 'flex',
+                  display: link.href === '/school' ? 'var(--school-visibility, flex)' : 'flex',
                   alignItems: 'center',
                   gap: '6px',
                 }}
@@ -272,6 +272,29 @@ export function Navbar() {
                         }}
                       >
                         My Profile
+                      </Link>
+
+                      <Link
+                        href="/bookmarks"
+                        onClick={() => setAvatarMenuOpen(false)}
+                        role="menuitem"
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          textAlign: 'left',
+                          fontFamily: 'var(--font-sans)',
+                          fontSize: '13px',
+                          color: 'var(--ink)',
+                          textDecoration: 'none',
+                          background: 'none',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '7px 10px',
+                          cursor: 'pointer',
+                          transition: 'background 0.12s ease',
+                        }}
+                      >
+                        My Bookmarks
                       </Link>
 
                       {isAdmin && (
@@ -435,7 +458,7 @@ export function Navbar() {
                   color: isActive(link.href) ? 'var(--ink)' : 'var(--ink-2)', 
                   padding: '10px 0', 
                   borderBottom: '1px solid var(--cream-border)',
-                  display: 'flex',
+                  display: link.href === '/school' ? 'var(--school-visibility, flex)' : 'flex',
                   alignItems: 'center',
                   gap: '8px'
                 }}
@@ -452,6 +475,7 @@ export function Navbar() {
               {user ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <Link href="/profile" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>My Profile</Link>
+                  <Link href="/bookmarks" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>My Bookmarks</Link>
                   {isAdmin && (
                     <Link href="/admin/dashboard" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>Admin Dashboard</Link>
                   )}

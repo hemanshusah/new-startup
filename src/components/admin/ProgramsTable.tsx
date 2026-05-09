@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { updateProgramPublished } from '@/app/admin/program-actions'
 import { bulkImportPrograms } from '@/app/admin/program-import-actions'
 import type { Program } from '@/types/program'
+import { isProgramPubliclyVisible } from '@/lib/programs/visibility'
 
 type SortCol = 'title' | 'type' | 'status' | 'deadline' | 'updated_at'
 type SortDir = 'asc' | 'desc'
@@ -127,6 +128,7 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
   const [typeFilter, setTypeFilter] = useState('all')
   const [scopeFilter, setScopeFilter] = useState('all')
   const [publishedFilter, setPublishedFilter] = useState('all')
+  const [liveFilter, setLiveFilter] = useState('all') // New filter for sync parity
   const [sortCol, setSortCol] = useState<SortCol>('updated_at')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
   const [selected, setSelected] = useState<Set<string>>(new Set())
@@ -154,8 +156,18 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
       if (typeFilter !== 'all' && p.type !== typeFilter) return false
       if (scopeFilter === 'national' && !p.is_india) return false
       if (scopeFilter === 'international' && p.is_india) return false
-      if (publishedFilter === 'true' && !p.published) return false
-      if (publishedFilter === 'false' && p.published) return false
+      if (publishedFilter !== 'all' && p.published.toString() !== publishedFilter) return false
+      
+      const isLive = isProgramPubliclyVisible({
+        published: p.published,
+        status: p.status,
+        product_slug: (p as any).product_slug,
+        deadline: p.deadline
+      })
+
+      if (liveFilter === 'live' && !isLive) return false
+      if (liveFilter === 'not_live' && isLive) return false
+
       return true
     })
     .sort((a, b) => {
@@ -173,24 +185,38 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
     else { setSortCol(col); setSortDir('asc') }
   }
 
-  // ── Publish toggle (optimistic UI) ──────────────────────────────
   const togglePublished = useCallback(async (program: Program) => {
-    const newVal = !program.published
-    setPrograms((prev) =>
-      prev.map((p) => (p.id === program.id ? { ...p, published: newVal } : p))
-    )
+    const newStatus = !program.published
     
-    showToast(`"${program.title}" ${newVal ? 'published' : 'unpublished'}.`)
-    const res = await updateProgramPublished(program.id, newVal)
-    
-    if (!res.ok) {
-      // Roll back
-      setPrograms((prev) =>
-        prev.map((p) => (p.id === program.id ? { ...p, published: program.published } : p))
-      )
-      showToast(`Failed to update: ${res.error}`, false)
+    // Safety check: Don't allow publishing expired programs
+    if (newStatus === true && program.deadline) {
+      const today = new Date().toISOString().split('T')[0]
+      if (program.deadline < today) {
+        showToast("Cannot publish: Deadline has already passed. Update the deadline first.", false)
+        return
+      }
     }
-  }, [])
+
+    // Optimistic UI update
+    setPrograms((prev) =>
+      prev.map((p) => (p.id === program.id ? { ...p, published: newStatus } : p))
+    )
+
+    const { error } = await supabase
+      .from('programs')
+      .update({ published: newStatus })
+      .eq('id', program.id)
+
+    if (error) {
+      showToast(`Update failed: ${error.message}`, false)
+      // Rollback
+      setPrograms((prev) =>
+        prev.map((p) => (p.id === program.id ? { ...p, published: !newStatus } : p))
+      )
+    } else {
+      showToast(`"${program.title}" is now ${newStatus ? 'published' : 'draft'}.`)
+    }
+  }, [supabase])
 
   // ── Delete ────────────────────────────────────────────────────
   const deleteProgram = useCallback(async (program: Program) => {
@@ -402,6 +428,11 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
           <option value="true">Published</option>
           <option value="false">Drafts</option>
         </select>
+        <select style={selectStyle} value={liveFilter} onChange={(e) => { setLiveFilter(e.target.value); setPage(0) }}>
+          <option value="all">Live Sync Status</option>
+          <option value="live">Visible on Web</option>
+          <option value="not_live">Hidden from Web</option>
+        </select>
 
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
           {selected.size > 0 && (
@@ -452,6 +483,11 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
               {colHeader('Type', 'type')}
               {colHeader('Status', 'status')}
               <th style={thBase}>Published</th>
+              {/* 
+                "Live on Web" indicator derived from shared visibility logic.
+                This visually confirms if the program meets all criteria (published, active, not expired).
+              */}
+              <th style={thBase}>Live on Web</th>
               {colHeader('Deadline', 'deadline')}
               <th style={thBase}>Scope</th>
               <th style={thBase}>Funding</th>
@@ -534,6 +570,41 @@ export function ProgramsTable({ initialPrograms }: ProgramsTableProps) {
                         }}
                       />
                     </button>
+                  </td>
+                  {/* Live on Web sync status */}
+                  <td style={tdBase}>
+                    {isProgramPubliclyVisible({
+                      published: p.published,
+                      status: p.status,
+                      product_slug: (p as any).product_slug,
+                      deadline: p.deadline
+                    }) ? (
+                      <span style={{ 
+                        fontFamily: 'var(--font-sans), sans-serif', 
+                        fontSize: '10px', 
+                        fontWeight: 600, 
+                        background: '#EDF5EA', 
+                        color: '#2A6620', 
+                        padding: '2px 8px', 
+                        borderRadius: '100px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
+                        <span style={{ width: '6px', height: '6px', background: '#2A6620', borderRadius: '50%' }} />
+                        LIVE
+                      </span>
+                    ) : (
+                      <span style={{ 
+                        fontFamily: 'var(--font-sans), sans-serif', 
+                        fontSize: '10px', 
+                        fontWeight: 500, 
+                        color: 'var(--ink-4)',
+                        padding: '2px 8px',
+                      }}>
+                        Hidden
+                      </span>
+                    )}
                   </td>
                   {/* Deadline */}
                   <td style={tdBase}>
