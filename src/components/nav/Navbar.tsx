@@ -474,6 +474,14 @@ export function Navbar() {
             <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid var(--cream-border)' }}>
               {user ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ paddingBottom: '10px', borderBottom: '1px solid var(--cream-border)', marginBottom: '4px' }}>
+                    <p style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', color: 'var(--ink-4)', margin: 0 }}>
+                      Signed in as
+                    </p>
+                    <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', fontWeight: 500, color: 'var(--ink)', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {user.email}
+                    </p>
+                  </div>
                   <Link href="/profile" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>My Profile</Link>
                   <Link href="/bookmarks" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>My Bookmarks</Link>
                   {isAdmin && (

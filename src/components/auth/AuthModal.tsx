@@ -93,17 +93,24 @@ export function AuthModal() {
   useEffect(() => {
     const v = searchParams.get('view') as View | null
     const verified = searchParams.get('verified') === 'true'
+    const urlError = searchParams.get('error')
 
     if (v === 'reset') {
       setView('reset')
+      if (urlError) setError(urlError.replace(/_/g, ' '))
       if (!isModalOpen) openModal()
       // Clean the URL so we don't re-trigger this logic on next render
       router.replace(window.location.pathname)
     } else if (verified && !v) {
       setSuccess('Email verified successfully! Please sign in to continue.')
       setView('signin')
+      if (urlError) setError(urlError.replace(/_/g, ' '))
       if (!isModalOpen) openModal()
       // Clean the URL
+      router.replace(window.location.pathname)
+    } else if (urlError) {
+      setError(urlError.replace(/_/g, ' '))
+      if (!isModalOpen) openModal()
       router.replace(window.location.pathname)
     }
   }, [searchParams, isModalOpen, openModal, router])

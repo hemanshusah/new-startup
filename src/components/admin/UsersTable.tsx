@@ -2,6 +2,8 @@
 
 import { useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { deleteUserAdmin } from '@/app/admin/user-actions'
+import { useRouter } from 'next/navigation'
 
 type UserRow = {
   id: string
@@ -19,10 +21,33 @@ export function UsersTable({ initialUsers }: { initialUsers: UserRow[] }) {
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState<'created_at' | 'total_views'>('created_at')
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [deleteConfirmText, setDeleteConfirmText] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
+  const router = useRouter()
 
   const showToast = (msg: string, ok = true) => {
     setToast({ msg, ok })
     setTimeout(() => setToast(null), 4000)
+  }
+
+  const handleDelete = async (userId: string) => {
+    if (deleteConfirmText.toLowerCase() !== 'delete') {
+      showToast('Please type "delete" to confirm.', false)
+      return
+    }
+    setIsDeleting(true)
+    const res = await deleteUserAdmin(userId)
+    setIsDeleting(false)
+    if (res.ok) {
+      showToast('User deleted successfully.')
+      setUsers((prev) => prev.filter((u) => u.id !== userId))
+      setDeletingId(null)
+      setDeleteConfirmText('')
+      router.refresh()
+    } else {
+      showToast(res.error || 'Failed to delete user.', false)
+    }
   }
 
   const filtered = users
@@ -138,7 +163,38 @@ export function UsersTable({ initialUsers }: { initialUsers: UserRow[] }) {
                   </select>
                 </td>
                 <td style={{ padding: '12px 14px' }}>
-                  <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '11.5px', color: 'var(--ink-4)' }}>—</span>
+                  {deletingId === u.id ? (
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <input 
+                        type="text" 
+                        placeholder="Type delete" 
+                        value={deleteConfirmText}
+                        onChange={(e) => setDeleteConfirmText(e.target.value)}
+                        style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '11px', border: '1px solid var(--cream-border)', borderRadius: '4px', padding: '4px 6px', width: '80px', outline: 'none' }}
+                      />
+                      <button 
+                        onClick={() => handleDelete(u.id)}
+                        disabled={isDeleting}
+                        style={{ background: '#B01F1F', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 8px', fontSize: '11px', cursor: isDeleting ? 'wait' : 'pointer' }}
+                      >
+                        {isDeleting ? '...' : 'Confirm'}
+                      </button>
+                      <button 
+                        onClick={() => { setDeletingId(null); setDeleteConfirmText(''); }}
+                        disabled={isDeleting}
+                        style={{ background: 'var(--cream)', color: 'var(--ink)', border: '1px solid var(--cream-border)', borderRadius: '4px', padding: '4px 8px', fontSize: '11px', cursor: 'pointer' }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button 
+                      onClick={() => { setDeletingId(u.id); setDeleteConfirmText(''); }}
+                      style={{ background: 'transparent', color: '#B01F1F', border: '1px solid #B01F1F', borderRadius: '4px', padding: '4px 8px', fontSize: '11px', cursor: 'pointer', fontFamily: 'var(--font-sans), sans-serif' }}
+                    >
+                      Delete
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
