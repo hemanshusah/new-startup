@@ -79,6 +79,7 @@ export function AuthModal() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [fullName, setFullName] = useState('')
+  const [accountIntent, setAccountIntent] = useState<'founder' | 'mentor' | 'explorer'>('founder')
 
   // Reset state when view changes
   const switchView = (v: View) => {
@@ -117,11 +118,13 @@ export function AuthModal() {
 
   // Pre-fill email if a Supabase session exists (e.g. after verification/reset)
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user?.email) {
+    const fetchUser = async () => {
+      const { data } = await supabase.auth.getUser()
+      if (data?.user?.email) {
         setEmail(data.user.email)
       }
-    })
+    }
+    fetchUser()
   }, [supabase])
 
   const handleSuccess = useCallback(() => {
@@ -170,7 +173,7 @@ export function AuthModal() {
 
     try {
       const { registerUser } = await import('./auth-register')
-      const result = await registerUser({ email, password, fullName })
+      const result = await registerUser({ email, password, fullName, accountIntent })
 
       if (!result.success) {
         setError(result.error || 'Sign up failed')
@@ -591,6 +594,18 @@ export function AuthModal() {
               </div>
             ) : (
               <form onSubmit={handleSignUp} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '12px', fontWeight: 500, color: 'var(--ink)' }}>I want to...</label>
+                  <select
+                    value={accountIntent}
+                    onChange={(e) => setAccountIntent(e.target.value as any)}
+                    style={inputStyle}
+                  >
+                    <option value="founder">Find grants for my startup</option>
+                    <option value="mentor">Mentor startups</option>
+                    <option value="explorer">Just explore the platform</option>
+                  </select>
+                </div>
                 <input
                   id="signup-name"
                   type="text"

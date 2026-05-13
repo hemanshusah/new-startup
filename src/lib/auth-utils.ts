@@ -51,11 +51,30 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
   // 3. Resolve the stable Profile by email
   // We use service client to ensure we find the profile even if RLS is tight
   const supabase = createServiceClient()
-  const { data: profile } = await supabase
+  let { data: profile } = await supabase
     .from('profiles')
     .select('id, role')
     .eq('email', authUser.email)
     .single()
+
+  // FALLBACK: If user is logged in but profile is missing, create it now
+  // This can happen if the Supabase trigger failed or if using NextAuth without proper sync
+  if (!profile && authUser.email) {
+    const { data: newProfile, error: createError } = await supabase
+      .from('profiles')
+      .insert({
+        id: authUser.id, // Try to match the auth ID if possible
+        email: authUser.email,
+        full_name: authUser.email.split('@')[0], // Fallback name
+        role: 'user'
+      })
+      .select('id, role')
+      .single()
+    
+    if (!createError && newProfile) {
+      profile = newProfile
+    }
+  }
 
   if (!profile) return null
 

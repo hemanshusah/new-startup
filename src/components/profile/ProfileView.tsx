@@ -25,31 +25,18 @@ interface Profile {
   startup_description: string | null
   revenue_status: string | null
   funding_status: string | null
+  account_intent: string | null
   role: string
   created_at: string
 }
 
-export interface HistoryItem {
-  viewed_at: string
-  program: {
-    id: string
-    slug: string
-    title: string
-    type: string
-    organisation: string
-    amount_display: string
-    deadline: string
-  }
-}
 
 export function ProfileView({ 
   profile: initialProfile, 
-  history, 
   userImage,
   sectorOptions = []
 }: { 
   profile: Profile; 
-  history: HistoryItem[]; 
   userImage?: string | null;
   sectorOptions?: string[];
 }) {
@@ -69,6 +56,7 @@ export function ProfileView({
     phone: initialProfile.phone || null
   })
   const [isEditing, setIsEditing] = useState(false)
+  const [activeTab, setActiveTab] = useState<'personal' | 'startup' | 'mentor'>('personal')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
@@ -106,6 +94,7 @@ export function ProfileView({
           full_name: profile.full_name || null,
           avatar_url: profile.avatar_url || null,
           phone: profile.phone || null,
+          account_intent: profile.account_intent || null,
           startup_name: profile.startup_name || null,
           startup_website: profile.startup_website || null,
           startup_email: profile.startup_email || null,
@@ -247,6 +236,25 @@ export function ProfileView({
                 <p style={{ fontSize: '14px', margin: '2px 0 0' }}>{profile.phone}</p>
               </div>
             )}
+            {profile.account_intent === 'mentor' && (
+              <Link
+                href="/mentor/availability"
+                style={{
+                  display: 'block',
+                  marginTop: '12px',
+                  padding: '10px',
+                  background: 'var(--ink)',
+                  borderRadius: '8px',
+                  textAlign: 'center',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  color: 'var(--white)',
+                  textDecoration: 'none'
+                }}
+              >
+                Mentor Dashboard
+              </Link>
+            )}
             {profile.role === 'admin' && (
               <Link
                 href="/admin"
@@ -342,12 +350,26 @@ export function ProfileView({
                       placeholder="+91..."
                     />
                   </div>
+                  <div className="form-group">
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, marginBottom: '6px' }}>Primary Goal on GrantsIndia</label>
+                    <select
+                      value={profile.account_intent || 'founder'}
+                      onChange={e => setProfile(p => ({ ...p, account_intent: e.target.value as any }))}
+                      style={inputStyle}
+                    >
+                      <option value="founder">I am a Founder seeking grants</option>
+                      <option value="mentor">I am a Mentor</option>
+                      <option value="explorer">Just exploring</option>
+                    </select>
+                  </div>
                 </div>
 
-                <div style={{ height: '1px', background: 'var(--cream-border)', margin: '10px 0' }} />
+                {profile.account_intent === 'founder' && (
+                  <>
+                    <div style={{ height: '1px', background: 'var(--cream-border)', margin: '10px 0' }} />
 
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', margin: '0 0 4px' }}>Startup Details</h3>
-                <p style={{ fontSize: '13px', color: 'var(--ink-3)', margin: '0 0 20px' }}>Tell us about your venture to get tailored recommendations.</p>
+                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', margin: '0 0 4px' }}>Startup Details</h3>
+                    <p style={{ fontSize: '13px', color: 'var(--ink-3)', margin: '0 0 20px' }}>Tell us about your venture to get tailored recommendations.</p>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                   <div className="form-group">
@@ -489,6 +511,8 @@ export function ProfileView({
                     placeholder="Briefly describe what your startup does..."
                   />
                 </div>
+                  </>
+                )}
 
                 {message && (
                   <div style={{
@@ -528,46 +552,60 @@ export function ProfileView({
                 animate={{ opacity: 1 }}
                 style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}
               >
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
-                  <div style={infoBoxStyle}>
-                    <label style={labelStyle}>Startup Name</label>
-                    <p style={valueStyle}>{profile.startup_name || '—'}</p>
-                  </div>
-                  <div style={infoBoxStyle}>
-                    <label style={labelStyle}>Official Email</label>
-                    <p style={valueStyle}>{profile.startup_email || '—'}</p>
-                  </div>
-                  <div style={infoBoxStyle}>
-                    <label style={labelStyle}>Website</label>
-                    <p style={valueStyle}>
-                      {profile.startup_website ? (
-                        <a href={profile.startup_website} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }}>
-                          {profile.startup_website.replace(/^https?:\/\//, '')}
-                        </a>
-                      ) : '—'}
-                    </p>
-                  </div>
-                  <div style={infoBoxStyle}>
-                    <label style={labelStyle}>Stage</label>
-                    <p style={valueStyle}>{profile.startup_stage || '—'}</p>
-                  </div>
-                  <div style={infoBoxStyle}>
-                    <label style={labelStyle}>Funding</label>
-                    <p style={valueStyle}>{profile.funding_status || '—'}</p>
-                  </div>
-                  <div style={infoBoxStyle}>
-                    <label style={labelStyle}>Sectors</label>
-                    <p style={valueStyle}>{profile.startup_sectors?.join(', ') || '—'}</p>
-                  </div>
-                  <div style={infoBoxStyle}>
-                    <label style={labelStyle}>Location</label>
-                    <p style={valueStyle}>{profile.startup_state || '—'}</p>
-                  </div>
-                  <div style={infoBoxStyle}>
-                    <label style={labelStyle}>Revenue</label>
-                    <p style={valueStyle}>{profile.revenue_status || '—'}</p>
-                  </div>
+                <div style={infoBoxStyle}>
+                  <label style={labelStyle}>Primary Goal on GrantsIndia</label>
+                  <p style={{ ...valueStyle, textTransform: 'capitalize' }}>
+                    {profile.account_intent === 'founder' ? 'Founder seeking grants' : 
+                     profile.account_intent === 'mentor' ? 'Mentor' : 
+                     profile.account_intent === 'explorer' ? 'Exploring' : '—'}
+                  </p>
                 </div>
+
+                {profile.account_intent === 'founder' && (
+                  <>
+                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', margin: '16px 0 0' }}>Startup Details</h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
+                      <div style={infoBoxStyle}>
+                        <label style={labelStyle}>Startup Name</label>
+                        <p style={valueStyle}>{profile.startup_name || '—'}</p>
+                      </div>
+                      <div style={infoBoxStyle}>
+                        <label style={labelStyle}>Official Email</label>
+                        <p style={valueStyle}>{profile.startup_email || '—'}</p>
+                      </div>
+                      <div style={infoBoxStyle}>
+                        <label style={labelStyle}>Website</label>
+                        <p style={valueStyle}>
+                          {profile.startup_website ? (
+                            <a href={profile.startup_website} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }}>
+                              {profile.startup_website.replace(/^https?:\/\//, '')}
+                            </a>
+                          ) : '—'}
+                        </p>
+                      </div>
+                      <div style={infoBoxStyle}>
+                        <label style={labelStyle}>Stage</label>
+                        <p style={valueStyle}>{profile.startup_stage || '—'}</p>
+                      </div>
+                      <div style={infoBoxStyle}>
+                        <label style={labelStyle}>Funding</label>
+                        <p style={valueStyle}>{profile.funding_status || '—'}</p>
+                      </div>
+                      <div style={infoBoxStyle}>
+                        <label style={labelStyle}>Sectors</label>
+                        <p style={valueStyle}>{profile.startup_sectors?.join(', ') || '—'}</p>
+                      </div>
+                      <div style={infoBoxStyle}>
+                        <label style={labelStyle}>Location</label>
+                        <p style={valueStyle}>{profile.startup_state || '—'}</p>
+                      </div>
+                      <div style={infoBoxStyle}>
+                        <label style={labelStyle}>Revenue</label>
+                        <p style={valueStyle}>{profile.revenue_status || '—'}</p>
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 {profile.startup_description && (
                   <div style={infoBoxStyle}>
@@ -580,54 +618,6 @@ export function ProfileView({
           </AnimatePresence>
         </section>
 
-        {/* Recently Viewed History */}
-        <section style={{
-          background: 'var(--white)',
-          padding: '40px',
-          borderRadius: '16px',
-          border: '1px solid var(--cream-border)'
-        }}>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', marginBottom: '24px' }}>Recently Viewed Programs</h2>
-
-          {history.length === 0 ? (
-            <p style={{ color: 'var(--ink-4)', textAlign: 'center', padding: '40px 0' }}>No programs viewed yet. Start exploring our listings!</p>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'var(--cream-border)', borderRadius: '10px', overflow: 'hidden' }}>
-              {history.map((item, idx) => {
-                const p = item.program
-                return (
-                  <Link
-                    key={`${p.id}-${idx}`}
-                    href={`/programs/${p.slug}`}
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr auto',
-                      alignItems: 'center',
-                      padding: '16px 20px',
-                      background: 'var(--white)',
-                      textDecoration: 'none',
-                      transition: 'background 0.1s ease'
-                    }}
-                    className="history-row"
-                  >
-                    <div>
-                      <p style={{ fontSize: '10px', color: 'var(--ink-4)', textTransform: 'uppercase', marginBottom: '4px' }}>{p.organisation}</p>
-                      <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '16px', color: 'var(--ink)', margin: 0 }}>{p.title}</h4>
-                      <p style={{ fontSize: '12px', color: 'var(--ink-3)', marginTop: '2px' }}>
-                        {p.type.charAt(0).toUpperCase() + p.type.slice(1)} • {p.amount_display || 'TBA'}
-                      </p>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <p style={{ fontSize: '11px', color: 'var(--ink-4)', margin: 0 }}>
-                        Viewed {formatDistanceToNow(new Date(item.viewed_at), { addSuffix: true })}
-                      </p>
-                    </div>
-                  </Link>
-                )
-              })}
-            </div>
-          )}
-        </section>
       </div>
 
       <style jsx>{`

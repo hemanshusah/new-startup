@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { revalidateAdminPath } from '@/app/admin/actions'
 import {
@@ -31,17 +32,27 @@ interface SettingsFormProps {
   initialFieldConfig: Record<string, FieldConfig>
   initialSectors: string[]
   initialCosmeticSettings?: any
+  initialMentorSettings?: {
+    enabled: boolean
+    commissionPct: number
+    priceMin: number
+    priceMax: number
+  }
 }
 
 export function SettingsForm({ 
   settingsRowId, 
   initialFieldConfig, 
   initialSectors,
-  initialCosmeticSettings 
+  initialCosmeticSettings,
+  initialMentorSettings
 }: SettingsFormProps) {
   const supabase = createClient()
+  const searchParams = useSearchParams()
+  const tabParam = searchParams.get('tab') as 'config' | 'tags' | 'appearance' | 'apps' | null
+  
   const [rowId, setRowId] = useState<string | null>(settingsRowId)
-  const [activeTab, setActiveTab] = useState<'config' | 'tags' | 'appearance' | 'apps'>('config')
+  const [activeTab, setActiveTab] = useState<'config' | 'tags' | 'appearance' | 'apps'>(tabParam || 'config')
   
   const [fieldConfig, setFieldConfig] = useState<Record<string, FieldConfig>>(() =>
     mergeFieldSchema(initialFieldConfig)
@@ -70,6 +81,13 @@ export function SettingsForm({
       enabledProducts: base.enabledProducts || { showSchool: true }
     }
   })
+
+  const [mentorSettings, setMentorSettings] = useState(() => ({
+    enabled: initialMentorSettings?.enabled ?? false,
+    commissionPct: initialMentorSettings?.commissionPct ?? 20,
+    priceMin: initialMentorSettings?.priceMin ?? 2500,
+    priceMax: initialMentorSettings?.priceMax ?? 25000,
+  }))
 
   useEffect(() => {
     setRowId(settingsRowId)
@@ -210,10 +228,10 @@ export function SettingsForm({
           </button>
         </div>
       )}
-
       {activeTab === 'apps' && (
         <div style={{ background: 'var(--white)', border: '1px solid var(--cream-border)', borderRadius: '12px', padding: '24px' }}>
           {sectionHead('App Visibility Control')}
+          
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
@@ -258,6 +276,37 @@ export function SettingsForm({
             marginTop: '16px'
           }}>
             <div>
+              <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--ink)', margin: 0 }}>Mentor Connect</p>
+              <p style={{ fontSize: '12px', color: 'var(--ink-4)', margin: 0 }}>Enable or disable the entire Mentor Connect platform.</p>
+            </div>
+            <button
+              onClick={() => setMentorSettings({ ...mentorSettings, enabled: !mentorSettings.enabled })}
+              style={{
+                width: '50px', height: '26px', borderRadius: '100px',
+                background: mentorSettings.enabled ? 'var(--accent)' : '#ccc',
+                border: 'none', position: 'relative', cursor: 'pointer'
+              }}
+            >
+              <div style={{
+                position: 'absolute', top: '3px',
+                left: mentorSettings.enabled ? '27px' : '3px',
+                width: '20px', height: '20px', borderRadius: '50%', background: '#fff',
+                transition: 'left 0.2s ease'
+              }} />
+            </button>
+          </div>
+
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between', 
+            padding: '16px', 
+            background: 'var(--cream)', 
+            borderRadius: '12px',
+            border: '1px solid var(--cream-border)',
+            marginTop: '16px'
+          }}>
+            <div>
               <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--ink)', margin: 0 }}>Personalization Section</p>
               <p style={{ fontSize: '12px', color: 'var(--ink-4)', margin: 0 }}>Show Health Tracker and Recommendations on the dashboard.</p>
             </div>
@@ -283,9 +332,59 @@ export function SettingsForm({
               }} />
             </button>
           </div>
-          <button onClick={() => saveSettings({ cosmetic_settings: cosmetic }, 'App Visibility')} disabled={saving} style={{ marginTop: '24px', padding: '10px 24px', borderRadius: '8px', background: 'var(--ink)', color: 'var(--white)', border: 'none', cursor: 'pointer' }}>
+          <button onClick={() => saveSettings({ 
+            cosmetic_settings: cosmetic,
+            mentor_connect_enabled: mentorSettings.enabled
+          }, 'App Visibility')} disabled={saving} style={{ marginTop: '24px', padding: '10px 24px', borderRadius: '8px', background: 'var(--ink)', color: 'var(--white)', border: 'none', cursor: 'pointer' }}>
             Save App Settings
           </button>
+
+          <div style={{ marginTop: '40px' }}>
+            {sectionHead('Mentor Connect Configuration')}
+            <div style={{ background: 'var(--cream)', border: '1px solid var(--cream-border)', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+                <div>
+                  <label style={subLabelStyle}>Commission (%)</label>
+                  <input 
+                    type="number" 
+                    value={mentorSettings.commissionPct} 
+                    onChange={(e) => setMentorSettings({ ...mentorSettings, commissionPct: Number(e.target.value) })}
+                    style={subInputStyle}
+                  />
+                </div>
+                <div>
+                  <label style={subLabelStyle}>Min Price (₹)</label>
+                  <input 
+                    type="number" 
+                    value={mentorSettings.priceMin} 
+                    onChange={(e) => setMentorSettings({ ...mentorSettings, priceMin: Number(e.target.value) })}
+                    style={subInputStyle}
+                  />
+                </div>
+                <div>
+                  <label style={subLabelStyle}>Max Price (₹)</label>
+                  <input 
+                    type="number" 
+                    value={mentorSettings.priceMax} 
+                    onChange={(e) => setMentorSettings({ ...mentorSettings, priceMax: Number(e.target.value) })}
+                    style={subInputStyle}
+                  />
+                </div>
+              </div>
+            </div>
+            <button 
+              onClick={() => saveSettings({ 
+                mentor_connect_enabled: mentorSettings.enabled,
+                mentor_commission_pct: mentorSettings.commissionPct,
+                price_min_inr: mentorSettings.priceMin,
+                price_max_inr: mentorSettings.priceMax
+              }, 'Mentor Connect')} 
+              disabled={saving} 
+              style={{ marginTop: '16px', padding: '10px 24px', borderRadius: '8px', background: 'var(--ink)', color: 'var(--white)', border: 'none', cursor: 'pointer' }}
+            >
+              Save Mentor Settings
+            </button>
+          </div>
         </div>
       )}
 
@@ -329,4 +428,24 @@ export function SettingsForm({
       )}
     </div>
   )
+}
+
+const subLabelStyle: React.CSSProperties = {
+  display: 'block',
+  fontSize: '10px',
+  fontWeight: 600,
+  color: 'var(--ink-3)',
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+  marginBottom: '4px',
+}
+
+const subInputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '8px 10px',
+  borderRadius: '6px',
+  border: '1px solid var(--cream-border)',
+  background: 'var(--white)',
+  fontSize: '13px',
+  fontFamily: 'var(--font-sans)',
 }

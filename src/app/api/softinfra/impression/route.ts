@@ -10,7 +10,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { siId } = await request.json()
+  const body = await request.json()
+  const siId = body.siId || body.si_id
   if (!siId) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
   return handleTracking(siId, request)
 }
@@ -36,7 +37,7 @@ async function handleTracking(siId: string, request: Request) {
 
     // 2. Log the detailed impression
     const { error } = await supabase
-      .from('softinfra_impression_log')
+      .from('softinfra_impressions')
       .insert({
         softinfra_id: siId,
         user_id: profileId,
@@ -44,7 +45,7 @@ async function handleTracking(siId: string, request: Request) {
       })
 
     if (error) {
-      console.error('Failed to insert into impression_log', error)
+      console.error('Failed to insert into softinfra_impressions', error)
     }
 
     return NextResponse.json({ ok: true })

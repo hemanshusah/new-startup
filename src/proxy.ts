@@ -7,7 +7,7 @@ import { auth } from "@/auth"
 import { type NextRequest, NextResponse } from 'next/server'
 import { createServiceClient, createClient } from '@/lib/supabase/server'
 
-export async function proxy(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   // 1. Check Auth.js session
   const session = await auth()
   let userEmail = session?.user?.email

@@ -100,7 +100,8 @@ export function DocLayout({
 /** Global hover styles for DocLayout components */
 function DocLayoutStyles() {
   return (
-    <style dangerouslySetInnerHTML={{ __html: `
+    <style dangerouslySetInnerHTML={{
+      __html: `
       .school-sidebar-link {
         transition: all 0.2s ease !important;
       }
@@ -166,7 +167,7 @@ function SchoolTopNav({
     <nav className="school-topnav" style={{ display: 'flex', flexDirection: 'column', background: 'var(--white)', borderBottom: '1px solid var(--cream-border)' }}>
       {/* Top Row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 24px' }}>
-        
+
         {/* Left: Hamburger & Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <button
@@ -216,11 +217,11 @@ function SchoolTopNav({
           >
             <Search size={16} style={{ marginRight: '10px', color: 'var(--ink-4)' }} />
             <span style={{ flex: 1, textAlign: 'left' }}>Search curriculum...</span>
-            <kbd style={{ 
-              fontSize: '11px', 
-              background: 'var(--white)', 
-              padding: '2px 6px', 
-              borderRadius: '4px', 
+            <kbd style={{
+              fontSize: '11px',
+              background: 'var(--white)',
+              padding: '2px 6px',
+              borderRadius: '4px',
               border: '1px solid var(--cream-border)',
               color: 'var(--ink-4)',
               fontWeight: 500
@@ -230,14 +231,14 @@ function SchoolTopNav({
 
         {/* Right Links */}
         <div className="school-desktop-actions" style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          <Link href="/" style={{ fontSize: '13px', color: 'var(--ink-3)', textDecoration: 'none', fontWeight: 500, fontFamily: 'var(--font-sans)' }}>Main Site</Link>
-          <Link href="/school" style={{ 
-            background: 'var(--accent)', 
-            color: 'white', 
-            padding: '6px 14px', 
-            borderRadius: '20px', 
-            fontSize: '13px', 
-            fontWeight: 500, 
+          {/* <Link href="/" style={{ fontSize: '13px', color: 'var(--ink-3)', textDecoration: 'none', fontWeight: 500, fontFamily: 'var(--font-sans)' }}>Main Site</Link> */}
+          <Link href="/school" style={{
+            background: 'var(--accent)',
+            color: 'white',
+            padding: '6px 14px',
+            borderRadius: '20px',
+            fontSize: '13px',
+            fontWeight: 500,
             textDecoration: 'none',
             fontFamily: 'var(--font-sans)'
           }}>
@@ -247,12 +248,12 @@ function SchoolTopNav({
       </div>
 
       {/* Bottom Row (Tabs) */}
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        padding: '0 24px', 
-        overflowX: 'auto', 
-        scrollbarWidth: 'none', 
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '0 24px',
+        overflowX: 'auto',
+        scrollbarWidth: 'none',
         gap: '28px',
         borderTop: '1px solid var(--cream-border)'
       }}>
@@ -400,8 +401,8 @@ function SchoolTOC() {
 
       h2h3.forEach((el) => observer.observe(el))
 
-      // Store cleanup
-      ;(window as any).__schoolTocObserver = observer
+        // Store cleanup
+        ; (window as any).__schoolTocObserver = observer
     })
 
     return () => {
@@ -432,7 +433,7 @@ function SchoolTOC() {
             key={h.id}
             href={`#${h.id}`}
             className={`school-toc-link${activeId === h.id ? ' active' : ''}`}
-            style={{ 
+            style={{
               paddingLeft: h.level === 3 ? '16px' : '0',
               fontFamily: 'var(--font-sans), sans-serif',
               fontSize: '13px',

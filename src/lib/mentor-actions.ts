@@ -1,0 +1,116 @@
+'use server'
+
+import { createServiceClient } from '@/lib/supabase/server'
+import { getAuthenticatedUser } from '@/lib/auth-utils'
+
+export async function toggleSavedMentor(mentorId: string) {
+  const user = await getAuthenticatedUser()
+  if (!user) {
+    return { error: 'You must be logged in to save mentors.' }
+  }
+
+  const supabase = createServiceClient()
+
+  try {
+    // Check if already saved
+    const { data: existing } = await supabase
+      .from('saved_mentors')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('mentor_id', mentorId)
+      .single()
+
+    if (existing) {
+      // Unsave
+      const { error } = await supabase
+        .from('saved_mentors')
+        .delete()
+        .eq('id', existing.id)
+      if (error) throw error
+      return { saved: false }
+    } else {
+      // Save
+      const { error } = await supabase
+        .from('saved_mentors')
+        .insert({
+          user_id: user.id,
+          mentor_id: mentorId
+        })
+      if (error) throw error
+      return { saved: true }
+    }
+  } catch (error: any) {
+    console.error('Error toggling saved mentor:', error)
+    return { error: error.message || 'Failed to update saved mentor.' }
+  }
+}
+
+export async function submitMentorApplication(formData: FormData) {
+  const user = await getAuthenticatedUser()
+  if (!user) {
+    return { error: 'You must be logged in to apply as a mentor.' }
+  }
+
+  const supabase = createServiceClient()
+
+  try {
+    // Generate a unique slug from the display name
+    const displayName = formData.get('display_name') as string
+    const baseSlug = displayName.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    let slug = baseSlug
+    
+    // Quick check if slug exists
+    let counter = 1
+    while (true) {
+      const { data } = await supabase.from('mentor_profiles').select('id').eq('slug', slug).single()
+      if (!data) break
+      slug = `${baseSlug}-${counter}`
+      counter++
+    }
+
+    // Parse array fields
+    const expertiseStr = formData.get('expertise_areas') as string
+    const expertiseAreas = expertiseStr ? expertiseStr.split(',').map(s => s.trim()).filter(Boolean) : []
+    
+    const industriesStr = formData.get('industries') as string
+    const industries = industriesStr ? industriesStr.split(',').map(s => s.trim()).filter(Boolean) : []
+    
+    const companiesStr = formData.get('notable_companies') as string
+    const notableCompanies = companiesStr ? companiesStr.split(',').map(s => s.trim()).filter(Boolean) : []
+
+    const insertData = {
+      user_id: user.id,
+      slug,
+      status: 'pending',
+      display_name: displayName,
+      linkedin_url: formData.get('linkedin_url'),
+      location_city: formData.get('location_city'),
+      location_country: formData.get('location_country'),
+      headline: formData.get('headline'),
+      bio: formData.get('bio'),
+      years_experience: parseInt(formData.get('years_experience') as string, 10),
+      intro_video_url: formData.get('intro_video_url') || null,
+      expertise_areas: expertiseAreas,
+      industries: industries,
+      notable_companies: notableCompanies,
+      languages: ['English'] // default for now, can add a field later
+    }
+
+    const { error } = await supabase
+      .from('mentor_profiles')
+      .insert(insertData)
+
+    if (error) {
+      // If it's a unique constraint on user_id, they already applied
+      if (error.code === '23505') {
+        return { error: 'You have already submitted an application.' }
+      }
+      throw error
+    }
+
+    return { success: true }
+  } catch (error: any) {
+    console.error('Error submitting application:', error)
+    return { error: error.message || 'Failed to submit application.' }
+  }
+}

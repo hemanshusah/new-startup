@@ -69,6 +69,32 @@ const SCHOOL_NAV_ITEMS = [
   },
 ]
 
+// Mentor Connect nav group — collapsible section
+const MENTOR_NAV_ITEMS = [
+  {
+    label: 'Overview',
+    href: '/admin/mentor-connect',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor" opacity="0.8" />
+        <rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor" opacity="0.8" />
+        <rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor" opacity="0.8" />
+        <rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor" opacity="0.4" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Sessions',
+    href: '/admin/mentor-connect/sessions',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.4" />
+        <path d="M8 5v3l2 2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+];
+
 const BOTTOM_NAV_ITEMS = [
   {
     label: 'Users',
@@ -105,7 +131,9 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
   const { user, profile, signOut } = useAuth()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const isSchoolRoute = pathname.startsWith('/admin/school')
+  const isMentorRoute = pathname.startsWith('/admin/mentor-connect')
   const [schoolOpen, setSchoolOpen] = useState(isSchoolRoute)
+  const [mentorOpen, setMentorOpen] = useState(isMentorRoute)
 
   useEffect(() => {
     if (mobileSidebarOpen) {
@@ -293,6 +321,81 @@ export function AdminShell({ children, adminEmail, role }: AdminShellProps) {
                       }}
                     >
                       <span style={{ color: isActive ? 'var(--ink)' : 'var(--ink-4)', flexShrink: 0 }}>
+                        {item.icon}
+                      </span>
+                      {item.label}
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* ── Mentor Connect collapsible group ── */}
+          <div style={{ marginTop: '4px', marginBottom: '4px' }}>
+            <button
+              type="button"
+              onClick={() => setMentorOpen((o) => !o)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                width: '100%',
+                padding: '9px 11px',
+                borderRadius: '8px',
+                marginBottom: '2px',
+                fontFamily: 'var(--font-section), var(--font-sans), sans-serif',
+                fontSize: '13px',
+                fontWeight: isMentorRoute ? 600 : ('var(--font-weight-section)' as any),
+                fontStyle: 'var(--font-style-section)' as any,
+                color: isMentorRoute ? 'var(--ink)' : 'var(--ink-3)',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'background 0.12s ease, color 0.12s ease',
+              }}
+            >
+              <span style={{ color: isMentorRoute ? 'var(--ink)' : 'var(--ink-4)', flexShrink: 0 }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <circle cx="8" cy="5" r="3" fill="currentColor" opacity="0.8" />
+                  <path d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+              </span>
+              Mentor Connect
+              <span style={{ marginLeft: 'auto', fontSize: '10px', color: 'var(--ink-4)', transition: 'transform 0.15s ease', transform: mentorOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                ▼
+              </span>
+            </button>
+            {mentorOpen && (
+              <div style={{ paddingLeft: '12px' }}>
+                {MENTOR_NAV_ITEMS.map((item) => {
+                  const isActiveItem = item.href === '/admin/mentor-connect'
+                    ? pathname === '/admin/mentor-connect'
+                    : pathname.startsWith(item.href)
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileSidebarOpen(false)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '8px 11px',
+                        borderRadius: '8px',
+                        marginBottom: '1px',
+                        fontFamily: 'var(--font-section), var(--font-sans), sans-serif',
+                        fontSize: '12.5px',
+                        fontWeight: isActiveItem ? 600 : ('var(--font-weight-section)' as any),
+                        fontStyle: 'var(--font-style-section)' as any,
+                        color: isActiveItem ? 'var(--ink)' : 'var(--ink-3)',
+                        background: isActiveItem ? 'var(--cream)' : 'transparent',
+                        textDecoration: 'none',
+                        transition: 'background 0.12s ease, color 0.12s ease',
+                      }}
+                    >
+                      <span style={{ color: isActiveItem ? 'var(--ink)' : 'var(--ink-4)', flexShrink: 0 }}>
                         {item.icon}
                       </span>
                       {item.label}

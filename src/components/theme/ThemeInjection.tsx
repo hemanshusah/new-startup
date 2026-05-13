@@ -10,7 +10,7 @@ export async function ThemeInjection() {
   const supabase = createServiceClient()
   const { data } = await supabase
     .from('site_config')
-    .select('cosmetic_settings')
+    .select('cosmetic_settings, mentor_connect_enabled')
     .limit(1)
     .maybeSingle()
 
@@ -71,6 +71,7 @@ export async function ThemeInjection() {
           --radius-lg: ${borderRadius};
           
           --school-visibility: ${settings?.enabledProducts?.showSchool === false ? 'none' : 'flex'};
+          --mentor-visibility: ${data?.mentor_connect_enabled === false ? 'none' : 'flex'};
           --personalization-visibility: ${settings?.enabledProducts?.showPersonalization === false ? 'none' : 'block'};
 
           --font-size-heading: ${h.size};

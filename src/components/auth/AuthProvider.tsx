@@ -101,6 +101,16 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
     setRedirectTo(null)
   }, [])
 
+  // ── Redirect to Onboarding if intent is missing ─────────────────────────────
+  useEffect(() => {
+    if (status === 'authenticated' && profile && !profile.account_intent) {
+      const currentPath = window.location.pathname
+      if (currentPath !== '/onboarding' && !currentPath.startsWith('/admin')) {
+        router.push('/onboarding')
+      }
+    }
+  }, [status, profile, router])
+
   const signOut = useCallback(async () => {
     await Promise.all([
       nextAuthSignOut({ redirect: false }),
@@ -111,19 +121,19 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
     router.refresh()
   }, [router, supabase])
 
+  const contextValue = useMemo(() => ({
+    user,
+    profile,
+    isModalOpen,
+    openModal,
+    closeModal,
+    redirectTo,
+    signOut,
+    status,
+  }), [user, profile, isModalOpen, openModal, closeModal, redirectTo, signOut, status])
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        profile,
-        isModalOpen,
-        openModal,
-        closeModal,
-        redirectTo,
-        signOut,
-        status,
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   )

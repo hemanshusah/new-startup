@@ -8,8 +8,9 @@ export async function registerUser(formData: {
   email: string
   password?: string
   fullName: string
+  accountIntent?: 'founder' | 'mentor' | 'explorer'
 }) {
-  const { email, password, fullName } = formData
+  const { email, password, fullName, accountIntent } = formData
   const supabase = await createClient()
 
   // Prefer request host (custom domain on Vercel sends x-forwarded-host) over env defaults
@@ -35,6 +36,7 @@ export async function registerUser(formData: {
     options: {
       data: {
         full_name: fullName,
+        account_intent: accountIntent || 'founder',
       },
       // Since the user has Firebase SMTP linked, this will go through Firebase
       emailRedirectTo: `${redirectBase.replace(/\/$/, '')}/verify`,

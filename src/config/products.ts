@@ -34,8 +34,7 @@ export const PRODUCTS: Record<string, ProductConfig> = {
     primaryColor: '#B8460A',
     navLinks: [
       { label: 'Grants & Funding', href: '/' },
-      { label: 'Startup School', href: '/school' },
-      { label: 'Software Deals', href: '/deals', badge: 'Coming Soon' }
+      { label: 'Startup School', href: '/school' }
     ]
   },
   school: {
@@ -45,8 +44,8 @@ export const PRODUCTS: Record<string, ProductConfig> = {
     title: 'StartupSchool — Learn to build and scale your startup',
     description: 'Interactive courses, mentorship, and resources for first-time founders in India.',
     logo: {
-      first: 'Startup',
-      second: 'School'
+      first: 'Grants',
+      second: 'India'
     },
     primaryColor: '#6C63FF',
     navLinks: [

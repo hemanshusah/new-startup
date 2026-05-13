@@ -4,11 +4,25 @@ import { UsersTable } from '@/components/admin/UsersTable'
 export default async function AdminUsersPage() {
   const supabase = createServiceClient()
 
-  // Fetch profiles with view counts (LEFT JOIN via program_views)
-  const { data: profiles } = await supabase
+  // Fetch profiles (Base users)
+  const { data: profiles, error: profileError } = await supabase
     .from('profiles')
-    .select('id, full_name, email, created_at, role')
+    .select('id, full_name, email, created_at, role, account_intent')
     .order('created_at', { ascending: false })
+
+  if (profileError) {
+    console.error('Error fetching profiles:', profileError)
+  }
+
+  // Fetch mentor profiles separately since join relationship might be missing/stale
+  const { data: mentorProfiles } = await supabase
+    .from('mentor_profiles')
+    .select('user_id, status, total_sessions')
+
+  const mentorMap: Record<string, any> = {}
+  for (const mp of mentorProfiles ?? []) {
+    mentorMap[mp.user_id] = mp
+  }
 
   // Get view counts per user
   const { data: viewCounts } = await supabase
@@ -22,11 +36,17 @@ export default async function AdminUsersPage() {
     if (v.viewed_at > viewMap[v.user_id].last) viewMap[v.user_id].last = v.viewed_at
   }
 
-  const users = (profiles ?? []).map((p) => ({
-    ...p,
-    total_views: viewMap[p.id]?.count ?? 0,
-    last_active: viewMap[p.id]?.last ?? null,
-  }))
+  const users = (profiles ?? []).map((p: any) => {
+    const mentorProfile = mentorMap[p.id]
+    
+    return {
+      ...p,
+      total_views: viewMap[p.id]?.count ?? 0,
+      last_active: viewMap[p.id]?.last ?? null,
+      mentor_status: mentorProfile?.status ?? null,
+      sessions_count: mentorProfile?.total_sessions ?? 0,
+    }
+  })
 
   return (
     <div>
