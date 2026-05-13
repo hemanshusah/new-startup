@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { submitMentorApplication } from '@/lib/mentor-actions'
 import { useRouter } from 'next/navigation'
 
@@ -32,9 +32,18 @@ export default function ApplyPage() {
     }
   }
 
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        router.push('/')
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [success, router])
+
   if (success) {
     return (
-      <main style={{ background: 'var(--cream)', minHeight: 'calc(100vh - 56px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px' }}>
+      <main style={{ background: 'var(--cream)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px' }}>
         <div style={{ background: 'var(--white)', border: '1px solid var(--cream-border)', borderRadius: '16px', padding: '60px 40px', maxWidth: '600px', textAlign: 'center' }}>
           <div style={{ width: '64px', height: '64px', background: '#EDF5EA', color: '#2A6620', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', margin: '0 auto 24px' }}>
             ✓
@@ -42,9 +51,11 @@ export default function ApplyPage() {
           <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', color: 'var(--ink)', margin: '0 0 16px' }}>Application Submitted</h1>
           <p style={{ fontFamily: 'var(--font-sans)', fontSize: '16px', color: 'var(--ink-3)', lineHeight: 1.6, margin: '0 0 32px' }}>
             Thank you for applying to Mentor Connect. Our team will review your application and LinkedIn profile. You will receive an email within 3-5 business days regarding your status.
+            <br/><br/>
+            Redirecting you to the homepage in 5 seconds...
           </p>
-          <button onClick={() => router.push('/mentor-connect')} style={{ padding: '14px 28px', background: 'var(--ink)', color: 'var(--white)', borderRadius: '8px', fontFamily: 'var(--font-sans)', fontSize: '15px', fontWeight: 500, cursor: 'pointer', border: 'none' }}>
-            Return to Homepage
+          <button onClick={() => router.push('/')} style={{ padding: '14px 28px', background: 'var(--ink)', color: 'var(--white)', borderRadius: '8px', fontFamily: 'var(--font-sans)', fontSize: '15px', fontWeight: 500, cursor: 'pointer', border: 'none' }}>
+            Return to Homepage Now
           </button>
         </div>
       </main>

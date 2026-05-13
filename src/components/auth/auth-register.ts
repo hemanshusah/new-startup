@@ -36,7 +36,7 @@ export async function registerUser(formData: {
     options: {
       data: {
         full_name: fullName,
-        account_intent: accountIntent || 'founder',
+        // No default account_intent here to force onboarding redirect
       },
       // Since the user has Firebase SMTP linked, this will go through Firebase
       emailRedirectTo: `${redirectBase.replace(/\/$/, '')}/verify`,

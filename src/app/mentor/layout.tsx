@@ -40,7 +40,73 @@ export default async function MentorLayout({ children }: { children: React.React
           <p style={{ fontFamily: 'var(--font-sans)', fontSize: '16px', color: 'var(--ink-3)', lineHeight: 1.6, margin: '0 0 32px' }}>
             We're sorry, but your mentor application was not approved at this time.
           </p>
-          <Link href="/mentor-connect" style={{ padding: '14px 28px', background: 'var(--ink)', color: 'var(--white)', borderRadius: '8px', fontFamily: 'var(--font-sans)', fontSize: '15px', fontWeight: 500, textDecoration: 'none' }}>
+          <Link href="/" style={{ padding: '14px 28px', background: 'var(--ink)', color: 'var(--white)', borderRadius: '8px', fontFamily: 'var(--font-sans)', fontSize: '15px', fontWeight: 500, textDecoration: 'none' }}>
+            Return to Homepage
+          </Link>
+        </div>
+      </main>
+    )
+  }
+
+  if (isPending) {
+    return (
+      <main style={{ background: 'var(--cream)', minHeight: 'calc(100vh - 56px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px' }}>
+        <div style={{ 
+          background: 'var(--white)', 
+          border: '1px solid var(--cream-border)', 
+          borderRadius: '16px', 
+          padding: '80px 40px', 
+          textAlign: 'center',
+          maxWidth: '600px',
+          width: '100%'
+        }}>
+          <div style={{ 
+            width: '80px', 
+            height: '80px', 
+            background: '#FFF9ED', 
+            color: '#D4820E', 
+            borderRadius: '50%', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            fontSize: '40px', 
+            margin: '0 auto 32px' 
+          }}>
+            ⏳
+          </div>
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', color: 'var(--ink)', marginBottom: '16px' }}>Profile Under Review</h1>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '16px', color: 'var(--ink-3)', lineHeight: 1.6, marginBottom: '32px' }}>
+            Thank you for your application! Our team is currently reviewing your profile and credentials. 
+            This process usually takes <strong>3-5 business days</strong>. 
+            We'll notify you via email once your dashboard is activated.
+          </p>
+          <div style={{ padding: '24px', background: 'var(--cream)', borderRadius: '12px', textAlign: 'left' }}>
+            <p style={{ margin: 0, fontSize: '14px', color: 'var(--ink-4)', fontFamily: 'var(--font-sans)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>NEXT STEPS:</p>
+            <ul style={{ margin: '16px 0 0', paddingLeft: '20px', fontSize: '15px', color: 'var(--ink-2)', fontFamily: 'var(--font-sans)', lineHeight: 1.6 }}>
+              <li>Reviewing your professional credentials</li>
+              <li>Verifying your expertise areas & industries</li>
+              <li>Setting up your mentor presence in the directory</li>
+            </ul>
+          </div>
+          <div style={{ marginTop: '32px' }}>
+            <Link href="/" style={{ padding: '14px 28px', background: 'var(--ink)', color: 'var(--white)', borderRadius: '8px', fontFamily: 'var(--font-sans)', fontSize: '15px', fontWeight: 500, textDecoration: 'none' }}>
+              Return to Homepage
+            </Link>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
+  if (isSuspended) {
+    return (
+      <main style={{ background: 'var(--cream)', minHeight: 'calc(100vh - 56px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px' }}>
+        <div style={{ background: 'var(--white)', border: '1px solid #FCA5A5', borderRadius: '16px', padding: '60px 40px', maxWidth: '600px', textAlign: 'center' }}>
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', color: '#B01F1F', margin: '0 0 16px' }}>Account Suspended</h1>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '16px', color: 'var(--ink-3)', lineHeight: 1.6, margin: '0 0 32px' }}>
+            Your account has been suspended by an administrator. Please contact support for more information.
+          </p>
+          <Link href="/" style={{ padding: '14px 28px', background: 'var(--ink)', color: 'var(--white)', borderRadius: '8px', fontFamily: 'var(--font-sans)', fontSize: '15px', fontWeight: 500, textDecoration: 'none' }}>
             Return to Homepage
           </Link>
         </div>
@@ -59,31 +125,6 @@ export default async function MentorLayout({ children }: { children: React.React
   return (
     <main style={{ background: 'var(--cream)', minHeight: 'calc(100vh - 56px)', padding: '40px 24px' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        {(isPending || isSuspended) && (
-          <div style={{ 
-            background: isPending ? '#FFF9E6' : '#FEF2F2', 
-            border: `1px solid ${isPending ? '#FFD666' : '#FCA5A5'}`, 
-            padding: '16px 24px', 
-            borderRadius: '12px', 
-            marginBottom: '32px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px'
-          }}>
-            <span style={{ fontSize: '20px' }}>{isPending ? '⏳' : '🚫'}</span>
-            <div>
-              <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: 600, color: isPending ? '#856404' : '#991B1B', margin: '0 0 4px' }}>
-                {isPending ? 'Application Pending Approval' : 'Account Suspended'}
-              </h3>
-              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: isPending ? '#856404' : '#991B1B', opacity: 0.8, margin: 0 }}>
-                {isPending 
-                  ? "Your profile is not yet visible in the directory. You can set up your availability, but founders cannot book you until you're approved."
-                  : "Your account has been suspended by an administrator. Please contact support."}
-              </p>
-            </div>
-          </div>
-        )}
-
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', background: 'var(--white)', padding: '24px', borderRadius: '16px', border: '1px solid var(--cream-border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--cream)', border: '1px solid var(--cream-border)', overflow: 'hidden', flexShrink: 0 }}>

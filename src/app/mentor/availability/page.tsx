@@ -11,6 +11,7 @@ export default function AvailabilityPage() {
   const [isCalendarValid, setIsCalendarValid] = useState(true)
   const [noticeHours, setNoticeHours] = useState(24)
   const [windowDays, setWindowDays] = useState(14)
+  const [mentorStatus, setMentorStatus] = useState<'pending' | 'active' | 'suspended' | 'rejected' | null>(null)
   const [weeklySlots, setWeeklySlots] = useState<any[]>([])
 
   const supabase = useMemo(() => createBrowserClient(
@@ -27,11 +28,12 @@ export default function AvailabilityPage() {
 
       const { data: mentor } = await supabase
         .from('mentor_profiles')
-        .select('id, notice_period_hours, booking_window_days, google_access_token')
+        .select('id, status, notice_period_hours, booking_window_days, google_access_token')
         .eq('user_id', user.id)
         .single()
 
       if (mentor) {
+        setMentorStatus(mentor.status)
         setIsConnected(!!mentor.google_access_token)
         setNoticeHours(mentor.notice_period_hours)
         setWindowDays(mentor.booking_window_days)
@@ -55,6 +57,63 @@ export default function AvailabilityPage() {
     }
     loadData()
   }, [supabase])
+
+  if (loading) return <div style={{ padding: '40px', textAlign: 'center', fontFamily: 'var(--font-sans)', color: 'var(--ink-3)' }}>Loading dashboard...</div>
+
+  if (mentorStatus === 'pending') {
+    return (
+      <div style={{ 
+        background: 'var(--white)', 
+        border: '1px solid var(--cream-border)', 
+        borderRadius: '16px', 
+        padding: '80px 40px', 
+        textAlign: 'center',
+        maxWidth: '600px',
+        margin: '40px auto'
+      }}>
+        <div style={{ 
+          width: '80px', 
+          height: '80px', 
+          background: '#FFF9ED', 
+          color: '#D4820E', 
+          borderRadius: '50%', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          fontSize: '40px', 
+          margin: '0 auto 32px' 
+        }}>
+          ⏳
+        </div>
+        <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', color: 'var(--ink)', marginBottom: '16px' }}>Profile Under Review</h1>
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '16px', color: 'var(--ink-3)', lineHeight: 1.6, marginBottom: '32px' }}>
+          Thank you for your application! Our team is currently reviewing your profile and credentials. 
+          This process usually takes <strong>3-5 business days</strong>. 
+          We'll notify you via email once your dashboard is activated.
+        </p>
+        <div style={{ padding: '16px', background: 'var(--cream)', borderRadius: '12px', textAlign: 'left' }}>
+          <p style={{ margin: 0, fontSize: '14px', color: 'var(--ink-4)', fontFamily: 'var(--font-sans)', fontWeight: 500 }}>NEXT STEPS:</p>
+          <ul style={{ margin: '12px 0 0', paddingLeft: '20px', fontSize: '14px', color: 'var(--ink-2)', fontFamily: 'var(--font-sans)', lineHeight: 1.5 }}>
+            <li>Reviewing your LinkedIn profile & experience</li>
+            <li>Verifying your expertise areas</li>
+            <li>Onboarding you to the platform</li>
+          </ul>
+        </div>
+      </div>
+    )
+  }
+
+  if (mentorStatus === 'rejected') {
+    return (
+      <div style={{ background: 'var(--white)', border: '1px solid #FCA5A5', borderRadius: '16px', padding: '60px 40px', textAlign: 'center', maxWidth: '600px', margin: '40px auto' }}>
+        <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '28px', color: '#B91C1C', marginBottom: '16px' }}>Application Update</h1>
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '16px', color: 'var(--ink-3)', lineHeight: 1.6 }}>
+          We appreciate your interest in Mentor Connect. At this time, we are unable to proceed with your application. 
+          If you have questions, please reach out to our support team.
+        </p>
+      </div>
+    )
+  }
 
   const handleSaveSettings = async () => {
     setSaving(true)

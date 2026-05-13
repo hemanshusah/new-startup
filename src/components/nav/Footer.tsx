@@ -13,6 +13,9 @@ export function Footer() {
     p.slug !== 'grants' && pathname?.startsWith(`/${p.slug}`)
   ) || DEFAULT_PRODUCT
 
+  // Hide global footer on admin, onboarding, and mentor apply routes
+  if (pathname?.startsWith('/admin') || pathname === '/onboarding' || pathname === '/mentor-connect/apply') return null
+
   return (
     <footer style={{
       background: 'var(--footer-bg)',

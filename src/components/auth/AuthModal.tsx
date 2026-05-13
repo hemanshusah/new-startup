@@ -79,7 +79,6 @@ export function AuthModal() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [fullName, setFullName] = useState('')
-  const [accountIntent, setAccountIntent] = useState<'founder' | 'mentor' | 'explorer'>('founder')
 
   // Reset state when view changes
   const switchView = (v: View) => {
@@ -173,7 +172,7 @@ export function AuthModal() {
 
     try {
       const { registerUser } = await import('./auth-register')
-      const result = await registerUser({ email, password, fullName, accountIntent })
+      const result = await registerUser({ email, password, fullName })
 
       if (!result.success) {
         setError(result.error || 'Sign up failed')
@@ -594,18 +593,6 @@ export function AuthModal() {
               </div>
             ) : (
               <form onSubmit={handleSignUp} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '12px', fontWeight: 500, color: 'var(--ink)' }}>I want to...</label>
-                  <select
-                    value={accountIntent}
-                    onChange={(e) => setAccountIntent(e.target.value as any)}
-                    style={inputStyle}
-                  >
-                    <option value="founder">Find grants for my startup</option>
-                    <option value="mentor">Mentor startups</option>
-                    <option value="explorer">Just explore the platform</option>
-                  </select>
-                </div>
                 <input
                   id="signup-name"
                   type="text"

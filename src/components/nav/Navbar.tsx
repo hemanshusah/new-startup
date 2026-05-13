@@ -40,8 +40,8 @@ function getInitials(user: { email?: string | null; name?: string | null }) {
 export function Navbar({ mentorConnectEnabled = false }: { mentorConnectEnabled?: boolean }) {
   const pathname = usePathname()
 
-  // Hide global navbar on admin routes
-  if (pathname?.startsWith('/admin')) return null
+  // Hide global navbar on admin, onboarding, and mentor apply routes
+  if (pathname?.startsWith('/admin') || pathname === '/onboarding' || pathname === '/mentor-connect/apply') return null
 
   const { user, profile, openModal, signOut } = useAuth()
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false)
