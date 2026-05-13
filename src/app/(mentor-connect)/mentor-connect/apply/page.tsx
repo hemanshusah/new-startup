@@ -78,7 +78,11 @@ export default function ApplyPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ background: 'var(--white)', border: '1px solid var(--cream-border)', borderRadius: '16px', padding: '40px' }}>
+        <form 
+          onSubmit={handleSubmit} 
+          encType="multipart/form-data"
+          style={{ background: 'var(--white)', border: '1px solid var(--cream-border)', borderRadius: '16px', padding: '40px' }}
+        >
           
           {/* Section 1: Basic Info */}
           <section style={{ marginBottom: '40px' }}>

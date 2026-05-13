@@ -125,11 +125,10 @@ export async function submitMentorApplication(formData: FormData) {
       .insert(insertData)
 
     if (error) {
-      // If it's a unique constraint on user_id, they already applied
       if (error.code === '23505') {
         return { error: 'You have already submitted an application.' }
       }
-      throw error
+      return { error: error.message || 'Database error occurred.' }
     }
 
     return { success: true }
