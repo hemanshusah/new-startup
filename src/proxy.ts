@@ -51,6 +51,66 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
+  // Step 3: Enforce Onboarding - Log out users who bypass the gate
+  const onboardingAllowedPaths = [
+    '/onboarding',
+    '/api/auth',
+    '/verify',
+    '/logout',
+    '/_next',
+    '/favicon.ico',
+    '/api/softinfra',
+    '/api/auth/session'
+  ]
+
+  // Check if current path is allowed during onboarding
+  const isOnboardingPath = onboardingAllowedPaths.some(p => 
+    pathname === p || pathname.startsWith(p + '/')
+  )
+
+  if (userEmail && !isOnboardingPath) {
+    const supabase = createServiceClient()
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('account_intent')
+      .eq('email', userEmail)
+      .single()
+
+    // DEBUG: console.log(`[Onboarding Gate] Path: ${pathname} | Intent: ${profile?.account_intent}`)
+
+    if (!profile?.account_intent) {
+      const referer = request.headers.get('referer') || ''
+      const isComingFromOnboarding = referer.includes('/onboarding')
+      
+      const cookieNames = [
+        'next-auth.session-token',
+        '__Secure-next-auth.session-token',
+        'next-auth.callback-url',
+        'next-auth.csrf-token',
+        'sb-access-token',
+        'sb-refresh-token'
+      ]
+
+      if (pathname === '/') {
+        if (isComingFromOnboarding) {
+          // They deliberately left onboarding for the home page -> LOG OUT
+          const response = NextResponse.next()
+          cookieNames.forEach(name => response.cookies.delete(name))
+          return response
+        } else {
+          // They just logged in or landed on home without intent -> REDIRECT TO ONBOARDING
+          return NextResponse.redirect(new URL('/onboarding', request.url))
+        }
+      }
+
+      // Any other path (like /programs) -> LOG OUT
+      const guestUrl = new URL('/', request.url)
+      const response = NextResponse.redirect(guestUrl)
+      cookieNames.forEach(name => response.cookies.delete(name))
+      return response
+    }
+  }
+
   return NextResponse.next()
 }
 

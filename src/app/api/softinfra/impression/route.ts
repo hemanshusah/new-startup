@@ -32,20 +32,25 @@ async function handleTracking(siId: string, request: Request) {
       profileId = profile?.id
     }
 
-    // 1. Increment generic impression counter
-    await supabase.rpc('increment_softinfra_impression', { p_si_id: siId })
-
-    // 2. Log the detailed impression
-    const { error } = await supabase
-      .from('softinfra_impressions')
-      .insert({
-        softinfra_id: siId,
-        user_id: profileId,
-        page: request.headers.get('referer') || 'unknown'
-      })
-
-    if (error) {
-      console.error('Failed to insert into softinfra_impressions', error)
+    // 1. Increment generic impression counter (Split by guest/user)
+    await supabase.rpc('increment_softinfra_impression', { 
+      p_si_id: siId, 
+      p_is_guest: !profileId 
+    })
+    
+    // 2. Log detailed impression ONLY for users (since user_id is NOT NULL)
+    if (profileId) {
+      const { error } = await supabase
+        .from('softinfra_impressions')
+        .insert({
+          softinfra_id: siId,
+          user_id: profileId,
+          page: request.headers.get('referer') || 'unknown'
+        })
+      
+      if (error) {
+        console.error('Failed to insert into softinfra_impressions', error)
+      }
     }
 
     return NextResponse.json({ ok: true })

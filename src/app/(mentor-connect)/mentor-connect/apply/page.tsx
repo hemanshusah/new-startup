@@ -84,6 +84,12 @@ export default function ApplyPage() {
           <section style={{ marginBottom: '40px' }}>
             <h2 style={{ fontFamily: 'var(--font-sans)', fontSize: '18px', fontWeight: 600, color: 'var(--ink)', margin: '0 0 24px', paddingBottom: '12px', borderBottom: '1px solid var(--cream-border)' }}>1. Basic Information</h2>
             
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ display: 'block', fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: 500, color: 'var(--ink)', marginBottom: '8px' }}>Profile Picture *</label>
+              <input required name="avatar" type="file" accept="image/*" style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid var(--cream-border)', background: 'var(--cream)', fontFamily: 'var(--font-sans)', fontSize: '14px' }} />
+              <p style={{ margin: '4px 0 0', fontSize: '12px', color: 'var(--ink-4)', fontFamily: 'var(--font-sans)' }}>Square JPG or PNG works best.</p>
+            </div>
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
               <div>
                 <label style={{ display: 'block', fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: 500, color: 'var(--ink)', marginBottom: '8px' }}>Display Name *</label>

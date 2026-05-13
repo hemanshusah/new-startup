@@ -300,28 +300,54 @@ export function Navbar({ mentorConnectEnabled = false }: { mentorConnectEnabled?
 
                       {profile?.account_intent === 'mentor' ? (
                         <>
-                          <Link
-                            href="/mentor/availability"
-                            onClick={() => setAvatarMenuOpen(false)}
-                            role="menuitem"
-                            style={{
-                              display: 'block',
-                              width: '100%',
-                              textAlign: 'left',
-                              fontFamily: 'var(--font-sans)',
-                              fontSize: '13px',
-                              color: 'var(--ink)',
-                              textDecoration: 'none',
-                              background: 'none',
-                              border: 'none',
-                              borderRadius: '6px',
-                              padding: '7px 10px',
-                              cursor: 'pointer',
-                              transition: 'background 0.12s ease',
-                            }}
-                          >
-                            Mentor Dashboard
-                          </Link>
+                          {profile.mentor_status ? (
+                            <Link
+                              href="/mentor/availability"
+                              onClick={() => setAvatarMenuOpen(false)}
+                              role="menuitem"
+                              style={{
+                                display: 'block',
+                                width: '100%',
+                                textAlign: 'left',
+                                fontFamily: 'var(--font-sans)',
+                                fontSize: '13px',
+                                color: 'var(--ink)',
+                                textDecoration: 'none',
+                                background: 'none',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '7px 10px',
+                                cursor: 'pointer',
+                                transition: 'background 0.12s ease',
+                              }}
+                            >
+                              Mentor Dashboard
+                            </Link>
+                          ) : (
+                            <Link
+                              href="/mentor-connect/apply"
+                              onClick={() => setAvatarMenuOpen(false)}
+                              role="menuitem"
+                              style={{
+                                display: 'block',
+                                width: '100%',
+                                textAlign: 'left',
+                                fontFamily: 'var(--font-sans)',
+                                fontSize: '13px',
+                                fontWeight: 500,
+                                color: 'var(--accent)',
+                                textDecoration: 'none',
+                                background: 'var(--cream)',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '7px 10px',
+                                cursor: 'pointer',
+                                transition: 'background 0.12s ease',
+                              }}
+                            >
+                              Complete Application
+                            </Link>
+                          )}
                         </>
                       ) : (
                         <>
@@ -589,7 +615,11 @@ export function Navbar({ mentorConnectEnabled = false }: { mentorConnectEnabled?
                   </div>
                   {profile?.account_intent === 'mentor' ? (
                     <>
-                      <Link href="/mentor/availability" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>Mentor Dashboard</Link>
+                      {profile.mentor_status ? (
+                        <Link href="/mentor/availability" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>Mentor Dashboard</Link>
+                      ) : (
+                        <Link href="/mentor-connect/apply" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: 600, color: 'var(--accent)', padding: '8px 0' }}>Complete Application</Link>
+                      )}
                     </>
                   ) : (
                     <>

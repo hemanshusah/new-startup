@@ -62,7 +62,7 @@ const inputStyle: React.CSSProperties = {
 // ─── AuthModal ────────────────────────────────────────────────────────────────
 
 export function AuthModal() {
-  const { isModalOpen, openModal, closeModal, redirectTo } = useAuth()
+  const { isModalOpen, openModal, closeModal, redirectTo, profile } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const supabase = useMemo(() => createClient(), [])
@@ -128,9 +128,11 @@ export function AuthModal() {
 
   const handleSuccess = useCallback(() => {
     closeModal()
+    
     if (redirectTo) {
       router.push(redirectTo)
     }
+    
     router.refresh()
   }, [closeModal, redirectTo, router])
 

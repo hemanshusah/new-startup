@@ -51,33 +51,33 @@ export default async function MentorLayout({ children }: { children: React.React
   if (isPending) {
     return (
       <main style={{ background: 'var(--cream)', minHeight: 'calc(100vh - 56px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px' }}>
-        <div style={{ 
-          background: 'var(--white)', 
-          border: '1px solid var(--cream-border)', 
-          borderRadius: '16px', 
-          padding: '80px 40px', 
+        <div style={{
+          background: 'var(--white)',
+          border: '1px solid var(--cream-border)',
+          borderRadius: '16px',
+          padding: '80px 40px',
           textAlign: 'center',
           maxWidth: '600px',
           width: '100%'
         }}>
-          <div style={{ 
-            width: '80px', 
-            height: '80px', 
-            background: '#FFF9ED', 
-            color: '#D4820E', 
-            borderRadius: '50%', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            fontSize: '40px', 
-            margin: '0 auto 32px' 
+          <div style={{
+            width: '80px',
+            height: '80px',
+            background: '#FFF9ED',
+            color: '#D4820E',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '40px',
+            margin: '0 auto 32px'
           }}>
             ⏳
           </div>
           <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', color: 'var(--ink)', marginBottom: '16px' }}>Profile Under Review</h1>
           <p style={{ fontFamily: 'var(--font-sans)', fontSize: '16px', color: 'var(--ink-3)', lineHeight: 1.6, marginBottom: '32px' }}>
-            Thank you for your application! Our team is currently reviewing your profile and credentials. 
-            This process usually takes <strong>3-5 business days</strong>. 
+            Thank you for your application! Our team is currently reviewing your profile and credentials.
+            This process usually takes <strong>3-5 business days</strong>.
             We'll notify you via email once your dashboard is activated.
           </p>
           <div style={{ padding: '24px', background: 'var(--cream)', borderRadius: '12px', textAlign: 'left' }}>
@@ -116,6 +116,7 @@ export default async function MentorLayout({ children }: { children: React.React
 
   // Dashboard Nav
   const navItems = [
+    { label: 'My Profile', href: '/mentor/profile' },
     { label: 'Dashboard', href: '/mentor/dashboard' },
     { label: 'Sessions', href: '/mentor/sessions' },
     { label: 'Availability', href: '/mentor/availability' },
@@ -154,7 +155,7 @@ export default async function MentorLayout({ children }: { children: React.React
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <span style={{ 
+            <span style={{
               display: 'inline-block',
               padding: '6px 12px',
               borderRadius: '100px',

@@ -78,7 +78,7 @@ export async function submitMentorApplication(formData: FormData) {
     const companiesStr = formData.get('notable_companies') as string
     const notableCompanies = companiesStr ? companiesStr.split(',').map(s => s.trim()).filter(Boolean) : []
 
-    const insertData = {
+    const insertData: any = {
       user_id: user.id,
       slug,
       status: 'pending',
@@ -94,6 +94,30 @@ export async function submitMentorApplication(formData: FormData) {
       industries: industries,
       notable_companies: notableCompanies,
       languages: ['English'] // default for now, can add a field later
+    }
+
+    // Handle avatar upload if provided
+    const avatarFile = formData.get('avatar') as File
+    if (avatarFile && avatarFile.size > 0) {
+      const fileExt = avatarFile.name.split('.').pop()
+      const fileName = `${user.id}/avatar-${Date.now()}.${fileExt}`
+      
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, avatarFile, {
+          cacheControl: '3600',
+          upsert: true
+        })
+
+      if (uploadError) {
+        console.error('Avatar upload error:', uploadError)
+      } else {
+        const { data: { publicUrl } } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(fileName)
+        
+        insertData.avatar_url = publicUrl
+      }
     }
 
     const { error } = await supabase
@@ -112,5 +136,48 @@ export async function submitMentorApplication(formData: FormData) {
   } catch (error: any) {
     console.error('Error submitting application:', error)
     return { error: error.message || 'Failed to submit application.' }
+  }
+}
+
+export async function updateMentorAvatar(formData: FormData) {
+  const user = await getAuthenticatedUser()
+  if (!user) {
+    return { error: 'You must be logged in.' }
+  }
+
+  const supabase = createServiceClient()
+  const avatarFile = formData.get('avatar') as File
+  if (!avatarFile || avatarFile.size === 0) {
+    return { error: 'No image provided.' }
+  }
+
+  try {
+    const fileExt = avatarFile.name.split('.').pop()
+    const fileName = `${user.id}/avatar-${Date.now()}.${fileExt}`
+    
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(fileName, avatarFile, {
+        cacheControl: '3600',
+        upsert: true
+      })
+
+    if (uploadError) throw uploadError
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(fileName)
+
+    const { error: updateError } = await supabase
+      .from('mentor_profiles')
+      .update({ avatar_url: publicUrl })
+      .eq('user_id', user.id)
+
+    if (updateError) throw updateError
+
+    return { success: true, avatarUrl: publicUrl }
+  } catch (error: any) {
+    console.error('Error updating avatar:', error)
+    return { error: error.message || 'Failed to update avatar.' }
   }
 }

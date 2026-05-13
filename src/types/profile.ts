@@ -25,5 +25,6 @@ export interface Profile {
   team_size: number | null;
   revenue_status: RevenueStatus | null;
   funding_status: FundingStatus | null;
+  mentor_status?: 'pending' | 'active' | 'suspended' | 'rejected' | null;
   created_at: string;
 }

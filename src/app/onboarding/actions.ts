@@ -1,18 +1,19 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/server'
+import { getAuthenticatedUser } from '@/lib/auth-utils'
 import { revalidatePath } from 'next/cache'
 
 export async function setAccountIntent(intent: 'founder' | 'mentor' | 'explorer') {
-  const supabase = await createClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
+  const user = await getAuthenticatedUser()
+  if (!user?.email) throw new Error('Not authenticated')
 
+  const supabase = createServiceClient()
+  
   const { error } = await supabase
     .from('profiles')
     .update({ account_intent: intent })
-    .eq('id', user.id)
+    .eq('email', user.email)
 
   if (error) throw error
 

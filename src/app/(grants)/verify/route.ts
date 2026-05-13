@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code')
   const type = searchParams.get('type') as EmailOtpType | null
   const view = searchParams.get('view')
-  const next = searchParams.get('next') ?? '/profile'
+  const next = searchParams.get('next') ?? '/onboarding'
 
   console.log(`[Verify Route] Processing: ${type} | Token: ${token_hash ? 'Yes' : 'No'} | Code: ${code ? 'Yes' : 'No'}`)
 
