@@ -3,12 +3,23 @@
 import { useState, useEffect } from 'react'
 import { submitMentorApplication } from '@/lib/mentor-actions'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/components/auth/AuthProvider'
 
 export default function ApplyPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+
+  const { profile, status } = useAuth()
+  const authLoading = status === 'loading'
+
+  useEffect(() => {
+    // If they already applied, send them to dashboard
+    if (!authLoading && profile?.account_intent === 'mentor' && profile.mentor_status) {
+      router.push('/mentor/availability')
+    }
+  }, [profile, authLoading, router])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -24,6 +35,8 @@ export default function ApplyPage() {
       } else {
         setSuccess(true)
         window.scrollTo(0, 0)
+        // Refresh to update Navbar mentor_status
+        router.refresh()
       }
     } catch (err: any) {
       setError(err.message || 'Something went wrong')
@@ -35,11 +48,13 @@ export default function ApplyPage() {
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
-        router.push('/')
+        router.push('/mentor/availability')
       }, 5000)
       return () => clearTimeout(timer)
     }
   }, [success, router])
+
+  if (authLoading) return <div style={{ padding: '100px', textAlign: 'center', fontFamily: 'var(--font-sans)', color: 'var(--ink-4)', background: 'var(--bg)', minHeight: '100vh' }}>Checking application status...</div>
 
   if (success) {
     return (
@@ -52,10 +67,10 @@ export default function ApplyPage() {
           <p style={{ fontFamily: 'var(--font-sans)', fontSize: '16px', color: 'var(--ink-3)', lineHeight: 1.6, margin: '0 0 32px' }}>
             Thank you for applying to Mentor Connect. Our team will review your application and LinkedIn profile. You will receive an email within 3-5 business days regarding your status.
             <br/><br/>
-            Redirecting you to the homepage in 5 seconds...
+            Redirecting you to the dashboard in 5 seconds...
           </p>
-          <button onClick={() => router.push('/')} style={{ padding: '14px 28px', background: 'var(--ink)', color: 'var(--white)', borderRadius: '8px', fontFamily: 'var(--font-sans)', fontSize: '15px', fontWeight: 500, cursor: 'pointer', border: 'none' }}>
-            Return to Homepage Now
+          <button onClick={() => router.push('/mentor/availability')} style={{ padding: '14px 28px', background: 'var(--ink)', color: 'var(--white)', borderRadius: '8px', fontFamily: 'var(--font-sans)', fontSize: '15px', fontWeight: 500, cursor: 'pointer', border: 'none' }}>
+            Go to Dashboard Now
           </button>
         </div>
       </main>
