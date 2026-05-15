@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getAuthenticatedUser } from '@/lib/auth-utils'
 import { createServiceClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import MentorNav from '@/components/mentor-connect/MentorNav'
 
 export default async function MentorLayout({ children }: { children: React.ReactNode }) {
   const user = await getAuthenticatedUser()
@@ -116,11 +117,12 @@ export default async function MentorLayout({ children }: { children: React.React
 
   // Dashboard Nav
   const navItems = [
-    { label: 'My Profile', href: '/mentor/profile' },
     { label: 'Dashboard', href: '/mentor/dashboard' },
     { label: 'Sessions', href: '/mentor/sessions' },
+    { label: 'Session Types', href: '/mentor/session-types' },
     { label: 'Availability', href: '/mentor/availability' },
     { label: 'Earnings', href: '/mentor/earnings' },
+    { label: 'My Profile', href: '/mentor/profile' },
   ]
 
   return (
@@ -170,29 +172,7 @@ export default async function MentorLayout({ children }: { children: React.React
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div style={{ borderBottom: '1px solid var(--cream-border)', marginBottom: '32px', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-          <div style={{ display: 'flex', gap: '24px', minWidth: 'max-content', padding: '0 4px' }}>
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  color: 'var(--ink-3)',
-                  padding: '12px 0',
-                  textDecoration: 'none',
-                  whiteSpace: 'nowrap',
-                  borderBottom: '2px solid transparent', // Will be active dynamically in a client component in a real app
-                }}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </div>
+        <MentorNav navItems={navItems} />
 
         {children}
       </div>

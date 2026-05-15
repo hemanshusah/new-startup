@@ -1,20 +1,57 @@
-import { createServiceClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
+import { AdminSessionsList } from '@/components/admin/mentor-connect/AdminSessionsList'
 
 export default async function AdminMentorConnectSessionsPage() {
-  const supabase = createServiceClient()
+  // Use direct connection with Service Role Key to bypass any config issues
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
 
-  const { data: sessions } = await supabase
+  // 1. Fetch raw sessions
+  const { data: sessionsData, error: sessionsError } = await supabase
     .from('sessions')
-    .select(`
-      id,
-      status,
-      scheduled_start,
-      amount_inr,
-      mentor_profiles ( display_name ),
-      founder_id
-    `)
+    .select('*')
     .order('scheduled_start', { ascending: false })
-    .limit(50)
+    .limit(100)
+
+  let mergedSessions: any[] = []
+  let debugInfo = ''
+
+  if (sessionsError) {
+    debugInfo = `Database Error: ${sessionsError.message} (Code: ${sessionsError.code})`
+  } else if (!sessionsData) {
+    debugInfo = 'Database returned null for sessionsData'
+  } else {
+    try {
+      if (sessionsData.length > 0) {
+        const mentorIds = Array.from(new Set(sessionsData.map(s => s.mentor_id)))
+        const founderIds = Array.from(new Set(sessionsData.map(s => s.founder_id)))
+        const typeIds = Array.from(new Set(sessionsData.map(s => s.session_type_id)))
+
+        // 2. Fetch related data in parallel
+        const [mentorsRes, foundersRes, typesRes] = await Promise.all([
+          supabase.from('mentor_profiles').select('id, display_name, slug').in('id', mentorIds),
+          supabase.from('profiles').select('id, full_name, email, startup_name').in('id', founderIds),
+          supabase.from('session_types').select('id, name').in('id', typeIds)
+        ])
+
+        const mentorMap = new Map(mentorsRes.data?.map(m => [m.id, m]))
+        const founderMap = new Map(foundersRes.data?.map(f => [f.id, f]))
+        const typeMap = new Map(typesRes.data?.map(t => [t.id, t]))
+
+        // 3. Merge
+        mergedSessions = sessionsData.map(s => ({
+          ...s,
+          mentor_profiles: mentorMap.get(s.mentor_id),
+          founder: founderMap.get(s.founder_id),
+          session_type: typeMap.get(s.session_type_id)
+        }))
+      }
+    } catch (err: any) {
+      debugInfo = `Processing Error: ${err.message}`
+    }
+  }
 
   return (
     <div>
@@ -27,53 +64,13 @@ export default async function AdminMentorConnectSessionsPage() {
         </p>
       </div>
 
-      {!sessions || sessions.length === 0 ? (
-        <div style={{ background: 'var(--white)', border: '1px solid var(--cream-border)', borderRadius: '12px', padding: '48px', textAlign: 'center' }}>
-          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink-4)' }}>
-            No sessions booked yet.
-          </p>
-        </div>
-      ) : (
-        <div style={{ background: 'var(--white)', border: '1px solid var(--cream-border)', borderRadius: '12px', overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'var(--font-sans)', fontSize: '13px' }}>
-            <thead>
-              <tr style={{ background: 'var(--cream)', borderBottom: '1px solid var(--cream-border)' }}>
-                <th style={{ padding: '12px 16px', textAlign: 'left', fontWeight: 500, color: 'var(--ink-3)' }}>Mentor</th>
-                <th style={{ padding: '12px 16px', textAlign: 'left', fontWeight: 500, color: 'var(--ink-3)' }}>Status</th>
-                <th style={{ padding: '12px 16px', textAlign: 'left', fontWeight: 500, color: 'var(--ink-3)' }}>Date</th>
-                <th style={{ padding: '12px 16px', textAlign: 'left', fontWeight: 500, color: 'var(--ink-3)' }}>Amount (₹)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sessions.map((s: any) => (
-                <tr key={s.id} style={{ borderBottom: '1px solid var(--cream-border)' }}>
-                  <td style={{ padding: '12px 16px', color: 'var(--ink)', fontWeight: 500 }}>
-                    {s.mentor_profiles?.display_name ?? '—'}
-                  </td>
-                  <td style={{ padding: '12px 16px' }}>
-                    <span style={{
-                      padding: '2px 8px',
-                      borderRadius: '4px',
-                      fontSize: '11px',
-                      fontWeight: 500,
-                      background: s.status === 'confirmed' ? '#EDF5EA' : 'var(--cream)',
-                      color: s.status === 'confirmed' ? '#2A6620' : 'var(--ink-3)',
-                    }}>
-                      {s.status}
-                    </span>
-                  </td>
-                  <td style={{ padding: '12px 16px', color: 'var(--ink-3)' }}>
-                    {new Date(s.scheduled_start).toLocaleDateString()}
-                  </td>
-                  <td style={{ padding: '12px 16px', color: 'var(--ink-3)' }}>
-                    ₹{(s.amount_inr ?? 0).toLocaleString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {debugInfo && (
+        <div style={{ padding: '16px', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: '12px', color: '#991B1B', marginBottom: '24px', fontSize: '13px', fontFamily: 'monospace' }}>
+          ⚠️ {debugInfo}
         </div>
       )}
+
+      <AdminSessionsList initialSessions={mergedSessions} />
     </div>
   )
 }

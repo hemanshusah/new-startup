@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface SlotPickerClientProps {
@@ -17,6 +17,13 @@ export function SlotPickerClient({ groupedSlots, mentorSlug, sessionId }: SlotPi
   const [selectedDate, setSelectedDate] = useState<string | null>(availableDates.length > 0 ? availableDates[0] : null)
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
   
+  const [mounted, setMounted] = useState(false)
+  
+  // Prevent hydration mismatch by only rendering time-specific strings on client
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   const handleSlotSelect = (slot: string) => {
     setSelectedSlot(slot)
   }
@@ -77,9 +84,15 @@ export function SlotPickerClient({ groupedSlots, mentorSlug, sessionId }: SlotPi
                   flexShrink: 0
                 }}
               >
-                <span style={{ fontSize: '12px', fontWeight: 500, fontFamily: 'var(--font-sans)', marginBottom: '4px' }}>{dayName}</span>
-                <span style={{ fontSize: '20px', fontWeight: 600, fontFamily: 'var(--font-serif)', color: isSelected ? '#2A6620' : 'var(--ink)' }}>{dayNum}</span>
-                <span style={{ fontSize: '12px', fontFamily: 'var(--font-sans)' }}>{monthName}</span>
+                <span style={{ fontSize: '12px', fontWeight: 500, fontFamily: 'var(--font-sans)', marginBottom: '4px' }}>
+                  {mounted ? dayName : '---'}
+                </span>
+                <span style={{ fontSize: '20px', fontWeight: 600, fontFamily: 'var(--font-serif)', color: isSelected ? '#2A6620' : 'var(--ink)' }}>
+                  {mounted ? dayNum : '--'}
+                </span>
+                <span style={{ fontSize: '12px', fontFamily: 'var(--font-sans)' }}>
+                  {mounted ? monthName : '---'}
+                </span>
               </button>
             )
           })}
@@ -116,7 +129,7 @@ export function SlotPickerClient({ groupedSlots, mentorSlug, sessionId }: SlotPi
                     textAlign: 'center'
                   }}
                 >
-                  {timeString}
+                  {mounted ? timeString : '--:--'}
                 </button>
               )
             })}

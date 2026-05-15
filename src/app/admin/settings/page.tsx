@@ -6,7 +6,7 @@ async function loadOrCreateSiteConfigRow() {
   const supabase = createServiceClient()
   const { data: rows } = await supabase
     .from('site_config')
-    .select('id, field_schema, sectors, cosmetic_settings, mentor_connect_enabled, mentor_commission_pct, price_min_inr, price_max_inr')
+    .select('*')
     .limit(1)
 
   const row = rows?.[0]
@@ -38,7 +38,7 @@ async function loadOrCreateSiteConfigRow() {
         borderRadius: "12px"
       }
     })
-    .select('id, field_schema, sectors, cosmetic_settings, mentor_connect_enabled, mentor_commission_pct, price_min_inr, price_max_inr')
+    .select('*')
     .maybeSingle()
 
   return inserted ?? null
@@ -65,6 +65,7 @@ export default async function AdminSettingsPage() {
         initialCosmeticSettings={row?.cosmetic_settings as any}
         initialMentorSettings={{
           enabled: row?.mentor_connect_enabled ?? false,
+          showPending: row?.mentor_show_pending_sessions ?? true,
           commissionPct: row?.mentor_commission_pct ?? 20,
           priceMin: row?.price_min_inr ?? 2500,
           priceMax: row?.price_max_inr ?? 25000,
