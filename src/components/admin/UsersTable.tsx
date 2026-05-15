@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { deleteUserAdmin } from '@/app/admin/user-actions'
+import { deleteUserAdmin, updateMentorStatusAdmin } from '@/app/admin/user-actions'
 import { useRouter } from 'next/navigation'
 
 type UserRow = {
@@ -11,12 +11,15 @@ type UserRow = {
   email: string
   created_at: string
   role: string
+  account_intent: string
   total_views: number
   last_active: string | null
+  mentor_status: string | null
+  sessions_count: number
 }
 
 export function UsersTable({ initialUsers }: { initialUsers: UserRow[] }) {
-  const supabase = createClient()
+  const supabase = useState(() => createClient())[0]
   const [users, setUsers] = useState<UserRow[]>(initialUsers)
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState<'created_at' | 'total_views'>('created_at')
@@ -74,10 +77,22 @@ export function UsersTable({ initialUsers }: { initialUsers: UserRow[] }) {
     }
   }, [supabase])
 
+  const updateMentorStatus = useCallback(async (userId: string, newStatus: string) => {
+    setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, mentor_status: newStatus } : u)))
+    const res = await updateMentorStatusAdmin(userId, newStatus)
+    if (!res.ok) {
+      showToast(`Failed to update status: ${res.error}`, false)
+      // rollback
+      setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, mentor_status: u.mentor_status } : u)))
+    } else {
+      showToast(`Mentor status updated to ${newStatus}.`)
+    }
+  }, [])
+
   const exportCsv = () => {
     const csv = [
-      'Name,Email,Joined,Total Views,Role',
-      ...filtered.map((u) => `"${u.full_name ?? ''}","${u.email}","${u.created_at}",${u.total_views},"${u.role}"`),
+      'Name,Email,Joined,Intent,Views,Mentor Status,Sessions,Role',
+      ...filtered.map((u) => `"${u.full_name ?? ''}","${u.email}","${u.created_at}","${u.account_intent || 'founder'}",${u.total_views},"${u.mentor_status || ''}",${u.sessions_count || 0},"${u.role}"`),
     ].join('\n')
     const blob = new Blob([csv], { type: 'text/csv' })
     const a = document.createElement('a')
@@ -117,14 +132,14 @@ export function UsersTable({ initialUsers }: { initialUsers: UserRow[] }) {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              {['Name', 'Email', 'Joined', 'Total views', 'Last active', 'Role', 'Actions'].map((h) => (
+              {['Name', 'Email', 'Joined', 'Intent', 'Views', 'Mentor Status', 'Sessions', 'Role', 'Actions'].map((h) => (
                 <th key={h} style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '10.5px', fontWeight: 500, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.07em', padding: '10px 14px', textAlign: 'left', background: 'var(--cream)', whiteSpace: 'nowrap' }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan={7} style={{ padding: '40px', textAlign: 'center', fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink-4)' }}>No users found.</td></tr>
+              <tr><td colSpan={9} style={{ padding: '40px', textAlign: 'center', fontFamily: 'var(--font-sans), sans-serif', fontSize: '13px', color: 'var(--ink-4)' }}>No users found.</td></tr>
             ) : filtered.map((u) => (
               <tr key={u.id} style={{ borderTop: '1px solid var(--cream-border)' }}>
                 <td style={{ padding: '12px 14px' }}>
@@ -143,13 +158,34 @@ export function UsersTable({ initialUsers }: { initialUsers: UserRow[] }) {
                   </span>
                 </td>
                 <td style={{ padding: '12px 14px' }}>
+                  <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', background: u.account_intent === 'mentor' ? '#E0F2FE' : '#F1F5F9', color: u.account_intent === 'mentor' ? '#0369A1' : '#475569', padding: '2px 6px', borderRadius: '4px', fontWeight: 500 }}>
+                    {u.account_intent || 'founder'}
+                  </span>
+                </td>
+                <td style={{ padding: '12px 14px' }}>
                   <span style={{ fontFamily: 'var(--font-serif), serif', fontSize: '14px', color: 'var(--ink)' }}>
                     {u.total_views.toLocaleString()}
                   </span>
                 </td>
                 <td style={{ padding: '12px 14px' }}>
-                  <span style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', color: 'var(--ink-4)' }}>
-                    {u.last_active ? formatDate(u.last_active) : '—'}
+                  {u.account_intent === 'mentor' ? (
+                    <select
+                      value={u.mentor_status || 'pending'}
+                      onChange={(e) => updateMentorStatus(u.id, e.target.value)}
+                      style={{ fontFamily: 'var(--font-sans), sans-serif', fontSize: '12px', border: '1px solid var(--cream-border)', borderRadius: '6px', padding: '4px 8px', background: 'var(--white)', cursor: 'pointer', color: u.mentor_status === 'active' ? '#1E6E2E' : '#B45309' }}
+                    >
+                      <option value="pending">pending</option>
+                      <option value="active">active</option>
+                      <option value="suspended">suspended</option>
+                      <option value="rejected">rejected</option>
+                    </select>
+                  ) : (
+                    <span style={{ color: 'var(--ink-4)', fontSize: '12px' }}>—</span>
+                  )}
+                </td>
+                <td style={{ padding: '12px 14px' }}>
+                  <span style={{ fontFamily: 'var(--font-serif), serif', fontSize: '14px', color: 'var(--ink)' }}>
+                    {u.sessions_count || 0}
                   </span>
                 </td>
                 <td style={{ padding: '12px 14px' }}>

@@ -10,7 +10,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { siId } = await request.json()
+  const body = await request.json()
+  const siId = body.siId || body.si_id
   if (!siId) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
   return handleTracking(siId, request)
 }
@@ -31,20 +32,25 @@ async function handleTracking(siId: string, request: Request) {
       profileId = profile?.id
     }
 
-    // 1. Increment generic impression counter
-    await supabase.rpc('increment_softinfra_impression', { p_si_id: siId })
-
-    // 2. Log the detailed impression
-    const { error } = await supabase
-      .from('softinfra_impression_log')
-      .insert({
-        softinfra_id: siId,
-        user_id: profileId,
-        page: request.headers.get('referer') || 'unknown'
-      })
-
-    if (error) {
-      console.error('Failed to insert into impression_log', error)
+    // 1. Increment generic impression counter (Split by guest/user)
+    await supabase.rpc('increment_softinfra_impression', { 
+      p_si_id: siId, 
+      p_is_guest: !profileId 
+    })
+    
+    // 2. Log detailed impression ONLY for users (since user_id is NOT NULL)
+    if (profileId) {
+      const { error } = await supabase
+        .from('softinfra_impressions')
+        .insert({
+          softinfra_id: siId,
+          user_id: profileId,
+          page: request.headers.get('referer') || 'unknown'
+        })
+      
+      if (error) {
+        console.error('Failed to insert into softinfra_impressions', error)
+      }
     }
 
     return NextResponse.json({ ok: true })

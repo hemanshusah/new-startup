@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { Program } from '@/types/program'
+import { BookmarkButton } from '@/components/ui/BookmarkButton'
 
 /** Shared deadline-days helper */
 function daysUntil(dateStr: string): number {
@@ -129,31 +130,47 @@ export function ProgramHeader({ program }: ProgramHeaderProps) {
         by {program.organisation}
       </p>
 
-      {/* Apply button */}
-      {program.apply_url && (
-        <a
-          href={program.apply_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          id="program-apply-btn-header"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--font-size-body)',
-            fontWeight: 500,
-            color: 'var(--cream)',
-            background: 'var(--ink)',
-            borderRadius: '8px',
-            padding: '10px 20px',
-            textDecoration: 'none',
-            marginBottom: '32px',
-          }}
-        >
-          Apply now ↗
-        </a>
-      )}
+      {/* Action Buttons row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
+        {/* Apply button */}
+        {program.apply_url && (
+          <a
+            href={program.apply_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            id="program-apply-btn-header"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--font-size-body)',
+              fontWeight: 500,
+              color: 'var(--cream)',
+              background: 'var(--ink)',
+              borderRadius: '8px',
+              padding: '10px 24px',
+              textDecoration: 'none',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            Apply now ↗
+          </a>
+        )}
+
+        <BookmarkButton 
+          programId={program.id} 
+          showText={true} 
+          size={20}
+        />
+      </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .bookmark-btn-reusable:hover {
+          background: var(--bg) !important;
+          transform: translateY(-1px);
+        }
+      `}} />
     </div>
   )
 }

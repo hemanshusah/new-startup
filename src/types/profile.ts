@@ -3,7 +3,10 @@ export type RevenueStatus = 'pre-revenue' | 'revenue-generating' | 'profitable';
 export type FundingStatus = 'bootstrapped' | 'angel-funded' | 'seed-funded' | 'series-a' | 'series-b+';
 export type UserRole = 'user' | 'admin';
 
+export type AccountIntent = 'founder' | 'mentor' | 'explorer';
+
 export interface Profile {
+  account_intent: AccountIntent | null;
   id: string;
   email: string;
   full_name: string | null;
@@ -22,5 +25,6 @@ export interface Profile {
   team_size: number | null;
   revenue_status: RevenueStatus | null;
   funding_status: FundingStatus | null;
+  mentor_status?: 'pending' | 'active' | 'suspended' | 'rejected' | null;
   created_at: string;
 }

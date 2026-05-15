@@ -7,11 +7,14 @@ import { PRODUCTS, DEFAULT_PRODUCT } from '@/config/products'
 
 export function Footer() {
   const pathname = usePathname()
-  
+
   // Determine current product based on path
-  const product = Object.values(PRODUCTS).find(p => 
+  const product = Object.values(PRODUCTS).find(p =>
     p.slug !== 'grants' && pathname?.startsWith(`/${p.slug}`)
   ) || DEFAULT_PRODUCT
+
+  // Hide global footer on admin, onboarding, and mentor apply routes
+  if (pathname?.startsWith('/admin') || pathname === '/onboarding' || pathname === '/mentor-connect/apply') return null
 
   return (
     <footer style={{
@@ -103,10 +106,10 @@ export function Footer() {
             <h4 className="footer-header" style={headerStyle}>FOR FOUNDERS</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <Link href="/" style={linkStyle}>Browse Grants</Link>
+              <Link href="/mentor-connect" style={{ ...linkStyle, display: 'var(--mentor-visibility, flex)' }}>Mentor Connect</Link>
               <Link href="/school" style={{ ...linkStyle, display: 'var(--school-visibility, flex)' }}>Startup School</Link>
               {/* <Link href="/newsletter" style={linkStyle}>Newsletter</Link>
               <Link href="/events" style={linkStyle}>Startup Events</Link> */}
-              <Link href="mailto:deeksharai014@gmail.com?subject=Software%20Deals%20%20%3C%3E%20StartupProgram%20Site!" style={linkStyle}>Software Deals</Link>
             </div>
           </div>
 

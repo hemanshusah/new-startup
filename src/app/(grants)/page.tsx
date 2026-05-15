@@ -88,7 +88,7 @@ export default async function ListingPage() {
         >
           India Startup Funding · 2026
         </p>
- 
+
         {/* H1 */}
         <h1
           style={{
@@ -129,9 +129,9 @@ export default async function ListingPage() {
 
       {/* Profile Health & Recommendations (Logged-in only) */}
       {profile && (
-        <PersonalizationSection 
-          profile={profile} 
-          recommendations={recommendations} 
+        <PersonalizationSection
+          profile={profile}
+          recommendations={recommendations}
         />
       )}
 

@@ -6,7 +6,7 @@ async function loadOrCreateSiteConfigRow() {
   const supabase = createServiceClient()
   const { data: rows } = await supabase
     .from('site_config')
-    .select('id, field_schema, sectors, cosmetic_settings')
+    .select('id, field_schema, sectors, cosmetic_settings, mentor_connect_enabled, mentor_commission_pct, price_min_inr, price_max_inr')
     .limit(1)
 
   const row = rows?.[0]
@@ -38,7 +38,7 @@ async function loadOrCreateSiteConfigRow() {
         borderRadius: "12px"
       }
     })
-    .select('id, field_schema, sectors, cosmetic_settings')
+    .select('id, field_schema, sectors, cosmetic_settings, mentor_connect_enabled, mentor_commission_pct, price_min_inr, price_max_inr')
     .maybeSingle()
 
   return inserted ?? null
@@ -55,7 +55,7 @@ export default async function AdminSettingsPage() {
       <div style={{ marginBottom: '28px' }}>
         <h1 style={{ fontFamily: 'DM Serif Display, serif', fontSize: '24px', fontWeight: 400, color: 'var(--ink)', marginBottom: '4px' }}>Settings</h1>
         <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '13px', color: 'var(--ink-3)' }}>
-          Manage field schema, sector tags, and cache controls.
+          Manage field schema, sector tags, branding, and app modules.
         </p>
       </div>
       <SettingsForm
@@ -63,6 +63,12 @@ export default async function AdminSettingsPage() {
         initialFieldConfig={fieldConfig}
         initialSectors={sectors}
         initialCosmeticSettings={row?.cosmetic_settings as any}
+        initialMentorSettings={{
+          enabled: row?.mentor_connect_enabled ?? false,
+          commissionPct: row?.mentor_commission_pct ?? 20,
+          priceMin: row?.price_min_inr ?? 2500,
+          priceMax: row?.price_max_inr ?? 25000,
+        }}
       />
     </div>
   )

@@ -2,10 +2,9 @@
 
 import Link from 'next/link'
 import { ProgramListItem } from '@/types/program'
-import React, { useState } from 'react'
-import { ArrowUpRight, Calendar, Bookmark } from 'lucide-react'
-import { useAuth } from '@/components/auth/AuthProvider'
-import { toggleBookmark } from '@/lib/bookmarks/actions'
+import React from 'react'
+import { ArrowUpRight, Calendar } from 'lucide-react'
+import { BookmarkButton } from '@/components/ui/BookmarkButton'
 
 interface GrantCardProps {
   program: ProgramListItem
@@ -14,54 +13,11 @@ interface GrantCardProps {
 }
 
 export function GrantCard({ program, onClick, isBookmarkedInitial = false }: GrantCardProps) {
-  const { user, openModal } = useAuth()
-  const [isBookmarked, setIsBookmarked] = useState(isBookmarkedInitial)
-  const [isToggling, setIsToggling] = useState(false)
-
-  // Sync state with props and handle auth changes
-  React.useEffect(() => {
-    if (!user) {
-      setIsBookmarked(false)
-    } else {
-      setIsBookmarked(isBookmarkedInitial)
-    }
-  }, [isBookmarkedInitial, user])
-
   const deadlineDate = new Date(program.deadline)
   const formattedDeadline = deadlineDate.toLocaleDateString('en-IN', {
     day: 'numeric',
     month: 'short'
   })
-
-  const handleBookmarkClick = async (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    if (!user) {
-      openModal()
-      return
-    }
-
-    if (isToggling) return
-
-    setIsToggling(true)
-    // Optimistic update
-    setIsBookmarked(!isBookmarked)
-
-    try {
-      const result = await toggleBookmark(program.id)
-      if (result.error) {
-        // Revert on error
-        setIsBookmarked(isBookmarked)
-        console.error('Bookmark toggle failed:', result.error)
-      }
-    } catch (err) {
-      setIsBookmarked(isBookmarked)
-      console.error('Bookmark toggle error:', err)
-    } finally {
-      setIsToggling(false)
-    }
-  }
 
   return (
     <div className="grant-card-unified-wrapper" style={{ position: 'relative' }}>
@@ -98,30 +54,13 @@ export function GrantCard({ program, onClick, isBookmarkedInitial = false }: Gra
               {program.type}
             </span>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <button
-                onClick={handleBookmarkClick}
-                disabled={isToggling}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  padding: '4px',
-                  cursor: 'pointer',
-                  color: isBookmarked ? 'var(--accent)' : 'var(--ink-4)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s ease',
-                  borderRadius: '50%',
-                }}
-                className="bookmark-btn"
-                title={isBookmarked ? "Remove bookmark" : "Bookmark program"}
-              >
-                <Bookmark
+              <div style={{ transform: 'translate(4px, -4px)' }}>
+                <BookmarkButton 
+                  programId={program.id} 
+                  initialBookmarked={isBookmarkedInitial}
                   size={18}
-                  fill={isBookmarked ? 'currentColor' : 'none'}
-                  strokeWidth={2}
                 />
-              </button>
+              </div>
               <ArrowUpRight size={18} className="card-arrow" style={{ color: 'var(--ink-4)', transition: 'all 0.3s ease' }} />
             </div>
           </div>

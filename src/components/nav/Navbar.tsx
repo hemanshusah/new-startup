@@ -36,9 +36,13 @@ function getInitials(user: { email?: string | null; name?: string | null }) {
   return (user.email ?? 'U').slice(0, 2).toUpperCase()
 }
 
-/** Global navigation bar — PROGRESS.md 2.2 & 3.4 */
-export function Navbar() {
+/** Global navigation bar */
+export function Navbar({ mentorConnectEnabled = false }: { mentorConnectEnabled?: boolean }) {
   const pathname = usePathname()
+
+  // Hide global navbar on admin, onboarding, and mentor apply routes
+  if (pathname?.startsWith('/admin') || pathname === '/onboarding' || pathname === '/mentor-connect/apply') return null
+
   const { user, profile, openModal, signOut } = useAuth()
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -100,7 +104,7 @@ export function Navbar() {
       >
         {/* Logo */}
         <Link
-          href={product.slug === 'grants' ? '/' : `/${product.slug}`}
+          href="/"
           onClick={() => setMobileMenuOpen(false)}
           style={{
             fontFamily: 'var(--font-serif)',
@@ -136,6 +140,24 @@ export function Navbar() {
                 {link.badge && <ComingSoonBadge label={link.badge} />}
               </Link>
             ))}
+            {/* Mentor Connect — only shown when admin toggle is on */}
+            {mentorConnectEnabled && (
+              <Link
+                href="/mentor-connect"
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '13px',
+                  fontWeight: isActive('/mentor-connect') ? 500 : 400,
+                  color: isActive('/mentor-connect') ? 'var(--ink)' : 'var(--ink-3)',
+                  transition: 'color 0.15s ease',
+                  display: 'var(--mentor-visibility, flex)',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                Mentor Connect
+              </Link>
+            )}
           </div>
         )}
 
@@ -232,15 +254,28 @@ export function Navbar() {
                             margin: 0,
                           }}
                         >
-                          Signed in as
+                          {profile?.account_intent === 'mentor' ? 'Mentor Profile' : 'Signed in as'}
                         </p>
+                        {profile?.full_name && profile.account_intent === 'mentor' && (
+                          <p
+                            style={{
+                              fontFamily: 'var(--font-sans)',
+                              fontSize: '13px',
+                              fontWeight: 600,
+                              color: 'var(--ink)',
+                              margin: '2px 0 0',
+                            }}
+                          >
+                            {profile.full_name}
+                          </p>
+                        )}
                         <p
                           style={{
                             fontFamily: 'var(--font-sans)',
                             fontSize: '12px',
                             fontWeight: 500,
                             color: 'var(--ink)',
-                            margin: 0,
+                            margin: profile?.full_name && profile.account_intent === 'mentor' ? 0 : '2px 0 0',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
@@ -249,53 +284,119 @@ export function Navbar() {
                         >
                           {user.email}
                         </p>
+                        {profile?.phone && profile.account_intent === 'mentor' && (
+                          <p
+                            style={{
+                              fontFamily: 'var(--font-sans)',
+                              fontSize: '11px',
+                              color: 'var(--ink-3)',
+                              margin: '2px 0 0',
+                            }}
+                          >
+                            {profile.phone}
+                          </p>
+                        )}
                       </div>
 
-                      <Link
-                        href="/profile"
-                        onClick={() => setAvatarMenuOpen(false)}
-                        role="menuitem"
-                        style={{
-                          display: 'block',
-                          width: '100%',
-                          textAlign: 'left',
-                          fontFamily: 'var(--font-sans)',
-                          fontSize: '13px',
-                          color: 'var(--ink)',
-                          textDecoration: 'none',
-                          background: 'none',
-                          border: 'none',
-                          borderRadius: '6px',
-                          padding: '7px 10px',
-                          cursor: 'pointer',
-                          transition: 'background 0.12s ease',
-                        }}
-                      >
-                        My Profile
-                      </Link>
-
-                      <Link
-                        href="/bookmarks"
-                        onClick={() => setAvatarMenuOpen(false)}
-                        role="menuitem"
-                        style={{
-                          display: 'block',
-                          width: '100%',
-                          textAlign: 'left',
-                          fontFamily: 'var(--font-sans)',
-                          fontSize: '13px',
-                          color: 'var(--ink)',
-                          textDecoration: 'none',
-                          background: 'none',
-                          border: 'none',
-                          borderRadius: '6px',
-                          padding: '7px 10px',
-                          cursor: 'pointer',
-                          transition: 'background 0.12s ease',
-                        }}
-                      >
-                        My Bookmarks
-                      </Link>
+                      {profile?.account_intent === 'mentor' ? (
+                        <>
+                          {profile.mentor_status ? (
+                            <Link
+                              href="/mentor/availability"
+                              onClick={() => setAvatarMenuOpen(false)}
+                              role="menuitem"
+                              style={{
+                                display: 'block',
+                                width: '100%',
+                                textAlign: 'left',
+                                fontFamily: 'var(--font-sans)',
+                                fontSize: '13px',
+                                color: 'var(--ink)',
+                                textDecoration: 'none',
+                                background: 'none',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '7px 10px',
+                                cursor: 'pointer',
+                                transition: 'background 0.12s ease',
+                              }}
+                            >
+                              Mentor Dashboard
+                            </Link>
+                          ) : (
+                            <Link
+                              href="/mentor-connect/apply"
+                              onClick={() => setAvatarMenuOpen(false)}
+                              role="menuitem"
+                              style={{
+                                display: 'block',
+                                width: '100%',
+                                textAlign: 'left',
+                                fontFamily: 'var(--font-sans)',
+                                fontSize: '13px',
+                                fontWeight: 500,
+                                color: 'var(--accent)',
+                                textDecoration: 'none',
+                                background: 'var(--cream)',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '7px 10px',
+                                cursor: 'pointer',
+                                transition: 'background 0.12s ease',
+                              }}
+                            >
+                              Complete Application
+                            </Link>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <Link
+                            href="/profile"
+                            onClick={() => setAvatarMenuOpen(false)}
+                            role="menuitem"
+                            style={{
+                              display: 'block',
+                              width: '100%',
+                              textAlign: 'left',
+                              fontFamily: 'var(--font-sans)',
+                              fontSize: '13px',
+                              color: 'var(--ink)',
+                              textDecoration: 'none',
+                              background: 'none',
+                              border: 'none',
+                              borderRadius: '6px',
+                              padding: '7px 10px',
+                              cursor: 'pointer',
+                              transition: 'background 0.12s ease',
+                            }}
+                          >
+                            My Profile
+                          </Link>
+                          <Link
+                            href="/bookmarks"
+                            onClick={() => setAvatarMenuOpen(false)}
+                            role="menuitem"
+                            style={{
+                              display: 'block',
+                              width: '100%',
+                              textAlign: 'left',
+                              fontFamily: 'var(--font-sans)',
+                              fontSize: '13px',
+                              color: 'var(--ink)',
+                              textDecoration: 'none',
+                              background: 'none',
+                              border: 'none',
+                              borderRadius: '6px',
+                              padding: '7px 10px',
+                              cursor: 'pointer',
+                              transition: 'background 0.12s ease',
+                            }}
+                          >
+                            My Bookmarks
+                          </Link>
+                        </>
+                      )}
 
                       {isAdmin && (
                         <Link
@@ -467,6 +568,26 @@ export function Navbar() {
                 {link.badge && <ComingSoonBadge label={link.badge} />}
               </Link>
             ))}
+            {/* Mentor Connect — only shown when admin toggle is on */}
+            {mentorConnectEnabled && (
+              <Link
+                href="/mentor-connect"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '14px',
+                  fontWeight: pathname === '/mentor-connect' ? 500 : 400,
+                  color: pathname === '/mentor-connect' ? 'var(--ink)' : 'var(--ink-2)',
+                  padding: '10px 0',
+                  borderBottom: '1px solid var(--cream-border)',
+                  display: 'var(--mentor-visibility, flex)',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
+                Mentor Connect
+              </Link>
+            )}
             <WhatsAppLink
               onClick={() => setMobileMenuOpen(false)}
               style={{ marginTop: '8px' }}
@@ -476,14 +597,36 @@ export function Navbar() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={{ paddingBottom: '10px', borderBottom: '1px solid var(--cream-border)', marginBottom: '4px' }}>
                     <p style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', color: 'var(--ink-4)', margin: 0 }}>
-                      Signed in as
+                      {profile?.account_intent === 'mentor' ? 'Mentor Profile' : 'Signed in as'}
                     </p>
-                    <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', fontWeight: 500, color: 'var(--ink)', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {profile?.full_name && profile.account_intent === 'mentor' && (
+                      <p style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: 600, color: 'var(--ink)', margin: '2px 0 0' }}>
+                        {profile.full_name}
+                      </p>
+                    )}
+                    <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', fontWeight: 500, color: 'var(--ink)', margin: profile?.full_name && profile.account_intent === 'mentor' ? 0 : '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {user.email}
                     </p>
+                    {profile?.phone && profile.account_intent === 'mentor' && (
+                      <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: 'var(--ink-3)', margin: '2px 0 0' }}>
+                        {profile.phone}
+                      </p>
+                    )}
                   </div>
-                  <Link href="/profile" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>My Profile</Link>
-                  <Link href="/bookmarks" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>My Bookmarks</Link>
+                  {profile?.account_intent === 'mentor' ? (
+                    <>
+                      {profile.mentor_status ? (
+                        <Link href="/mentor/availability" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>Mentor Dashboard</Link>
+                      ) : (
+                        <Link href="/mentor-connect/apply" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: 600, color: 'var(--accent)', padding: '8px 0' }}>Complete Application</Link>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/profile" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>My Profile</Link>
+                      <Link href="/bookmarks" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>My Bookmarks</Link>
+                    </>
+                  )}
                   {isAdmin && (
                     <Link href="/admin/dashboard" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink)', padding: '8px 0' }}>Admin Dashboard</Link>
                   )}

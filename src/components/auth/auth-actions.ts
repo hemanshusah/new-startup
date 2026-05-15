@@ -14,5 +14,18 @@ export async function getCurrentProfile() {
     .eq('email', user.email)
     .single()
 
+  if (!data) return null
+
+  // If mentor, also fetch mentor status
+  if (data.account_intent === 'mentor') {
+    const { data: mentor } = await supabase
+      .from('mentor_profiles')
+      .select('status')
+      .eq('user_id', data.id)
+      .single()
+    
+    return { ...data, mentor_status: mentor?.status || null }
+  }
+
   return data
 }

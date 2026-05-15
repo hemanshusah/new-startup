@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { getAuthenticatedUser } from '@/lib/auth-utils'
 import { createServiceClient } from '@/lib/supabase/server'
-import { ProfileView, type HistoryItem } from '@/components/profile/ProfileView'
+import { ProfileView } from '@/components/profile/ProfileView'
 import { getProgramFormSiteConfig } from '@/lib/site-config'
 
 export const dynamic = 'force-dynamic'
@@ -29,53 +29,19 @@ export default async function ProfilePage() {
   if (!profile) {
     redirect('/')
   }
-
-  // 3. Fetch View History (Last 20 to find 10 unique)
-  // Joined with programs to get titles/slugs/types
-  const { data: historyData } = await supabase
-    .from('program_views')
-    .select(`
-      viewed_at,
-      programs (
-        id,
-        slug,
-        title,
-        type,
-        organisation,
-        amount_display,
-        deadline
-      )
-    `)
-    .eq('user_id', user.id)
-    .order('viewed_at', { ascending: false })
-    .limit(30) // Get more to filter for unique program_ids
-
-  // 4. Flatten and Filter for Unique Programs
-  const seen = new Set<string>()
-  const history = (historyData || [])
-    .map((h: { viewed_at: string; programs: any }) => ({
-      viewed_at: h.viewed_at,
-      program: h.programs as HistoryItem['program']
-    }))
-    .filter((h) => {
-      if (!h.program || seen.has(h.program.id)) return false
-      seen.add(h.program.id)
-      return true
-    })
-    .slice(0, 10) // Only take top 10 unique
+  
+  // Redirect mentors to their own dashboard
+  if (profile.account_intent === 'mentor') {
+    redirect('/mentor/availability')
+  }
 
   return (
-    <main style={{ background: 'var(--cream)', minHeight: 'calc(100vh - 56px)', padding: '40px 24px' }}>
-      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        <Suspense fallback={<div>Loading profile...</div>}>
-          <ProfileView
-            profile={profile}
-            history={history}
-            userImage={user.image}
-            sectorOptions={sectorOptions}
-          />
-        </Suspense>
-      </div>
-    </main>
+    <Suspense fallback={<div>Loading profile...</div>}>
+      <ProfileView
+        profile={profile}
+        userImage={user.image}
+        sectorOptions={sectorOptions}
+      />
+    </Suspense>
   )
 }

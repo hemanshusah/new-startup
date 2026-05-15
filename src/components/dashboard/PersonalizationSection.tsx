@@ -24,6 +24,12 @@ export function PersonalizationSection({ profile: serverProfile, recommendations
 
   // For data calculation, prefer client profile but fallback to server prop
   const profile = (clientProfile || serverProfile) as Profile
+
+  // If user is explicitly a mentor or explorer, don't push startup recommendations
+  if (profile.account_intent === 'mentor' || profile.account_intent === 'explorer') {
+    return null
+  }
+
   const completion = calculateCompletion(profile)
   const isUnlocked = completion >= 80
 

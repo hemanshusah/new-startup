@@ -80,3 +80,34 @@ export async function getBookmarkedPrograms() {
 
   return data?.map(b => b.programs) || []
 }
+
+export async function getBookmarkedMentors() {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const { data, error } = await supabase
+    .from('saved_mentors')
+    .select(`
+      mentor_id,
+      mentor_profiles (
+        id,
+        display_name,
+        slug,
+        headline,
+        avatar_url,
+        verification_tier,
+        avg_rating
+      )
+    `)
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('Error fetching saved mentors:', error)
+    return []
+  }
+
+  return data?.map(sm => sm.mentor_profiles) || []
+}

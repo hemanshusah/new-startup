@@ -62,7 +62,7 @@ const inputStyle: React.CSSProperties = {
 // ─── AuthModal ────────────────────────────────────────────────────────────────
 
 export function AuthModal() {
-  const { isModalOpen, openModal, closeModal, redirectTo } = useAuth()
+  const { isModalOpen, openModal, closeModal, redirectTo, profile } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const supabase = useMemo(() => createClient(), [])
@@ -117,18 +117,22 @@ export function AuthModal() {
 
   // Pre-fill email if a Supabase session exists (e.g. after verification/reset)
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user?.email) {
+    const fetchUser = async () => {
+      const { data } = await supabase.auth.getUser()
+      if (data?.user?.email) {
         setEmail(data.user.email)
       }
-    })
+    }
+    fetchUser()
   }, [supabase])
 
   const handleSuccess = useCallback(() => {
     closeModal()
+    
     if (redirectTo) {
       router.push(redirectTo)
     }
+    
     router.refresh()
   }, [closeModal, redirectTo, router])
 

@@ -111,19 +111,20 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
     router.refresh()
   }, [router, supabase])
 
+
+  const contextValue = useMemo(() => ({
+    user,
+    profile,
+    isModalOpen,
+    openModal,
+    closeModal,
+    redirectTo,
+    signOut,
+    status,
+  }), [user, profile, isModalOpen, openModal, closeModal, redirectTo, signOut, status])
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        profile,
-        isModalOpen,
-        openModal,
-        closeModal,
-        redirectTo,
-        signOut,
-        status,
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   )
