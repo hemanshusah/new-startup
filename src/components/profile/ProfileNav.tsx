@@ -8,6 +8,7 @@ export function ProfileNav() {
 
   const navItems = [
     { label: 'My Profile', href: '/profile' },
+    { label: 'My Sessions', href: '/profile/sessions' },
   ]
 
   return (

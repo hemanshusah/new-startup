@@ -26,7 +26,7 @@ export async function updateMentorBookingRules(noticeHours: number, windowDays: 
   return { success: true }
 }
 
-export async function updateMentorWeeklyAvailability(availabilityData: any[]) {
+export async function updateMentorWeeklyAvailability(availabilityData: { day_of_week: number; start_time: string; end_time: string }[]) {
   const user = await getAuthenticatedUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -52,17 +52,23 @@ export async function updateMentorWeeklyAvailability(availabilityData: any[]) {
   }
 
   if (availabilityData.length > 0) {
-    const insertData = availabilityData.map(slot => ({
-      mentor_id: mentor.id,
-      day_of_week: slot.day_of_week,
-      start_time: slot.start_time,
-      end_time: slot.end_time,
-      timezone: slot.timezone || 'Asia/Kolkata'
-    }))
+    // Deduplicate rules before inserting (in case UI state has duplicates)
+    const uniqueRules = Array.from(new Set(availabilityData.map(slot => 
+      `${slot.day_of_week}-${slot.start_time}-${slot.end_time}`
+    ))).map(key => {
+      const [day, start, end] = key.split('-')
+      return {
+        mentor_id: mentor.id,
+        day_of_week: parseInt(day),
+        start_time: start,
+        end_time: end,
+        timezone: 'Asia/Kolkata' // Default to India for now
+      }
+    })
 
     const { error: insertError } = await supabase
       .from('mentor_availability')
-      .insert(insertData)
+      .insert(uniqueRules)
 
     if (insertError) {
       console.error('Error inserting availability:', insertError)
@@ -109,9 +115,68 @@ export async function checkGoogleCalendarStatus() {
   try {
     await getValidOAuthClient(mentor.id)
     return { isConnected: true, isValid: true }
-  } catch (err: any) {
-    console.error('Calendar validation failed:', err.message)
-    return { isConnected: true, isValid: false, error: err.message }
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('Calendar validation failed:', message)
+    return { isConnected: true, isValid: false, error: message }
   }
 }
 
+export async function createSessionType(data: { name: string; duration_minutes: number; price_inr: number; description: string }) {
+  const user = await getAuthenticatedUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const supabase = createServiceClient()
+  const { data: mentor } = await supabase.from('mentor_profiles').select('id').eq('user_id', user.id).single()
+  if (!mentor) return { error: 'Mentor not found' }
+
+  if (data.price_inr < 2500 || data.price_inr > 25000) {
+    return { error: 'Price must be between ₹2,500 and ₹25,000' }
+  }
+
+  const { error } = await supabase.from('session_types').insert({
+    mentor_id: mentor.id,
+    ...data,
+    tier: 'standard',
+    is_active: true
+  })
+
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+export async function updateSessionType(id: string, data: Partial<{ name: string; duration_minutes: number; price_inr: number; description: string; is_active: boolean }>) {
+  const user = await getAuthenticatedUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const supabase = createServiceClient()
+  const { data: mentor } = await supabase.from('mentor_profiles').select('id').eq('user_id', user.id).single()
+  if (!mentor) return { error: 'Mentor not found' }
+
+  const { error } = await supabase
+    .from('session_types')
+    .update(data)
+    .eq('id', id)
+    .eq('mentor_id', mentor.id)
+
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+export async function deleteSessionType(id: string) {
+  const user = await getAuthenticatedUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const supabase = createServiceClient()
+  const { data: mentor } = await supabase.from('mentor_profiles').select('id').eq('user_id', user.id).single()
+  if (!mentor) return { error: 'Mentor not found' }
+
+  const { error } = await supabase
+    .from('session_types')
+    .delete()
+    .eq('id', id)
+    .eq('mentor_id', mentor.id)
+
+  if (error) return { error: error.message }
+  return { success: true }
+}

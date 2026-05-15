@@ -34,6 +34,7 @@ interface SettingsFormProps {
   initialCosmeticSettings?: any
   initialMentorSettings?: {
     enabled: boolean
+    showPending: boolean
     commissionPct: number
     priceMin: number
     priceMax: number
@@ -84,6 +85,7 @@ export function SettingsForm({
 
   const [mentorSettings, setMentorSettings] = useState(() => ({
     enabled: initialMentorSettings?.enabled ?? false,
+    showPending: initialMentorSettings?.showPending ?? true,
     commissionPct: initialMentorSettings?.commissionPct ?? 20,
     priceMin: initialMentorSettings?.priceMin ?? 2500,
     priceMax: initialMentorSettings?.priceMax ?? 25000,
@@ -107,12 +109,22 @@ export function SettingsForm({
     let id = rowId
     if (!id) {
        const { data, error } = await supabase.from('site_config').insert({ ...payload, site_name: 'GrantsIndia', product_slug: 'grants' }).select('id').single()
-       if (error) { showToast(error.message, false); setSaving(false); return }
+       if (error) { 
+         const msg = error.message.includes('schema cache') 
+           ? "Database column missing. Please run the latest migrations or contact support." 
+           : error.message
+         showToast(msg, false); setSaving(false); return 
+       }
        id = data.id; setRowId(id)
     }
     const { error } = await supabase.from('site_config').update(payload).eq('id', id)
     setSaving(false)
-    if (error) showToast(formatSiteConfigError(error), false)
+    if (error) {
+      const msg = error.message.includes('schema cache') 
+        ? "Some settings could not be saved because columns are missing in the database. Please run migrations." 
+        : error.message
+      showToast(msg, false)
+    }
     else {
       showToast(`${label} saved.`)
       await Promise.allSettled([
@@ -307,6 +319,37 @@ export function SettingsForm({
             marginTop: '16px'
           }}>
             <div>
+              <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--ink)', margin: 0 }}>Show Pending Sessions</p>
+              <p style={{ fontSize: '12px', color: 'var(--ink-4)', margin: 0 }}>Allow mentors to see bookings that are awaiting payment.</p>
+            </div>
+            <button
+              onClick={() => setMentorSettings({ ...mentorSettings, showPending: !mentorSettings.showPending })}
+              style={{
+                width: '50px', height: '26px', borderRadius: '100px',
+                background: mentorSettings.showPending ? 'var(--accent)' : '#ccc',
+                border: 'none', position: 'relative', cursor: 'pointer'
+              }}
+            >
+              <div style={{
+                position: 'absolute', top: '3px',
+                left: mentorSettings.showPending ? '27px' : '3px',
+                width: '20px', height: '20px', borderRadius: '50%', background: '#fff',
+                transition: 'left 0.2s ease'
+              }} />
+            </button>
+          </div>
+
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between', 
+            padding: '16px', 
+            background: 'var(--cream)', 
+            borderRadius: '12px',
+            border: '1px solid var(--cream-border)',
+            marginTop: '16px'
+          }}>
+            <div>
               <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--ink)', margin: 0 }}>Personalization Section</p>
               <p style={{ fontSize: '12px', color: 'var(--ink-4)', margin: 0 }}>Show Health Tracker and Recommendations on the dashboard.</p>
             </div>
@@ -334,7 +377,8 @@ export function SettingsForm({
           </div>
           <button onClick={() => saveSettings({ 
             cosmetic_settings: cosmetic,
-            mentor_connect_enabled: mentorSettings.enabled
+            mentor_connect_enabled: mentorSettings.enabled,
+            mentor_show_pending_sessions: mentorSettings.showPending
           }, 'App Visibility')} disabled={saving} style={{ marginTop: '24px', padding: '10px 24px', borderRadius: '8px', background: 'var(--ink)', color: 'var(--white)', border: 'none', cursor: 'pointer' }}>
             Save App Settings
           </button>
@@ -375,6 +419,7 @@ export function SettingsForm({
             <button 
               onClick={() => saveSettings({ 
                 mentor_connect_enabled: mentorSettings.enabled,
+                mentor_show_pending_sessions: mentorSettings.showPending,
                 mentor_commission_pct: mentorSettings.commissionPct,
                 price_min_inr: mentorSettings.priceMin,
                 price_max_inr: mentorSettings.priceMax

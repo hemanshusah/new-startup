@@ -2,7 +2,7 @@
 
 import { createServiceClient } from '@/lib/supabase/server'
 import { getMentorBusyIntervals } from '@/lib/google-calendar'
-import { addDays, addHours, addMinutes, isBefore, isAfter, isSameDay, startOfDay, endOfDay, parseISO, format } from 'date-fns'
+import { addDays, addHours, addMinutes, isBefore, isAfter, startOfDay, endOfDay, format } from 'date-fns'
 
 export async function generateAvailableSlots(mentorId: string, durationMinutes: number) {
   const supabase = createServiceClient()
@@ -53,10 +53,17 @@ export async function generateAvailableSlots(mentorId: string, durationMinutes: 
     .gte('scheduled_start', minDate.toISOString())
     .lte('scheduled_start', maxDate.toISOString())
 
-  const dbBookings = (existingSessions || []).map((s: any) => ({
-    start: new Date(s.scheduled_start),
-    end: addMinutes(new Date(s.scheduled_start), s.session_types.duration_minutes)
-  }))
+  const dbBookings = (existingSessions || []).map((s: any) => {
+    // Supabase join might return session_types as an object or array
+    const duration = Array.isArray(s.session_types) 
+      ? s.session_types[0]?.duration_minutes 
+      : s.session_types?.duration_minutes
+    
+    return {
+      start: new Date(s.scheduled_start),
+      end: addMinutes(new Date(s.scheduled_start), duration || 30)
+    }
+  })
 
   // 6. Fetch Google Calendar FreeBusy (if connected)
   let googleBusyIntervals: { start: Date, end: Date }[] = []
@@ -133,12 +140,15 @@ export async function generateAvailableSlots(mentorId: string, durationMinutes: 
     currentDay = addDays(currentDay, 1)
   }
 
+  // Deduplicate slots (in case of overlapping rules)
+  const uniqueSlots = Array.from(new Set(availableSlots.map(s => s.getTime()))).map(t => new Date(t))
+
   // Sort slots chronologically
-  availableSlots.sort((a, b) => a.getTime() - b.getTime())
+  uniqueSlots.sort((a, b) => a.getTime() - b.getTime())
 
   // Group by date for the UI
   const grouped: Record<string, string[]> = {}
-  availableSlots.forEach(slot => {
+  uniqueSlots.forEach(slot => {
     const dateKey = format(slot, 'yyyy-MM-dd')
     if (!grouped[dateKey]) grouped[dateKey] = []
     grouped[dateKey].push(slot.toISOString())
