@@ -55,5 +55,13 @@ export async function confirmPayment(params: ConfirmPaymentParams) {
     // Don't fail the payment confirmation if calendar fails
   }
 
+  // 4. Trigger Confirmation Emails via Firebase SMTP (non-blocking)
+  try {
+    const { triggerBookingEmails } = await import('@/lib/actions/email-booking')
+    await triggerBookingEmails({ sessionId })
+  } catch (mailErr) {
+    console.error('Email trigger failed (non-blocking):', mailErr)
+  }
+
   return { success: true, sessionId }
 }

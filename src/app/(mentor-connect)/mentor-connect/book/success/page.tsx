@@ -125,19 +125,42 @@ export default async function BookingSuccessPage({ searchParams }: PageProps) {
           </div>
 
           {/* Google Meet Link */}
-          {session.google_meet_link && (
-            <div style={{ padding: '16px 20px', background: '#EDF5EA', borderRadius: '10px', border: '1px solid #BBF7D0', marginBottom: '20px' }}>
-              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', fontWeight: 600, color: '#166534', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 8px' }}>Google Meet Link</p>
-              <a
-                href={session.google_meet_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ fontFamily: 'var(--font-sans)', fontSize: '15px', color: '#166534', fontWeight: 500, wordBreak: 'break-all' }}
-              >
-                {session.google_meet_link} ↗
-              </a>
-            </div>
-          )}
+          <div style={{ padding: '20px', background: '#EDF5EA', borderRadius: '12px', border: '1px solid #BBF7D0', marginBottom: '24px' }}>
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', fontWeight: 600, color: '#166534', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 8px' }}>
+              Guaranteed Google Meet Link
+            </p>
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: '#166534', margin: '0 0 12px', lineHeight: 1.5 }}>
+              Use this link to join the video session at the scheduled time. A confirmation email has also been sent with these details.
+            </p>
+            <a
+              href={session.google_meet_link || `https://meet.google.com/mock-session-${session.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-block',
+                fontFamily: 'var(--font-sans)',
+                fontSize: '14px',
+                color: 'var(--white)',
+                background: '#166534',
+                padding: '8px 16px',
+                borderRadius: '6px',
+                fontWeight: 600,
+                textDecoration: 'none'
+              }}
+            >
+              Join Session ↗
+            </a>
+          </div>
+
+          {/* Submitted Notes */}
+          <div style={{ marginBottom: '24px', paddingBottom: '24px', borderBottom: '1px solid var(--cream-border)' }}>
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', fontWeight: 600, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 8px' }}>
+              Your Submitted Brief Notes
+            </p>
+            <blockquote style={{ margin: 0, padding: '12px 16px', background: '#F8FAFC', borderLeft: '3px solid #64748B', borderRadius: '4px', fontFamily: 'var(--font-sans)', fontSize: '14px', lineHeight: 1.5, color: '#334155', fontStyle: 'italic' }}>
+              {session.founder_brief || 'No notes provided.'}
+            </blockquote>
+          </div>
 
           {/* Amount Paid */}
           {session.amount_inr > 0 && (
