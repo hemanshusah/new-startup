@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { initiateBooking } from '@/lib/actions/booking'
+import { confirmPayment } from '@/lib/actions/confirm-payment'
 
 interface BookingDetailsFormProps {
   mentorId: string
@@ -12,11 +13,77 @@ interface BookingDetailsFormProps {
   priceInr: number
 }
 
+declare global {
+  interface Window {
+    Razorpay: any
+  }
+}
+
 export function BookingDetailsForm({ mentorId, mentorSlug, sessionTypeId, selectedSlot, priceInr }: BookingDetailsFormProps) {
   const router = useRouter()
   const [brief, setBrief] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Load Razorpay script on mount
+  useEffect(() => {
+    if (priceInr > 0 && !document.getElementById('razorpay-script')) {
+      const script = document.createElement('script')
+      script.id = 'razorpay-script'
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+      script.async = true
+      document.body.appendChild(script)
+    }
+  }, [priceInr])
+
+  const openRazorpayCheckout = (orderId: string, keyId: string, sessionId: string) => {
+    const options = {
+      key: keyId,
+      order_id: orderId,
+      name: 'GrantsIndia',
+      description: 'Mentor Connect Session',
+      handler: async function (response: any) {
+        // Payment succeeded — verify on server
+        setLoading(true)
+        setError(null)
+
+        try {
+          const result = await confirmPayment({
+            sessionId,
+            razorpayOrderId: response.razorpay_order_id,
+            razorpayPaymentId: response.razorpay_payment_id,
+            razorpaySignature: response.razorpay_signature,
+          })
+
+          if (result.error) {
+            setError(result.error)
+          } else {
+            router.push(`/mentor-connect/book/success?session=${sessionId}`)
+          }
+        } catch (err: any) {
+          setError(err.message || 'Payment verification failed.')
+        } finally {
+          setLoading(false)
+        }
+      },
+      modal: {
+        ondismiss: function () {
+          setLoading(false)
+          setError('Payment was cancelled. You can try again.')
+        }
+      },
+      theme: {
+        color: '#1A1A1A'
+      }
+    }
+
+    const rzp = new window.Razorpay(options)
+    rzp.on('payment.failed', function (response: any) {
+      setError(`Payment failed: ${response.error.description}`)
+      setLoading(false)
+    })
+    rzp.open()
+  }
 
   const handleSubmit = async () => {
     if (!brief.trim()) {
@@ -41,20 +108,22 @@ export function BookingDetailsForm({ mentorId, mentorSlug, sessionTypeId, select
 
       if (result.error) {
         setError(result.error)
+        setLoading(false)
         return
       }
 
-      if (result.requiresPayment && result.razorpayOrderId) {
-        // TODO: Open Razorpay checkout widget once keys are configured
-        // For now, show a message
-        setError('Payment integration is being configured. Please try again shortly.')
-      } else if (result.sessionId) {
-        // Free session or payment completed — go to success
+      if (result.requiresPayment && result.razorpayOrderId && result.razorpayKeyId) {
+        // Open Razorpay checkout widget
+        openRazorpayCheckout(result.razorpayOrderId, result.razorpayKeyId, result.sessionId!)
+      } else if (result.sessionId && !result.requiresPayment) {
+        // Free session — go directly to success
         router.push(`/mentor-connect/book/success?session=${result.sessionId}`)
+      } else {
+        setError('Something went wrong with payment setup. Please try again.')
+        setLoading(false)
       }
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please try again.')
-    } finally {
       setLoading(false)
     }
   }
@@ -98,7 +167,7 @@ export function BookingDetailsForm({ mentorId, mentorSlug, sessionTypeId, select
 
       <div style={{ marginBottom: '24px', padding: '16px', background: 'var(--cream)', borderRadius: '10px', border: '1px solid var(--cream-border)' }}>
         <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: 'var(--ink-3)', margin: 0, lineHeight: 1.5 }}>
-          💡 <strong>Tips for a great brief:</strong> Include your startup stage, specific challenges, and what outcome you're hoping for. The mentor will review this before your session.
+          💡 <strong>Tips for a great brief:</strong> Include your startup stage, specific challenges, and what outcome you&apos;re hoping for. The mentor will review this before your session.
         </p>
       </div>
 

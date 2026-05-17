@@ -68,6 +68,29 @@ export default async function MentorProfilePage({ params }: PageProps) {
     if (saved) isSaved = true
   }
 
+  // Fetch reviews for this mentor
+  const { data: rawReviews } = await supabase
+    .from('reviews')
+    .select('*')
+    .eq('mentor_id', mentor.id)
+    .eq('is_hidden', false)
+    .order('created_at', { ascending: false })
+
+  let reviews: any[] = []
+  if (rawReviews && rawReviews.length > 0) {
+    const founderIds = rawReviews.map(r => r.founder_id)
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, full_name')
+      .in('id', founderIds)
+
+    const profileMap = new Map(profiles?.map(p => [p.id, p]))
+    reviews = rawReviews.map(r => ({
+      ...r,
+      founder: profileMap.get(r.founder_id)
+    }))
+  }
+
   // Helper to extract YouTube ID for embed
   const getYoutubeEmbedUrl = (url: string) => {
     if (!url) return null
@@ -106,6 +129,11 @@ export default async function MentorProfilePage({ params }: PageProps) {
                   <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     🌐 {mentor.languages.join(', ')}
                   </span>
+                  {mentor.avg_rating > 0 && (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#EAB308', fontWeight: 600 }}>
+                      ★ {mentor.avg_rating} ({mentor.total_reviews} reviews)
+                    </span>
+                  )}
                   {mentor.verification_tier !== 'community' && (
                     <span style={{ background: '#EDF5EA', color: '#2A6620', padding: '4px 10px', borderRadius: '100px', fontWeight: 500, fontSize: '12px' }}>
                       {mentor.verification_tier === 'verified' ? 'Verified Mentor' : 'Credential Verified'}
@@ -146,7 +174,7 @@ export default async function MentorProfilePage({ params }: PageProps) {
               </div>
             </div>
 
-            <div style={{ background: 'var(--white)', borderRadius: '16px', border: '1px solid var(--cream-border)', padding: '32px' }}>
+            <div style={{ background: 'var(--white)', borderRadius: '16px', border: '1px solid var(--cream-border)', padding: '32px', marginBottom: '32px' }}>
               <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', color: 'var(--ink)', margin: '0 0 24px' }}>Expertise & Experience</h2>
               
               <div style={{ marginBottom: '24px' }}>
@@ -183,6 +211,48 @@ export default async function MentorProfilePage({ params }: PageProps) {
                       </span>
                     ))}
                   </div>
+                </div>
+              )}
+            </div>
+
+            {/* Reviews Section */}
+            <div style={{ background: 'var(--white)', borderRadius: '16px', border: '1px solid var(--cream-border)', padding: '32px' }}>
+              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', color: 'var(--ink)', margin: '0 0 24px' }}>
+                Reviews ({reviews.length})
+              </h2>
+
+              {reviews.length === 0 ? (
+                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink-4)', margin: 0 }}>
+                  No reviews left for this mentor yet.
+                </p>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  {reviews.map((r: any) => (
+                    <div key={r.id} style={{ borderBottom: '1px solid var(--cream-border)', paddingBottom: '24px', lastChild: { borderBottom: 'none' } } as any}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <span style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: 600, color: 'var(--ink)' }}>
+                          {r.founder?.full_name || 'Founder'}
+                        </span>
+                        <span style={{ color: '#EAB308', fontSize: '15px' }}>
+                          {'★'.repeat(r.rating_overall)}{'☆'.repeat(5 - r.rating_overall)}
+                        </span>
+                      </div>
+                      <p style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink-3)', lineHeight: 1.5, margin: '0 0 12px' }}>
+                        {r.review_text}
+                      </p>
+
+                      {r.mentor_reply && (
+                        <div style={{ background: 'var(--cream)', borderRadius: '8px', padding: '16px', marginTop: '12px', borderLeft: '3px solid var(--ink)' }}>
+                          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', fontWeight: 600, color: 'var(--ink)', margin: '0 0 4px' }}>
+                            Reply from {mentor.display_name}:
+                          </p>
+                          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: 'var(--ink-3)', margin: 0, lineHeight: 1.5 }}>
+                            {r.mentor_reply}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

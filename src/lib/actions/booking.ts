@@ -84,9 +84,6 @@ export async function initiateBooking(params: InitiateBookingParams) {
     }
 
     // 6. For paid sessions, create Razorpay order
-    // TODO: Wire Razorpay once keys are provided
-    // For now, return the session ID and flag that payment is needed
-    /*
     const Razorpay = (await import('razorpay')).default
     const razorpay = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID!,
@@ -115,13 +112,6 @@ export async function initiateBooking(params: InitiateBookingParams) {
       requiresPayment: true,
       razorpayOrderId: order.id,
       razorpayKeyId: process.env.RAZORPAY_KEY_ID
-    }
-    */
-
-    return {
-      sessionId: session.id,
-      requiresPayment: true,
-      razorpayOrderId: null // Placeholder until Razorpay keys are set
     }
 
   } catch (error: unknown) {
