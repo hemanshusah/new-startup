@@ -112,8 +112,8 @@ export async function createSessionEvent(sessionId: string) {
     calendarEventId = event.data.id || null
   } catch (err) {
     console.warn('Google Calendar OAuth failed, generating fallback virtual meeting link:', err)
-    // Fallback: generate virtual mock meeting link
-    meetLink = `https://meet.google.com/mock-session-${sessionId}`
+    // Fallback: generate open-access working Jitsi Meet virtual room
+    meetLink = `https://meet.jit.si/grantsindia-session-${sessionId}`
   }
 
   // 6. Update the session with Meet link and calendar event ID in Supabase

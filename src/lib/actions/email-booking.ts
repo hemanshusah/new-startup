@@ -1,7 +1,7 @@
 'use server'
 
 import { createServiceClient } from '@/lib/supabase/server'
-import { adminDb } from '@/lib/firebase-admin'
+import { getFirestoreDb } from '@/lib/firebase-admin'
 
 interface TriggerBookingEmailsParams {
   sessionId: string
@@ -180,8 +180,14 @@ export async function triggerBookingEmails({ sessionId }: TriggerBookingEmailsPa
 
     // 3. Write documents to Firebase Firestore 'mail' collection
     try {
+      const db = getFirestoreDb()
+      if (!db) {
+        console.warn('Firebase Firestore not initialized (credentials missing). Skipping email trigger queue.')
+        return { success: true, mocked: true }
+      }
+
       // Founder Email document
-      await adminDb.collection('mail').add({
+      await db.collection('mail').add({
         to: founderProfile.email,
         message: {
           subject: `Confirmed: Your Session with ${mentorProfile.display_name}`,
@@ -191,7 +197,7 @@ export async function triggerBookingEmails({ sessionId }: TriggerBookingEmailsPa
       })
 
       // Mentor Email document
-      await adminDb.collection('mail').add({
+      await db.collection('mail').add({
         to: mentorUser.email,
         message: {
           subject: `New Booking: Session with ${founderProfile.full_name || 'Founder'}`,
