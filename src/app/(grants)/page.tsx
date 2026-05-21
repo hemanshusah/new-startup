@@ -70,24 +70,49 @@ export default async function ListingPage() {
         maxWidth: '1280px',
         margin: '0 auto',
         padding: '48px 24px 80px',
+        position: 'relative'
       }}
     >
+      {/* Ambient background glow */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '100%',
+        maxWidth: '1280px',
+        height: '320px',
+        background: 'radial-gradient(ellipse 60% 50% at 50% 0%, var(--accent-light) 0%, transparent 70%)',
+        opacity: 0.5,
+        zIndex: 0,
+        pointerEvents: 'none'
+      }} />
+
       {/* Page header */}
-      <header style={{ marginBottom: '40px' }}>
+      <header style={{ marginBottom: '40px', position: 'relative', zIndex: 1 }}>
         {/* Kicker */}
-        <p
-          style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: '12px',
-            fontWeight: 500,
-            color: 'var(--accent)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.1em',
-            marginBottom: '10px',
-          }}
-        >
-          India Startup Funding · 2026
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+          <span style={{
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: 'var(--accent)',
+            display: 'inline-block'
+          }} />
+          <p
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '11px',
+              fontWeight: 600,
+              color: 'var(--accent)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.12em',
+              margin: 0
+            }}
+          >
+            India Startup Funding · Live Index
+          </p>
+        </div>
 
         {/* H1 */}
         <h1
@@ -96,16 +121,18 @@ export default async function ListingPage() {
             fontSize: homeHeadingSize,
             fontWeight: 400,
             color: 'var(--ink)',
-            lineHeight: 1.15,
+            lineHeight: 1.12,
             letterSpacing: '-0.02em',
-            marginBottom: '12px',
-            maxWidth: '680px',
+            marginBottom: '16px',
+            maxWidth: '720px',
           }}
         >
           {homeHeading.includes('Indian founders') ? (
             <>
               {homeHeading.split('Indian founders')[0]}
-              <span style={{ color: 'var(--accent)', fontStyle: 'italic' }}>Indian founders</span>
+              <span style={{ color: 'var(--accent)', fontStyle: 'italic' }}>
+                Indian founders
+              </span>
               {homeHeading.split('Indian founders')[1]}
             </>
           ) : homeHeading}
@@ -115,15 +142,15 @@ export default async function ListingPage() {
         <p
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: '15px',
-            fontWeight: 300,
+            fontSize: '16px',
+            fontWeight: 400,
             color: 'var(--ink-3)',
             lineHeight: 1.6,
-            maxWidth: '520px',
+            maxWidth: '560px',
+            margin: 0
           }}
         >
-          Curated government and private sector opportunities updated weekly so you
-          never miss a deadline.
+          Curated government initiatives and private sector funding opportunities updated in real-time so you never miss a deadline.
         </p>
       </header>
 

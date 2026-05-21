@@ -31,7 +31,7 @@ export function GrantCard({ program, onClick, isBookmarkedInitial = false }: Gra
         <div className="card-inner" style={{
           background: 'var(--white)',
           border: '1px solid var(--cream-border)',
-          borderRadius: '16px',
+          borderRadius: 'var(--radius-lg, 16px)',
           padding: '24px',
           height: '100%',
           display: 'flex',
@@ -108,7 +108,7 @@ export function GrantCard({ program, onClick, isBookmarkedInitial = false }: Gra
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: '12px',
-            borderTop: '1px solid var(--bg)',
+            borderTop: '1px solid var(--cream-border)',
             paddingTop: '16px'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>

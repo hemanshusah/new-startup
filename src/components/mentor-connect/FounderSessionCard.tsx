@@ -3,6 +3,10 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { ReviewForm } from './ReviewForm'
+import { useRazorpayCheckout } from '@/lib/hooks/useRazorpayCheckout'
+import { initiateExistingSessionPayment } from '@/lib/actions/booking'
+import { PaymentLoadingOverlay } from './PaymentLoadingOverlay'
+import { NegotiationTimeline } from './NegotiationTimeline'
 
 interface FounderSessionCardProps {
   session: any
@@ -15,6 +19,11 @@ interface FounderSessionCardProps {
 export function FounderSessionCard({ session: s, mentor, sessionType: st, hasReviewedInitial, nowString }: FounderSessionCardProps) {
   const [isReviewing, setIsReviewing] = useState(false)
   const [hasReviewed, setHasReviewed] = useState(hasReviewedInitial)
+  const [localLoading, setLocalLoading] = useState(false)
+  const [localError, setLocalError] = useState<string | null>(null)
+  const [showHistory, setShowHistory] = useState(false)
+
+  const checkout = useRazorpayCheckout()
 
   const startDate = new Date(s.scheduled_start)
   const dateStr = startDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
@@ -22,7 +31,41 @@ export function FounderSessionCard({ session: s, mentor, sessionType: st, hasRev
   
   const now = new Date(nowString)
   const isUpcoming = startDate > now && s.status !== 'cancelled'
+  const isPendingPayment = s.status === 'pending_payment'
   const canReview = s.status === 'completed' && !hasReviewed
+
+  const handleResumePayment = async () => {
+    setLocalLoading(true)
+    setLocalError(null)
+    checkout.setError(null)
+
+    try {
+      const result = await initiateExistingSessionPayment(s.id)
+      setLocalLoading(false)
+
+      if (result.error) {
+        setLocalError(result.error)
+        return
+      }
+
+      if (result.requiresPayment && result.razorpayOrderId && result.razorpayKeyId) {
+        checkout.startCheckout({
+          sessionId: s.id,
+          razorpayOrderId: result.razorpayOrderId,
+          razorpayKeyId: result.razorpayKeyId,
+          onSuccess: () => {
+            alert('Payment completed and booking verified successfully!')
+            window.location.reload()
+          }
+        })
+      } else {
+        setLocalError('Failed to fetch valid payment parameters.')
+      }
+    } catch (err: any) {
+      setLocalError(err.message || 'Something went wrong. Please try again.')
+      setLocalLoading(false)
+    }
+  }
 
   const StatusBadge = ({ status }: { status: string }) => {
     const colors: Record<string, { bg: string; text: string }> = {
@@ -50,8 +93,13 @@ export function FounderSessionCard({ session: s, mentor, sessionType: st, hasRev
     )
   }
 
+  const activeLoading = localLoading || checkout.loading
+  const activeError = localError || checkout.error
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', background: 'var(--white)', border: '1px solid var(--cream-border)', borderRadius: '12px', padding: '20px' }}>
+      <PaymentLoadingOverlay isOpen={activeLoading} message={localLoading ? 'Resuming secure checkout credentials...' : checkout.loadingMessage} />
+
       <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
         {/* Mentor Avatar */}
         {mentor?.avatar_url ? (
@@ -77,11 +125,34 @@ export function FounderSessionCard({ session: s, mentor, sessionType: st, hasRev
           <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: 'var(--ink-4)', margin: 0 }}>
             {dateStr} at {timeStr}
           </p>
+          {activeError && (
+            <p style={{ margin: '6px 0 0', fontSize: '12px', color: '#DC2626', fontWeight: 500 }}>
+              ⚠️ {activeError}
+            </p>
+          )}
         </div>
 
         {/* Action */}
-        <div style={{ flexShrink: 0, display: 'flex', gap: '10px' }}>
-          {isUpcoming && s.google_meet_link ? (
+        <div style={{ flexShrink: 0, display: 'flex', gap: '10px', alignItems: 'center' }}>
+          {isPendingPayment ? (
+            <button
+              onClick={handleResumePayment}
+              disabled={activeLoading}
+              style={{
+                padding: '8px 18px',
+                background: 'var(--ink)',
+                color: 'var(--white)',
+                border: 'none',
+                borderRadius: '8px',
+                fontFamily: 'var(--font-sans)',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: activeLoading ? 'wait' : 'pointer'
+              }}
+            >
+              💳 Complete Payment
+            </button>
+          ) : isUpcoming && s.google_meet_link ? (
             <a
               href={s.google_meet_link}
               target="_blank"
@@ -158,6 +229,34 @@ export function FounderSessionCard({ session: s, mentor, sessionType: st, hasRev
         <p style={{ margin: '4px 0 0 64px', fontFamily: 'var(--font-sans)', fontSize: '12px', color: '#166534', fontWeight: 500 }}>
           ✓ Review submitted! Thank you.
         </p>
+      )}
+
+      {/* Discussion Timeline logs for custom-booked sessions */}
+      {s.negotiation_timeline && s.negotiation_timeline.length > 0 && (
+        <>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px', borderTop: '1px solid var(--cream-border)', paddingTop: '12px' }}>
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--ink-3)',
+                fontFamily: 'var(--font-sans)',
+                fontSize: '13px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              {showHistory ? 'Hide Discussion History ▴' : 'View Discussion History ▾'}
+            </button>
+          </div>
+          {showHistory && (
+            <NegotiationTimeline timeline={s.negotiation_timeline} />
+          )}
+        </>
       )}
     </div>
   )

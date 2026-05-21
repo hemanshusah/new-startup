@@ -2,6 +2,7 @@
 
 import { createServiceClient } from '@/lib/supabase/server'
 import { getAuthenticatedUser } from '@/lib/auth-utils'
+import { revalidatePath } from 'next/cache'
 
 interface InitiateBookingParams {
   mentorId: string
@@ -10,6 +11,77 @@ interface InitiateBookingParams {
   founderBrief: string
 }
 
+/**
+ * Creates a Razorpay order for an existing session that is in pending_payment status.
+ * Reusable backend checkout order generator.
+ */
+export async function createRazorpayOrderForSession(sessionId: string) {
+  const supabase = createServiceClient()
+
+  // 1. Fetch session details
+  const { data: session, error: fetchErr } = await supabase
+    .from('sessions')
+    .select('*')
+    .eq('id', sessionId)
+    .single()
+
+  if (fetchErr || !session) {
+    return { error: 'Session booking not found.' }
+  }
+
+  if (session.status === 'confirmed' || session.status === 'completed') {
+    return { error: 'Session is already paid and confirmed.', requiresPayment: false }
+  }
+
+  if (session.amount_inr === 0) {
+    return { requiresPayment: false }
+  }
+
+  // 2. Spawn secure Razorpay Order
+  try {
+    const Razorpay = (await import('razorpay')).default
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID!,
+      key_secret: process.env.RAZORPAY_KEY_SECRET!,
+    })
+
+    const order = await razorpay.orders.create({
+      amount: session.amount_inr * 100, // Razorpay works in paise
+      currency: 'INR',
+      receipt: session.id,
+      notes: {
+        session_id: session.id,
+        mentor_id: session.mentor_id,
+        founder_id: session.founder_id
+      }
+    })
+
+    // 3. Update session with razorpay_order_id in database
+    const { error: updateErr } = await supabase
+      .from('sessions')
+      .update({ razorpay_order_id: order.id })
+      .eq('id', session.id)
+
+    if (updateErr) {
+      console.error('Failed to update Razorpay order ID in session:', updateErr)
+      return { error: 'Failed to secure checkout credentials.' }
+    }
+
+    return {
+      sessionId: session.id,
+      requiresPayment: true,
+      razorpayOrderId: order.id,
+      razorpayKeyId: process.env.RAZORPAY_KEY_ID
+    }
+  } catch (err: any) {
+    console.error('Razorpay order creation error:', err)
+    return { error: err.message || 'Razorpay order formulation failed.' }
+  }
+}
+
+/**
+ * Initiates standard session booking.
+ */
 export async function initiateBooking(params: InitiateBookingParams) {
   const user = await getAuthenticatedUser()
   if (!user) {
@@ -72,7 +144,6 @@ export async function initiateBooking(params: InitiateBookingParams) {
 
     // 5. If free session, confirm immediately and create calendar event
     if (amountInr === 0) {
-      // Create calendar event for free sessions
       try {
         const { createSessionEvent } = await import('@/lib/mentor/calendar-booking')
         await createSessionEvent(session.id)
@@ -80,43 +151,43 @@ export async function initiateBooking(params: InitiateBookingParams) {
         console.error('Calendar event creation failed (non-blocking):', calErr)
       }
 
+      revalidatePath('/profile/sessions')
+      revalidatePath('/admin/mentor-connect/sessions')
+      revalidatePath('/admin/mentor-connect/payments')
+      revalidatePath('/admin/mentor-connect')
+
       return { sessionId: session.id, requiresPayment: false }
     }
 
-    // 6. For paid sessions, create Razorpay order
-    const Razorpay = (await import('razorpay')).default
-    const razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID!,
-      key_secret: process.env.RAZORPAY_KEY_SECRET!,
-    })
-
-    const order = await razorpay.orders.create({
-      amount: amountInr * 100, // Razorpay uses paise
-      currency: 'INR',
-      receipt: session.id,
-      notes: {
-        session_id: session.id,
-        mentor_id: params.mentorId,
-        founder_id: user.id
-      }
-    })
-
-    // Update session with Razorpay order ID
-    await supabase
-      .from('sessions')
-      .update({ razorpay_order_id: order.id })
-      .eq('id', session.id)
-
-    return {
-      sessionId: session.id,
-      requiresPayment: true,
-      razorpayOrderId: order.id,
-      razorpayKeyId: process.env.RAZORPAY_KEY_ID
-    }
+    // 6. Reuse reusable Razorpay order helper for paid sessions
+    return await createRazorpayOrderForSession(session.id)
 
   } catch (error: unknown) {
     console.error('Booking error:', error)
     const message = error instanceof Error ? error.message : 'Failed to initiate booking.'
     return { error: message }
   }
+}
+
+/**
+ * Public action allowing founders to complete/resume payment for any pending_payment session.
+ */
+export async function initiateExistingSessionPayment(sessionId: string) {
+  const user = await getAuthenticatedUser()
+  if (!user) return { error: 'You must be logged in to resume payment.' }
+
+  const supabase = createServiceClient()
+
+  // Verify owner is the founder
+  const { data: session, error } = await supabase
+    .from('sessions')
+    .select('founder_id, status')
+    .eq('id', sessionId)
+    .single()
+
+  if (error || !session) return { error: 'Session not found.' }
+  if (session.founder_id !== user.id) return { error: 'Not authorized to checkout this session.' }
+  if (session.status !== 'pending_payment') return { error: 'This session does not require payment at this time.' }
+
+  return await createRazorpayOrderForSession(sessionId)
 }

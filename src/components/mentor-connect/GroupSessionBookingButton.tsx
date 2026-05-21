@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { initiateGroupBooking, confirmGroupBooking } from '@/lib/actions/group-booking'
+import { PaymentLoadingOverlay } from './PaymentLoadingOverlay'
 
 interface GroupSessionBookingButtonProps {
   groupSessionId: string
@@ -14,8 +15,10 @@ interface GroupSessionBookingButtonProps {
 export function GroupSessionBookingButton({ groupSessionId, priceInr, isFull, isLoggedIn }: GroupSessionBookingButtonProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [loadingMessage, setLoadingMessage] = useState('Securing your checkout...')
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [bookingDetails, setBookingDetails] = useState<{ razorpayOrderId: string, razorpayKeyId: string } | null>(null)
 
   // Load Razorpay script on mount
   useEffect(() => {
@@ -28,6 +31,56 @@ export function GroupSessionBookingButton({ groupSessionId, priceInr, isFull, is
     }
   }, [])
 
+  const openRazorpayCheckout = (orderId: string, keyId: string) => {
+    const options = {
+      key: keyId,
+      order_id: orderId,
+      name: 'GrantsIndia',
+      description: 'Group Office Hour Booking',
+      handler: async function (response: any) {
+        setLoading(true)
+        setLoadingMessage('Confirming payment and securing your reservation')
+        setError(null)
+
+        try {
+          const confirmResult = await confirmGroupBooking({
+            groupSessionId,
+            razorpayOrderId: response.razorpay_order_id,
+            razorpayPaymentId: response.razorpay_payment_id,
+            razorpaySignature: response.razorpay_signature,
+          })
+
+          if (confirmResult.error) {
+            setError(confirmResult.error)
+          } else {
+            setSuccess(true)
+            router.refresh()
+          }
+        } catch (err: any) {
+          setError(err.message || 'Payment confirmation failed.')
+        } finally {
+          setLoading(false)
+        }
+      },
+      modal: {
+        ondismiss: function () {
+          setLoading(false)
+          setError('Payment was cancelled. You can try again.')
+        }
+      },
+      theme: {
+        color: '#1A1A1A'
+      }
+    }
+
+    const rzp = new (window as any).Razorpay(options)
+    rzp.on('payment.failed', function (response: any) {
+      setError(`Payment failed: ${response.error.description}`)
+      setLoading(false)
+    })
+    rzp.open()
+  }
+
   const handleBooking = async () => {
     if (!isLoggedIn) {
       router.push('/login?redirect=' + encodeURIComponent(window.location.pathname))
@@ -35,7 +88,15 @@ export function GroupSessionBookingButton({ groupSessionId, priceInr, isFull, is
     }
 
     setLoading(true)
+    setLoadingMessage('Initiating group office hour seat checkout')
     setError(null)
+
+    // Reuse existing booking details if they exist
+    if (bookingDetails) {
+      setLoadingMessage('Opening payment window')
+      openRazorpayCheckout(bookingDetails.razorpayOrderId, bookingDetails.razorpayKeyId)
+      return
+    }
 
     try {
       const result = await initiateGroupBooking({ groupSessionId })
@@ -47,52 +108,12 @@ export function GroupSessionBookingButton({ groupSessionId, priceInr, isFull, is
       }
 
       if (result.requiresPayment && result.razorpayOrderId && result.razorpayKeyId) {
-        const options = {
-          key: result.razorpayKeyId,
-          order_id: result.razorpayOrderId,
-          name: 'GrantsIndia',
-          description: 'Group Office Hour Booking',
-          handler: async function (response: any) {
-            setLoading(true)
-            setError(null)
-
-            try {
-              const confirmResult = await confirmGroupBooking({
-                groupSessionId,
-                razorpayOrderId: response.razorpay_order_id,
-                razorpayPaymentId: response.razorpay_payment_id,
-                razorpaySignature: response.razorpay_signature,
-              })
-
-              if (confirmResult.error) {
-                setError(confirmResult.error)
-              } else {
-                setSuccess(true)
-                router.refresh()
-              }
-            } catch (err: any) {
-              setError(err.message || 'Payment confirmation failed.')
-            } finally {
-              setLoading(false)
-            }
-          },
-          modal: {
-            ondismiss: function () {
-              setLoading(false)
-              setError('Payment was cancelled. You can try again.')
-            }
-          },
-          theme: {
-            color: '#1A1A1A'
-          }
-        }
-
-        const rzp = new (window as any).Razorpay(options)
-        rzp.on('payment.failed', function (response: any) {
-          setError(`Payment failed: ${response.error.description}`)
-          setLoading(false)
+        setBookingDetails({
+          razorpayOrderId: result.razorpayOrderId,
+          razorpayKeyId: result.razorpayKeyId
         })
-        rzp.open()
+        setLoadingMessage('Opening payment window')
+        openRazorpayCheckout(result.razorpayOrderId, result.razorpayKeyId)
       } else {
         setError('Failed to setup payment. Please try again.')
         setLoading(false)
@@ -122,6 +143,9 @@ export function GroupSessionBookingButton({ groupSessionId, priceInr, isFull, is
 
   return (
     <div>
+      {/* Premium secure lock-screen overlay during payment processing */}
+      <PaymentLoadingOverlay isOpen={loading} message={loadingMessage} />
+
       {error && (
         <div style={{
           background: '#FEF2F2',

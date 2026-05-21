@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
-import { AdminSessionsList } from '@/components/admin/mentor-connect/AdminSessionsList'
+import { AdminPaymentsList } from '@/components/admin/mentor-connect/AdminPaymentsList'
 
 export const dynamic = 'force-dynamic'
 
-export default async function AdminMentorConnectSessionsPage() {
-  // Use direct connection with Service Role Key to bypass any config issues
+export default async function AdminMentorConnectPaymentsPage() {
+  // Use direct connection with Service Role Key to bypass RLS issues in Admin view
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -14,7 +14,7 @@ export default async function AdminMentorConnectSessionsPage() {
   const { data: sessionsData, error: sessionsError } = await supabase
     .from('sessions')
     .select('*')
-    .order('scheduled_start', { ascending: false })
+    .order('created_at', { ascending: false })
     .limit(100)
 
   let mergedSessions: any[] = []
@@ -59,10 +59,10 @@ export default async function AdminMentorConnectSessionsPage() {
     <div>
       <div style={{ marginBottom: '28px' }}>
         <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '26px', fontWeight: 400, color: 'var(--ink)', marginBottom: '4px' }}>
-          Sessions
+          Payments & Receipts
         </h1>
         <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: 'var(--ink-3)' }}>
-          All booked sessions across all mentors.
+          Monitor transaction statuses, diagnose payment delays, and manage billing receipts.
         </p>
       </div>
 
@@ -72,7 +72,7 @@ export default async function AdminMentorConnectSessionsPage() {
         </div>
       )}
 
-      <AdminSessionsList initialSessions={mergedSessions} />
+      <AdminPaymentsList initialSessions={mergedSessions} />
     </div>
   )
 }

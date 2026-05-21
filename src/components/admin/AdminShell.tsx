@@ -93,6 +93,16 @@ const MENTOR_NAV_ITEMS = [
       </svg>
     ),
   },
+  {
+    label: 'Payments',
+    href: '/admin/mentor-connect/payments',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.4" />
+        <path d="M1 7h14M4 10h2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      </svg>
+    ),
+  },
 ];
 
 const BOTTOM_NAV_ITEMS = [

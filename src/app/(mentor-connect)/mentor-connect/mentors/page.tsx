@@ -1,21 +1,24 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/server'
 import { MentorCard } from '@/components/mentor-connect/MentorCard'
 import { getAuthenticatedUser } from '@/lib/auth-utils'
+import { Sparkles, SlidersHorizontal, Search, X, Check, Globe, HelpCircle } from 'lucide-react'
+import EnterpriseRegistry from '@/components/mentor-connect/EnterpriseRegistry'
 
 export const metadata: Metadata = {
-  title: 'Mentor Directory | Mentor Connect',
-  description: 'Find and book sessions with vetted experts for your startup.',
+  title: 'Ecosystem Directory | Mentor Connect',
+  description: 'Book verified 1:1 sessions with industry leaders, cross-border operators, and scaling experts.',
 }
 
 export const dynamic = 'force-dynamic'
 
 interface PageProps {
-  searchParams: Promise<{ industry?: string; expertise?: string }>
+  searchParams: Promise<{ industry?: string; expertise?: string; q?: string }>
 }
 
 export default async function MentorDirectoryPage({ searchParams }: PageProps) {
-  const { industry, expertise } = await searchParams
+  const { industry, expertise, q } = await searchParams
   const supabase = createServiceClient()
   const user = await getAuthenticatedUser()
 
@@ -31,9 +34,13 @@ export default async function MentorDirectoryPage({ searchParams }: PageProps) {
       avg_rating,
       expertise_areas,
       industries,
+      linkedin_url,
+      twitter_url,
+      intro_video_url,
       session_types ( price_inr )
     `)
     .eq('status', 'active')
+    .eq('is_available', true)
 
   if (industry) {
     query = query.contains('industries', [industry])
@@ -44,12 +51,21 @@ export default async function MentorDirectoryPage({ searchParams }: PageProps) {
 
   const { data: mentors } = await query
 
-  // Process data to get starting price
-  const processedMentors = (mentors || []).map(mentor => {
+  // Process data to get starting price and filter by search query on display name or bio if provided
+  let processedMentors = (mentors || []).map(mentor => {
     const prices = mentor.session_types.map((s: any) => s.price_inr).filter((p: number) => p > 0)
     const priceStart = prices.length > 0 ? Math.min(...prices) : 0
     return { ...mentor, priceStart }
   })
+
+  if (q) {
+    const lowerQuery = q.toLowerCase()
+    processedMentors = processedMentors.filter(mentor => 
+      mentor.display_name.toLowerCase().includes(lowerQuery) ||
+      mentor.headline.toLowerCase().includes(lowerQuery) ||
+      mentor.expertise_areas.some((area: string) => area.toLowerCase().includes(lowerQuery))
+    )
+  }
 
   // Get user's saved mentors if logged in
   let savedMentorIds = new Set<string>()
@@ -63,106 +79,75 @@ export default async function MentorDirectoryPage({ searchParams }: PageProps) {
     }
   }
 
-  // Common filters (In production, these could be fetched dynamically from DB)
+  // Common filters
   const commonIndustries = ['Fintech', 'SaaS', 'Deeptech', 'Cleantech', 'EdTech', 'HealthTech']
   const commonExpertise = ['Market Entry', 'Grant Navigation', 'Regulatory Compliance', 'Fundraising', 'US Expansion', 'Pitch Deck Review']
 
   return (
-    <main style={{ background: 'var(--cream)', minHeight: 'calc(100vh - 56px)' }}>
-      {/* ── HEADER ── */}
-      <section style={{ padding: '60px 24px', background: 'var(--white)', borderBottom: '1px solid var(--cream-border)' }}>
+    <main style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 56px)', position: 'relative', paddingBottom: '100px' }}>
+      {/* Ambient background glow */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '100%',
+        maxWidth: '1280px',
+        height: '340px',
+        background: 'radial-gradient(ellipse 60% 50% at 50% 0%, var(--accent-light) 0%, transparent 70%)',
+        opacity: 0.5,
+        zIndex: 0,
+        pointerEvents: 'none'
+      }} />
+
+      {/* ── HEADER & SEARCH BAR ── */}
+      <section style={{ padding: '60px 24px 40px', background: 'transparent', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '40px', color: 'var(--ink)', margin: '0 0 16px' }}>
-            Mentor Directory
-          </h1>
-          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '18px', color: 'var(--ink-3)', margin: 0 }}>
-            Browse vetted experts ready to help you navigate your next milestone.
-          </p>
-        </div>
-      </section>
-
-      {/* ── MAIN CONTENT ── */}
-      <section style={{ padding: '40px 24px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', gap: '40px', alignItems: 'flex-start' }}>
-          
-          {/* Filters Sidebar */}
-          <aside style={{ width: '280px', flexShrink: 0, display: 'none' /* For mobile we'll need a drawer, but desktop it shows */ }}>
-            <div style={{ background: 'var(--white)', border: '1px solid var(--cream-border)', borderRadius: '12px', padding: '24px' }}>
-              <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '16px', fontWeight: 600, color: 'var(--ink)', margin: '0 0 20px' }}>
-                Filters
-              </h3>
-              
-              <div style={{ marginBottom: '24px' }}>
-                <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: 500, color: 'var(--ink)', margin: '0 0 12px' }}>Industry</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {commonIndustries.map(ind => (
-                    <a key={ind} href={`?industry=${encodeURIComponent(ind)}`} style={{
-                      fontFamily: 'var(--font-sans)', fontSize: '14px', color: industry === ind ? 'var(--accent)' : 'var(--ink-3)', textDecoration: 'none',
-                      fontWeight: industry === ind ? 600 : 400
-                    }}>
-                      {ind}
-                    </a>
-                  ))}
-                </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '24px' }}>
+            <div>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '4px 12px',
+                background: 'var(--accent-light)',
+                color: 'var(--accent)',
+                borderRadius: '100px',
+                fontFamily: 'var(--font-sans)',
+                fontSize: '10.5px',
+                fontWeight: 600,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                marginBottom: '16px',
+                border: '1px solid rgba(184, 70, 10, 0.12)'
+              }}>
+                <Sparkles size={11} />
+                DIRECT ACCESS
               </div>
-
-              <div>
-                <h4 style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: 500, color: 'var(--ink)', margin: '0 0 12px' }}>Expertise</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {commonExpertise.map(exp => (
-                    <a key={exp} href={`?expertise=${encodeURIComponent(exp)}`} style={{
-                      fontFamily: 'var(--font-sans)', fontSize: '14px', color: expertise === exp ? 'var(--accent)' : 'var(--ink-3)', textDecoration: 'none',
-                      fontWeight: expertise === exp ? 600 : 400
-                    }}>
-                      {exp}
-                    </a>
-                  ))}
-                </div>
-              </div>
-
-              {(industry || expertise) && (
-                <a href="/mentor-connect/mentors" style={{ display: 'block', marginTop: '24px', fontFamily: 'var(--font-sans)', fontSize: '13px', color: 'var(--ink-4)', textDecoration: 'underline' }}>
-                  Clear all filters
-                </a>
-              )}
-            </div>
-          </aside>
-
-          {/* Directory Grid */}
-          <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink-3)', margin: 0 }}>
-                Showing <strong style={{ color: 'var(--ink)' }}>{processedMentors.length}</strong> mentors
+              <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '42px', color: 'var(--ink)', margin: '0 0 12px', fontWeight: 400, letterSpacing: '-0.015em' }}>
+                Expert Operator Index
+              </h1>
+              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '15.5px', color: 'var(--ink-3)', margin: 0, maxWidth: '580px', lineHeight: 1.6 }}>
+                Book direct 1:1 strategy slots with vetted leaders, regulatory compliance specialists, and scaling advisors.
               </p>
             </div>
 
-            {processedMentors.length === 0 ? (
-              <div style={{ background: 'var(--white)', border: '1px dashed var(--cream-border)', borderRadius: '16px', padding: '60px 24px', textAlign: 'center' }}>
-                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '16px', color: 'var(--ink-4)', margin: 0 }}>
-                  No mentors found matching your filters.
-                </p>
-              </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
-                {processedMentors.map((mentor) => (
-                  <MentorCard 
-                    key={mentor.id} 
-                    mentor={mentor} 
-                    isSaved={savedMentorIds.has(mentor.id)}
-                    priceStart={mentor.priceStart}
-                  />
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </section>
-      
-      <style>{`
-        @media (min-width: 900px) {
-          aside { display: block !important; }
-        }
-      `}</style>
+
+      {/* ── MAIN DIRECTORY CONTENT ── */}
+      <section style={{ padding: '0 24px', position: 'relative', zIndex: 1 }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <EnterpriseRegistry 
+            mentors={processedMentors} 
+            savedMentorIds={Array.from(savedMentorIds)} 
+            defaultSearchQuery={q}
+            defaultIndustry={industry}
+            defaultExpertise={expertise}
+          />
+        </div>
+      </section>
     </main>
   )
 }

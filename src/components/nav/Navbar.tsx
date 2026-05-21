@@ -57,10 +57,8 @@ export function Navbar({ mentorConnectEnabled = false }: { mentorConnectEnabled?
   const initials = user ? getInitials(user) : ''
   const isAdmin = profile?.role === 'admin'
 
-  // Determine current product based on path
-  const product = Object.values(PRODUCTS).find(p => 
-    p.slug !== 'grants' && pathname?.startsWith(`/${p.slug}`)
-  ) || DEFAULT_PRODUCT
+  // Always use the main GrantsIndia product configuration for the global navbar
+  const product = DEFAULT_PRODUCT
 
   useEffect(() => {
     if (mobileMenuOpen) {

@@ -84,6 +84,7 @@ export async function submitMentorApplication(formData: FormData) {
       status: 'pending',
       display_name: displayName,
       linkedin_url: formData.get('linkedin_url'),
+      twitter_url: formData.get('twitter_url') || null,
       location_city: formData.get('location_city'),
       location_country: formData.get('location_country'),
       headline: formData.get('headline'),

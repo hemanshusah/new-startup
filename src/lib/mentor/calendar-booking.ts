@@ -111,9 +111,8 @@ export async function createSessionEvent(sessionId: string) {
 
     calendarEventId = event.data.id || null
   } catch (err) {
-    console.warn('Google Calendar OAuth failed, generating fallback virtual meeting link:', err)
-    // Fallback: generate open-access working Jitsi Meet virtual room
-    meetLink = `https://meet.jit.si/grantsindia-session-${sessionId}`
+    console.error('Google Calendar scheduling failed:', err)
+    throw new Error('Google Calendar scheduling failed. A connected Google Calendar is required for booking.')
   }
 
   // 6. Update the session with Meet link and calendar event ID in Supabase
@@ -132,5 +131,47 @@ export async function createSessionEvent(sessionId: string) {
   return {
     meetLink,
     calendarEventId
+  }
+}
+
+/**
+ * Deletes the Google Calendar event corresponding to a session if it exists.
+ */
+export async function deleteSessionEvent(sessionId: string) {
+  const supabase = createServiceClient()
+
+  // 1. Fetch google_calendar_event_id and mentor_id
+  const { data: session, error } = await supabase
+    .from('sessions')
+    .select('google_calendar_event_id, mentor_id')
+    .eq('id', sessionId)
+    .single()
+
+  if (error || !session || !session.google_calendar_event_id) {
+    return { success: false, message: 'No Google Calendar event mapped to this session.' }
+  }
+
+  // 2. Fetch mentor's custom calendar ID if exists
+  const { data: mentor } = await supabase
+    .from('mentor_profiles')
+    .select('google_calendar_id')
+    .eq('id', session.mentor_id)
+    .single()
+
+  // 3. Delete event using Google Calendar API
+  try {
+    const auth = await getValidOAuthClient(session.mentor_id)
+    const calendar = google.calendar({ version: 'v3', auth })
+    const calendarId = mentor?.google_calendar_id || 'primary'
+
+    await calendar.events.delete({
+      calendarId,
+      eventId: session.google_calendar_event_id,
+    })
+
+    return { success: true }
+  } catch (err: any) {
+    console.error('Failed to delete Google Calendar event:', err)
+    return { success: false, error: err.message || 'API error during calendar event deletion.' }
   }
 }

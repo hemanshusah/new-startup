@@ -2,6 +2,7 @@
 
 import crypto from 'crypto'
 import { createServiceClient } from '@/lib/supabase/server'
+import { revalidatePath } from 'next/cache'
 
 interface ConfirmPaymentParams {
   sessionId: string
@@ -31,12 +32,39 @@ export async function confirmPayment(params: ConfirmPaymentParams) {
 
   const supabase = createServiceClient()
 
+  // Get existing timeline to append
+  const { data: session } = await supabase
+    .from('sessions')
+    .select('negotiation_timeline')
+    .eq('id', sessionId)
+    .single()
+
+  const timestamp = new Date().toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  })
+
+  const updatedTimeline = [
+    ...(session?.negotiation_timeline || []),
+    {
+      timestamp,
+      actor: 'founder',
+      event: 'Payment completed successfully',
+      details: `Razorpay payment completed. Signature verified. Order ID: ${razorpayOrderId} | Payment ID: ${razorpayPaymentId}.`
+    }
+  ]
+
   // 2. Update session status to confirmed
   const { error: updateError } = await supabase
     .from('sessions')
     .update({
       status: 'confirmed',
       razorpay_payment_id: razorpayPaymentId,
+      negotiation_timeline: updatedTimeline
     })
     .eq('id', sessionId)
     .eq('razorpay_order_id', razorpayOrderId)
@@ -55,13 +83,20 @@ export async function confirmPayment(params: ConfirmPaymentParams) {
     // Don't fail the payment confirmation if calendar fails
   }
 
-  // 4. Trigger Confirmation Emails via Firebase SMTP (non-blocking)
+  // 4. Trigger Confirmation Emails via Firebase SMTP (Skipped temporarily as requested)
+  /*
   try {
     const { triggerBookingEmails } = await import('@/lib/actions/email-booking')
     await triggerBookingEmails({ sessionId })
   } catch (mailErr) {
     console.error('Email trigger failed (non-blocking):', mailErr)
   }
+  */
+
+  revalidatePath('/profile/sessions')
+  revalidatePath('/admin/mentor-connect/sessions')
+  revalidatePath('/admin/mentor-connect/payments')
+  revalidatePath('/admin/mentor-connect')
 
   return { success: true, sessionId }
 }

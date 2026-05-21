@@ -73,13 +73,15 @@ export async function POST(request: NextRequest) {
           console.error('Webhook: Calendar event creation failed:', calErr)
         }
 
-        // Trigger Confirmation Emails via Firebase SMTP (non-blocking)
+        // Trigger Confirmation Emails via Firebase SMTP (Skipped temporarily as requested)
+        /*
         try {
           const { triggerBookingEmails } = await import('@/lib/actions/email-booking')
           await triggerBookingEmails({ sessionId: session.id })
         } catch (mailErr) {
           console.error('Webhook: Email trigger failed:', mailErr)
         }
+        */
 
         console.log(`Webhook: Session ${session.id} confirmed via webhook`)
       }

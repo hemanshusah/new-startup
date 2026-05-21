@@ -54,7 +54,7 @@ export default async function BookSessionPage({ params }: PageProps) {
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
         
         <div style={{ marginBottom: '32px' }}>
-          <a href={`/mentor-connect/mentors/${slug}`} style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink-4)', textDecoration: 'none' }}>
+          <a href={`/mentor-connect/mentors/${slug}`} style={{ fontFamily: 'var(--font-sans)', fontSize: '14.5px', color: 'var(--accent)', textDecoration: 'none', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }} className="back-link-profile">
             ← Back to profile
           </a>
         </div>
@@ -62,47 +62,49 @@ export default async function BookSessionPage({ params }: PageProps) {
         <div style={{ display: 'flex', gap: '40px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
           
           {/* Left Column: Session Details */}
-          <div style={{ flex: '1 1 300px', background: 'var(--white)', border: '1px solid var(--cream-border)', borderRadius: '16px', padding: '32px' }}>
+          <div style={{ flex: '1 1 340px', background: 'var(--white)', border: '1px solid var(--cream-border)', borderRadius: '16px', padding: '36px', boxShadow: '0 12px 32px rgba(28,26,22,0.015)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px', paddingBottom: '24px', borderBottom: '1px solid var(--cream-border)' }}>
               {mentor.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={mentor.avatar_url} alt="" style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover' }} />
+                <img src={mentor.avatar_url} alt="" style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--cream-border)' }} />
               ) : (
-                <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'var(--cream-dark)' }} />
+                <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'var(--cream-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-serif)', fontSize: '20px', color: 'var(--ink-4)' }}>
+                  {mentor.display_name.charAt(0)}
+                </div>
               )}
               <div>
-                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: 'var(--ink-4)', margin: '0 0 2px' }}>Booking a session with</p>
-                <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', color: 'var(--ink)', margin: 0 }}>{mentor.display_name}</h2>
+                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--ink-4)', margin: '0 0 2px' }}>Booking a session with</p>
+                <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', color: 'var(--ink)', fontWeight: 400, margin: 0 }}>{mentor.display_name}</h2>
               </div>
             </div>
 
-            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', color: 'var(--ink)', margin: '0 0 16px' }}>
+            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '26px', color: 'var(--ink)', margin: '0 0 16px', fontWeight: 400 }}>
               {session.name}
             </h1>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px', fontFamily: 'var(--font-sans)', fontSize: '15px', color: 'var(--ink-3)' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                ⏱ {session.duration_minutes} minutes
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '28px', paddingBottom: '24px', borderBottom: '1px solid var(--cream-border)', fontFamily: 'var(--font-sans)', fontSize: '14.5px', color: 'var(--ink-3)' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                ⏱ <span style={{ fontWeight: 600 }}>{session.duration_minutes} minutes</span> duration
               </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                🎥 Google Meet
+              <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                🎥 Delivered via <span style={{ fontWeight: 600 }}>Google Meet</span>
               </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                💳 {session.price_inr > 0 ? `₹${session.price_inr.toLocaleString()}` : 'Free'}
+              <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                💳 Price: <span style={{ fontWeight: 600, color: 'var(--accent)' }}>{session.price_inr > 0 ? `₹${session.price_inr.toLocaleString()}` : 'Free'}</span>
               </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                🌍 Timezone: {mentor.timezone}
+              <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                🌍 Mentor Timezone: <span style={{ fontWeight: 600 }}>{mentor.timezone}</span>
               </span>
             </div>
 
-            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'var(--ink-4)', lineHeight: 1.5, margin: 0 }}>
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13.5px', color: 'var(--ink-3)', lineHeight: 1.6, margin: 0 }}>
               {session.description}
             </p>
           </div>
 
           {/* Right Column: Slot Picker */}
-          <div style={{ flex: '1 1 500px', background: 'var(--white)', border: '1px solid var(--cream-border)', borderRadius: '16px', padding: '32px' }}>
-            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', color: 'var(--ink)', margin: '0 0 24px' }}>
+          <div style={{ flex: '1 1 500px', background: 'var(--white)', border: '1px solid var(--cream-border)', borderRadius: '16px', padding: '36px', boxShadow: '0 12px 32px rgba(28,26,22,0.015)' }}>
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', color: 'var(--ink)', margin: '0 0 24px', fontWeight: 400 }}>
               Select a Date & Time
             </h2>
             <SlotPickerClient 
@@ -114,6 +116,12 @@ export default async function BookSessionPage({ params }: PageProps) {
 
         </div>
       </div>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        .back-link-profile:hover {
+          text-decoration: underline !important;
+        }
+      `}} />
     </main>
   )
 }

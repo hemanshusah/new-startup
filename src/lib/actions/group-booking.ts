@@ -3,6 +3,7 @@
 import { createServiceClient } from '@/lib/supabase/server'
 import { getAuthenticatedUser } from '@/lib/auth-utils'
 import crypto from 'crypto'
+import { revalidatePath } from 'next/cache'
 
 interface InitiateGroupBookingParams {
   groupSessionId: string
@@ -152,6 +153,11 @@ export async function confirmGroupBooking(params: ConfirmGroupBookingParams) {
         })
         .eq('id', groupSessionId)
     }
+
+    revalidatePath('/profile/sessions')
+    revalidatePath('/admin/mentor-connect/sessions')
+    revalidatePath('/admin/mentor-connect/payments')
+    revalidatePath('/admin/mentor-connect')
 
     return { success: true }
 
