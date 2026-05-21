@@ -6,8 +6,9 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
 import Credentials from "next-auth/providers/credentials"
-import { SupabaseAdapter } from "@auth/supabase-adapter"
+import { SupabaseAdapter } from "@/lib/auth/supabase-adapter"
 import { createClient } from "@/lib/supabase/server"
+
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.AUTH_SECRET,

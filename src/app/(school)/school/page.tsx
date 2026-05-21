@@ -66,7 +66,7 @@ export default async function SchoolPage() {
           <div style={{ 
             background: 'var(--white)', 
             padding: '60px', 
-            borderRadius: '16px', 
+            borderRadius: 'var(--radius-lg, 16px)', 
             border: '1px solid var(--cream-border)',
             textAlign: 'center'
           }}>
@@ -88,7 +88,7 @@ export default async function SchoolPage() {
                   flexDirection: 'column',
                   background: 'var(--white)',
                   border: '1px solid var(--cream-border)',
-                  borderRadius: '16px',
+                  borderRadius: 'var(--radius-lg, 16px)',
                   padding: '32px',
                   textDecoration: 'none',
                   transition: 'all 0.2s ease',

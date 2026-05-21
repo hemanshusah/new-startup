@@ -145,8 +145,24 @@ export default async function ProgramDetailPage({ params }: Props) {
           maxWidth: '1280px',
           margin: '0 auto',
           padding: '40px 24px 80px',
+          position: 'relative'
         }}
       >
+        {/* Ambient background glow */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '100%',
+          maxWidth: '1280px',
+          height: '320px',
+          background: 'radial-gradient(ellipse 60% 50% at 50% 0%, var(--accent-light) 0%, transparent 70%)',
+          opacity: 0.4,
+          zIndex: 0,
+          pointerEvents: 'none'
+        }} />
+
         {/* Header: breadcrumb, badges, H1, org, Apply button */}
         <ProgramHeader program={program as Program} />
 

@@ -22,6 +22,7 @@ export default async function AdminReviewMentorPage({ params }: PageProps) {
     'use server'
     const newStatus = formData.get('status') as string
     const tier = formData.get('verification_tier') as string
+    const isFeatured = formData.get('is_featured') === 'true'
     
     const supabase = createServiceClient()
     const { error } = await supabase
@@ -29,6 +30,7 @@ export default async function AdminReviewMentorPage({ params }: PageProps) {
       .update({ 
         status: newStatus,
         verification_tier: tier,
+        is_featured: isFeatured,
         updated_at: new Date().toISOString()
       })
       .eq('id', id)
@@ -122,6 +124,14 @@ export default async function AdminReviewMentorPage({ params }: PageProps) {
                 <option value="community">Community (Unverified)</option>
                 <option value="verified">Verified</option>
                 <option value="credential_verified">Credential Verified</option>
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', color: 'var(--ink-4)', marginBottom: '8px' }}>Featured Operator</label>
+              <select name="is_featured" defaultValue={mentor.is_featured ? 'true' : 'false'} style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--cream-border)', background: 'var(--white)', width: '200px' }}>
+                <option value="false">Standard Operator</option>
+                <option value="true">★ Featured on Landing</option>
               </select>
             </div>
           </div>

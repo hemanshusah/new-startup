@@ -440,29 +440,79 @@ export function SettingsForm({
             <div>
               <p style={{ fontSize: '13px', fontWeight: 600, marginBottom: '16px' }}>Brand Colors</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
-                {colorInput('Accent', 'accent')}
-                {colorInput('Background', 'bg')}
-                {colorInput('Header', 'headerBg')}
-                {colorInput('Footer', 'footerBg')}
+                {colorInput('Accent Primary', 'accent')}
+                {colorInput('Accent Light (Badges)', 'accentLight')}
+                {colorInput('Main Background', 'bg')}
+                {colorInput('Card Background', 'white')}
+                {colorInput('Text Color (Ink)', 'text')}
+                {colorInput('Borders & Lines', 'border')}
+                {colorInput('Header Background', 'headerBg')}
+                {colorInput('Footer Background', 'footerBg')}
               </div>
             </div>
             <div>
               <p style={{ fontSize: '13px', fontWeight: 600, marginBottom: '16px' }}>Typography</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <select 
-                  value={cosmetic.fonts.heading.family}
-                  onChange={(e) => setCosmetic({ ...cosmetic, fonts: { ...cosmetic.fonts, heading: { ...cosmetic.fonts.heading, family: e.target.value } } })}
-                  style={{ padding: '8px', borderRadius: '6px', border: '1px solid var(--cream-border)' }}
-                >
-                  {GOOGLE_FONTS_CURATED.map(f => <option key={f} value={f}>{f}</option>)}
-                </select>
-                <select 
-                  value={cosmetic.fonts.body.family}
-                  onChange={(e) => setCosmetic({ ...cosmetic, fonts: { ...cosmetic.fonts, body: { ...cosmetic.fonts.body, family: e.target.value } } })}
-                  style={{ padding: '8px', borderRadius: '6px', border: '1px solid var(--cream-border)' }}
-                >
-                  {GOOGLE_FONTS_CURATED.map(f => <option key={f} value={f}>{f}</option>)}
-                </select>
+                <div>
+                  <label style={{ fontSize: '12px', color: 'var(--ink-2)', marginBottom: '4px', display: 'block' }}>Heading Font</label>
+                  <select 
+                    value={cosmetic.fonts.heading.family}
+                    onChange={(e) => setCosmetic({ ...cosmetic, fonts: { ...cosmetic.fonts, heading: { ...cosmetic.fonts.heading, family: e.target.value } } })}
+                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid var(--cream-border)', background: 'var(--white)', fontSize: '13px' }}
+                  >
+                    {GOOGLE_FONTS_CURATED.map(f => <option key={f} value={f}>{f}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: '12px', color: 'var(--ink-2)', marginBottom: '4px', display: 'block' }}>Section & Card Font</label>
+                  <select 
+                    value={cosmetic.fonts.section?.family || cosmetic.fonts.heading.family}
+                    onChange={(e) => setCosmetic({ 
+                      ...cosmetic, 
+                      fonts: { 
+                        ...cosmetic.fonts, 
+                        section: { 
+                          family: e.target.value, 
+                          size: cosmetic.fonts.section?.size || '16px', 
+                          weight: cosmetic.fonts.section?.weight || '400', 
+                          style: cosmetic.fonts.section?.style || 'normal' 
+                        } 
+                      } 
+                    })}
+                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid var(--cream-border)', background: 'var(--white)', fontSize: '13px' }}
+                  >
+                    {GOOGLE_FONTS_CURATED.map(f => <option key={f} value={f}>{f}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: '12px', color: 'var(--ink-2)', marginBottom: '4px', display: 'block' }}>Body Copy Font</label>
+                  <select 
+                    value={cosmetic.fonts.body.family}
+                    onChange={(e) => setCosmetic({ ...cosmetic, fonts: { ...cosmetic.fonts, body: { ...cosmetic.fonts.body, family: e.target.value } } })}
+                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid var(--cream-border)', background: 'var(--white)', fontSize: '13px' }}
+                  >
+                    {GOOGLE_FONTS_CURATED.map(f => <option key={f} value={f}>{f}</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div style={{ gridColumn: 'span 2', marginTop: '16px', borderTop: '1px solid var(--cream-border)', paddingTop: '20px' }}>
+              <p style={{ fontSize: '13px', fontWeight: 600, marginBottom: '12px' }}>Layout Dynamics</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxWidth: '300px' }}>
+                <label style={{ fontSize: '12px', color: 'var(--ink-2)' }}>Card Border Radius: {cosmetic.borderRadius}</label>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="32" 
+                    step="2"
+                    value={parseInt(cosmetic.borderRadius) || 0} 
+                    onChange={(e) => setCosmetic({ ...cosmetic, borderRadius: `${e.target.value}px` })}
+                    style={{ flex: 1, accentColor: 'var(--accent)', cursor: 'pointer' }}
+                  />
+                  <span style={{ fontSize: '13px', fontFamily: 'monospace', width: '40px', textAlign: 'right' }}>{cosmetic.borderRadius}</span>
+                </div>
               </div>
             </div>
           </div>

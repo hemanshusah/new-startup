@@ -55,12 +55,11 @@ export function DocLayout({
 
   return (
     <div className="school-shell">
-      {/* TopNav */}
+      {/* Top sub-header below standard Navbar */}
       <SchoolTopNav
         modules={navigation.modules}
         currentSection={currentSection}
         onOpenSearch={() => setSearchOpen(true)}
-        onOpenMobileNav={() => setMobileNavOpen(true)}
       />
 
       {/* Mobile backdrop */}
@@ -80,6 +79,58 @@ export function DocLayout({
 
       {/* Main content */}
       <main className="school-content">
+        {/* Mobile Curriculum Action Bar */}
+        <div className="school-mobile-action-bar" style={{
+          display: 'none',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '12px 16px',
+          background: 'var(--white)',
+          border: '1px solid var(--cream-border)',
+          borderRadius: '12px',
+          marginBottom: '28px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+        }}>
+          <button
+            onClick={() => setMobileNavOpen(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: 'none',
+              border: 'none',
+              color: 'var(--ink)',
+              fontFamily: 'var(--font-sans)',
+              fontSize: '13.5px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              padding: 0
+            }}
+          >
+            <Menu size={16} color="var(--accent)" />
+            <span>Curriculum Menu</span>
+          </button>
+          <button
+            onClick={() => setSearchOpen(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'var(--bg)',
+              border: 'none',
+              padding: '6px 12px',
+              borderRadius: '20px',
+              color: 'var(--ink-3)',
+              fontFamily: 'var(--font-sans)',
+              fontSize: '12.5px',
+              cursor: 'pointer'
+            }}
+          >
+            <Search size={14} />
+            <span>Search</span>
+          </button>
+        </div>
+
         {children}
       </main>
 
@@ -110,20 +161,6 @@ function DocLayoutStyles() {
         color: var(--ink) !important;
         transform: translateX(4px);
       }
-      .school-topnav a, .school-topnav button {
-        transition: all 0.2s ease !important;
-      }
-      .school-topnav a:hover {
-        color: var(--accent) !important;
-      }
-      .school-desktop-search button {
-        transition: all 0.2s ease !important;
-      }
-      .school-desktop-search button:hover {
-        border-color: var(--cream-border) !important;
-        background: var(--white) !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      }
       .school-toc-link {
         transition: all 0.2s ease !important;
       }
@@ -142,57 +179,72 @@ function DocLayoutStyles() {
         background: var(--bg) !important;
         transform: translateX(4px);
       }
+      
+      /* Dashboard Button Distinct Hover - Prevents matching background & text bug */
+      .school-dashboard-btn {
+        background: #0029FF !important;
+        color: white !important;
+        transition: all 0.2s ease !important;
+      }
+      .school-dashboard-btn:hover {
+        background: var(--ink) !important;
+        color: var(--white) !important;
+        box-shadow: 0 4px 12px rgba(28, 26, 22, 0.15) !important;
+        transform: translateY(-1px) !important;
+      }
+
+      /* Desktop sub-navbar sticky alignment below global Navbar (56px) */
+      @media (min-width: 1025px) {
+        .school-topnav {
+          display: flex !important;
+          position: sticky !important;
+          top: 56px !important;
+          z-index: 40 !important;
+        }
+        .school-sidebar {
+          top: 160px !important;
+          height: calc(100vh - 160px) !important;
+        }
+        .school-toc {
+          top: 160px !important;
+          height: calc(100vh - 160px) !important;
+        }
+      }
+
+      /* Hide sub-navbar on mobile for clutter-free reading */
+      @media (max-width: 1024px) {
+        .school-topnav {
+          display: none !important;
+        }
+        .school-mobile-action-bar {
+          display: flex !important;
+        }
+      }
     `}} />
   )
 }
 
 // ── TopNav Sub-component ─────────────────────────────────────
 
-/**
- * Horizontal navigation bar for Startup School.
- * Displays the product logo, search trigger, and top-level module tabs.
- */
 function SchoolTopNav({
   modules,
   currentSection,
   onOpenSearch,
-  onOpenMobileNav,
 }: {
   modules: SchoolModule[]
   currentSection?: string
   onOpenSearch: () => void
-  onOpenMobileNav: () => void
 }) {
   return (
     <nav className="school-topnav" style={{ display: 'flex', flexDirection: 'column', background: 'var(--white)', borderBottom: '1px solid var(--cream-border)' }}>
       {/* Top Row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 24px' }}>
 
-        {/* Left: Hamburger & Logo */}
+        {/* Left Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <button
-            type="button"
-            onClick={onOpenMobileNav}
-            className="school-hamburger"
-            style={{
-              display: 'none',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '32px',
-              height: '32px',
-              border: '1px solid var(--cream-border)',
-              borderRadius: '6px',
-              background: 'transparent',
-              cursor: 'pointer',
-              color: 'var(--ink)',
-            }}
-            aria-label="Open navigation"
-          >
-            <Menu size={18} />
-          </button>
           <Link href="/school" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
             <span style={{ fontFamily: 'var(--font-serif), serif', fontSize: '20px', fontWeight: 400, color: 'var(--ink)', letterSpacing: '-0.02em' }}>
-              Startup<span style={{ color: 'var(--accent)' }}>School</span>
+              Startup<span style={{ color: '#0029FF' }}>School</span>
             </span>
           </Link>
         </div>
@@ -229,18 +281,18 @@ function SchoolTopNav({
           </button>
         </div>
 
-        {/* Right Links */}
+        {/* Right Actions */}
         <div className="school-desktop-actions" style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          {/* <Link href="/" style={{ fontSize: '13px', color: 'var(--ink-3)', textDecoration: 'none', fontWeight: 500, fontFamily: 'var(--font-sans)' }}>Main Site</Link> */}
-          <Link href="/school" style={{
-            background: 'var(--accent)',
+          <Link href="/school" className="school-dashboard-btn" style={{
+            background: '#0029FF',
             color: 'white',
-            padding: '6px 14px',
-            borderRadius: '20px',
+            padding: '8px 18px',
+            borderRadius: '24px',
             fontSize: '13px',
-            fontWeight: 500,
+            fontWeight: 600,
             textDecoration: 'none',
-            fontFamily: 'var(--font-sans)'
+            fontFamily: 'var(--font-sans)',
+            boxShadow: '0 2px 8px rgba(0, 41, 255, 0.15)'
           }}>
             Dashboard ›
           </Link>
@@ -266,13 +318,14 @@ function SchoolTopNav({
               style={{
                 fontFamily: 'var(--font-sans), sans-serif',
                 fontSize: '13.5px',
-                fontWeight: isActive ? 500 : 400,
+                fontWeight: isActive ? 600 : 500,
                 color: isActive ? 'var(--ink)' : 'var(--ink-3)',
                 padding: '12px 0',
-                borderBottom: `2px solid ${isActive ? 'var(--accent)' : 'transparent'}`,
+                borderBottom: `2px solid ${isActive ? '#0029FF' : 'transparent'}`,
                 textDecoration: 'none',
                 whiteSpace: 'nowrap',
-                marginTop: '1px' // visual alignment
+                marginTop: '1px',
+                transition: 'all 0.15s ease'
               }}
             >
               {mod.title}
