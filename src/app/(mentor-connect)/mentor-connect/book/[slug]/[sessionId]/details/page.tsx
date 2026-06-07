@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createServiceClient } from '@/lib/supabase/server'
-import { BookingDetailsForm } from '@/components/mentor-connect/BookingDetailsForm'
+import { BookingDetailsForm } from '@/components/organisms/BookingDetailsForm'
 import { 
   Sparkles, 
   Calendar, 

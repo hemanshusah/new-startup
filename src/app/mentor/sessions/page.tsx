@@ -8,7 +8,7 @@ import {
   sendMentorMeetingOffer, 
   toggleMentorAvailability 
 } from '@/lib/mentor-dashboard-actions'
-import { NegotiationTimeline } from '@/components/mentor-connect/NegotiationTimeline'
+import { NegotiationTimeline } from '@/components/molecules/NegotiationTimeline'
 
 export default function MentorSessionsPage() {
   const searchParams = useSearchParams()

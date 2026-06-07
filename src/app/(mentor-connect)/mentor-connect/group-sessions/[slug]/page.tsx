@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createServiceClient } from '@/lib/supabase/server'
 import { getAuthenticatedUser } from '@/lib/auth-utils'
-import { GroupSessionBookingButton } from '@/components/mentor-connect/GroupSessionBookingButton'
+import { GroupSessionBookingButton } from '@/components/molecules/GroupSessionBookingButton'
 import Link from 'next/link'
 
 interface PageProps {

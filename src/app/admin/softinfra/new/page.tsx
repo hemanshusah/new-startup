@@ -1,4 +1,4 @@
-import { SIForm } from '@/components/admin/SIForm'
+import { SIForm } from '@/components/organisms/admin/SIForm'
 
 export default function NewSIPage() {
   return (

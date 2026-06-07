@@ -2,7 +2,7 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { getAuthenticatedUser } from '@/lib/auth-utils'
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
-import { FounderSessionsList } from '@/components/mentor-connect/FounderSessionsList'
+import { FounderSessionsList } from '@/components/organisms/FounderSessionsList'
 
 export const metadata: Metadata = {
   title: 'My Sessions | Mentor Connect'

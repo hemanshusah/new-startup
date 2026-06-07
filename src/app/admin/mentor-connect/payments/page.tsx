@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { AdminPaymentsList } from '@/components/admin/mentor-connect/AdminPaymentsList'
+import { AdminPaymentsList } from '@/components/organisms/admin/mentor-connect/AdminPaymentsList'
 
 export const dynamic = 'force-dynamic'
 

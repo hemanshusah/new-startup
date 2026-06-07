@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { getAuthenticatedUser } from '@/lib/auth-utils'
 import { createServiceClient } from '@/lib/supabase/server'
-import { ProfileView } from '@/components/profile/ProfileView'
+import { ProfileView } from '@/components/organisms/ProfileView'
 import { getProgramFormSiteConfig } from '@/lib/site-config'
 
 export const dynamic = 'force-dynamic'

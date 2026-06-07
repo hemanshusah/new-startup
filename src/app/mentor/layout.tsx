@@ -2,8 +2,8 @@ import { redirect } from 'next/navigation'
 import { getAuthenticatedUser } from '@/lib/auth-utils'
 import { createServiceClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import MentorNav from '@/components/mentor-connect/MentorNav'
-import MentorGoogleLock from '@/components/mentor-connect/MentorGoogleLock'
+import MentorNav from '@/components/templates/MentorNav'
+import MentorGoogleLock from '@/components/atoms/MentorGoogleLock'
 import { Clock, ShieldCheck, AlertCircle, ArrowLeft, Mail, Phone } from 'lucide-react'
 
 export default async function MentorLayout({ children }: { children: React.ReactNode }) {

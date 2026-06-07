@@ -1,5 +1,5 @@
 import { createServiceClient } from '@/lib/supabase/server'
-import { UsersTable } from '@/components/admin/UsersTable'
+import { UsersTable } from '@/components/organisms/admin/UsersTable'
 
 export default async function AdminUsersPage() {
   const supabase = createServiceClient()

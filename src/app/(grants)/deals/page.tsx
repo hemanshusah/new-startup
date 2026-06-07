@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { EmailCapture } from '@/components/ui/EmailCapture'
+import { EmailCapture } from '@/components/molecules/EmailCapture'
 
 export const metadata: Metadata = {
   title: 'Software Deals — GrantsIndia',

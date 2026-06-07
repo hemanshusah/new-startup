@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getAuthenticatedUser } from '@/lib/auth-utils'
 import { createServiceClient } from '@/lib/supabase/server'
-import { AdminShell } from '@/components/admin/AdminShell'
+import { AdminShell } from '@/components/templates/AdminShell'
 
 /**
  * Admin layout — wraps all /admin/* pages with AdminShell.

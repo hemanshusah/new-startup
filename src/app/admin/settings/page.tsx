@@ -1,5 +1,5 @@
 import { createServiceClient } from '@/lib/supabase/server'
-import { SettingsForm, type FieldConfig } from '@/components/admin/SettingsForm'
+import { SettingsForm, type FieldConfig } from '@/components/organisms/admin/SettingsForm'
 import { SECTOR_DEFAULTS, normalizeSectorsFromDb } from '@/lib/site-field-schema'
 
 async function loadOrCreateSiteConfigRow() {

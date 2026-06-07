@@ -3,9 +3,9 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/server'
 import { getAuthenticatedUser } from '@/lib/auth-utils'
-import { SaveMentorButton } from '@/components/mentor-connect/SaveMentorButton'
-import { RequestMeetingButton } from '@/components/mentor-connect/RequestMeetingButton'
-import SessionSelector from '@/components/mentor-connect/SessionSelector'
+import { SaveMentorButton } from '@/components/atoms/SaveMentorButton'
+import { RequestMeetingButton } from '@/components/organisms/RequestMeetingButton'
+import SessionSelector from '@/components/organisms/SessionSelector'
 import { Star, ShieldCheck, Sparkles, MapPin, Globe, ArrowLeft, Video, Calendar, Shield } from 'lucide-react'
 
 const LinkedinIcon = ({ size = 14 }: { size?: number }) => (

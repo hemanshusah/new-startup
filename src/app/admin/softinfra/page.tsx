@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/server'
-import { SITable } from '@/components/admin/SITable'
+import { SITable } from '@/components/organisms/admin/SITable'
 
 export default async function AdminSIPage() {
   const supabase = createServiceClient()

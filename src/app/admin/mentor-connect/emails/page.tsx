@@ -1,5 +1,5 @@
 import { getFirestoreDb } from '@/lib/firebase-admin'
-import { AdminEmailsList } from '@/components/admin/mentor-connect/AdminEmailsList'
+import { AdminEmailsList } from '@/components/organisms/admin/mentor-connect/AdminEmailsList'
 
 export const dynamic = 'force-dynamic'
 

@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createServiceClient } from '@/lib/supabase/server'
-import { SlotPickerClient } from '@/components/mentor-connect/SlotPickerClient'
+import { SlotPickerClient } from '@/components/organisms/SlotPickerClient'
 import { generateAvailableSlots } from '@/lib/slot-generator'
 
 interface PageProps {

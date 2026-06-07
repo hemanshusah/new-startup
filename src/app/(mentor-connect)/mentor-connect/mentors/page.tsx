@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/server'
-import { MentorCard } from '@/components/mentor-connect/MentorCard'
+import { MentorCard } from '@/components/organisms/MentorCard'
 import { getAuthenticatedUser } from '@/lib/auth-utils'
 import { Sparkles, SlidersHorizontal, Search, X, Check, Globe, HelpCircle } from 'lucide-react'
-import EnterpriseRegistry from '@/components/mentor-connect/EnterpriseRegistry'
+import EnterpriseRegistry from '@/components/organisms/EnterpriseRegistry'
 
 export const metadata: Metadata = {
   title: 'Ecosystem Directory | Mentor Connect',
@@ -37,6 +37,9 @@ export default async function MentorDirectoryPage({ searchParams }: PageProps) {
       linkedin_url,
       twitter_url,
       intro_video_url,
+      years_experience,
+      total_sessions,
+      total_reviews,
       session_types ( price_inr )
     `)
     .eq('status', 'active')

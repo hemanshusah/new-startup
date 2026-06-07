@@ -1,4 +1,4 @@
-import { ProgramForm } from '@/components/admin/ProgramForm'
+import { ProgramForm } from '@/components/organisms/admin/ProgramForm'
 import { getProgramFormSiteConfig } from '@/lib/site-config'
 
 export default async function NewProgramPage() {

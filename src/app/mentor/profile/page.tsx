@@ -1,7 +1,7 @@
 import { getAuthenticatedUser } from '@/lib/auth-utils'
 import { createServiceClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { AvatarUpload } from '@/components/mentor/AvatarUpload'
+import { AvatarUpload } from '@/components/molecules/AvatarUpload'
 
 export default async function MentorProfilePage() {
   const user = await getAuthenticatedUser()
