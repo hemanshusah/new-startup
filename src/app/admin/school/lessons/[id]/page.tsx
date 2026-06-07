@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { createServiceClient } from '@/lib/supabase/server'
-import { LessonForm } from '@/components/admin/school/LessonForm'
+import { LessonForm } from '@/components/organisms/admin/school/LessonForm'
 
 export default async function EditLessonPage({
   params,

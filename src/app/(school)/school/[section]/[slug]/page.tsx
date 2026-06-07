@@ -3,9 +3,9 @@ import type { Metadata } from 'next'
 import { auth } from '@/auth'
 import { getSchoolNavigation, getFlatLessonList } from '@/lib/school/navigation'
 import { getLessonBySlug } from '@/lib/school/content'
-import { DocLayout } from '@/components/school/DocLayout'
-import { ContentArea } from '@/components/school/ContentArea'
-import { LockedContent } from '@/components/school/LockedContent'
+import { DocLayout } from '@/components/templates/DocLayout'
+import { ContentArea } from '@/components/organisms/ContentArea'
+import { LockedContent } from '@/components/molecules/LockedContent'
 
 interface PageProps {
   params: Promise<{ section: string; slug: string }>

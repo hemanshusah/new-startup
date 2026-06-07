@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
-import SessionTypeModal from '@/components/mentor-connect/SessionTypeModal'
+import SessionTypeModal from '@/components/organisms/SessionTypeModal'
 import { deleteSessionType, updateSessionType } from '@/lib/mentor-dashboard-actions'
 
 interface SessionType {

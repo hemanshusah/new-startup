@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { createServiceClient } from '@/lib/supabase/server'
-import { ModuleForm } from '@/components/admin/school/ModuleForm'
+import { ModuleForm } from '@/components/organisms/admin/school/ModuleForm'
 
 export default async function EditModulePage({
   params,

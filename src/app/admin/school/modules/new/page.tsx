@@ -1,4 +1,4 @@
-import { ModuleForm } from '@/components/admin/school/ModuleForm'
+import { ModuleForm } from '@/components/organisms/admin/school/ModuleForm'
 
 export default function NewModulePage() {
   return (

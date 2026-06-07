@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/server'
-import { StatCard } from '@/components/admin/StatCard'
+import { StatCard } from '@/components/atoms/StatCard'
 
 function relativeTime(dateStr: string, now: number): string {
   const diff = now - new Date(dateStr).getTime()

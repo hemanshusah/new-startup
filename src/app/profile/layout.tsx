@@ -1,4 +1,4 @@
-import { ProfileNav } from '@/components/profile/ProfileNav'
+import { ProfileNav } from '@/components/molecules/ProfileNav'
 
 export default function ProfileLayout({ children }: { children: React.ReactNode }) {
   return (

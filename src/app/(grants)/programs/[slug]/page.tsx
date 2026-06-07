@@ -6,12 +6,12 @@ import type { Program, ProgramListItem } from '@/types/program'
 import type { SoftInfra } from '@/types/softinfra'
 import { getSimilarPrograms } from '@/lib/similarity'
 import { getActiveSoftInfra } from '@/lib/softinfra'
-import { ProgramHeader } from '@/components/detail/ProgramHeader'
-import { MetaStrip } from '@/components/detail/MetaStrip'
-import { ContentSections } from '@/components/detail/ContentSection'
-import { DetailSidebar } from '@/components/detail/DetailSidebar'
-import { SimilarPrograms } from '@/components/detail/SimilarPrograms'
-import { InlineSI } from '@/components/softinfra/InlineSI'
+import { ProgramHeader } from '@/components/organisms/ProgramHeader'
+import { MetaStrip } from '@/components/organisms/MetaStrip'
+import { ContentSections } from '@/components/organisms/ContentSection'
+import { DetailSidebar } from '@/components/organisms/DetailSidebar'
+import { SimilarPrograms } from '@/components/organisms/SimilarPrograms'
+import { InlineSI } from '@/components/organisms/InlineSI'
 import { absoluteUrl } from '@/lib/site-url'
 
 // 10-minute ISR cache (CONTEXT.md §11)
@@ -145,8 +145,24 @@ export default async function ProgramDetailPage({ params }: Props) {
           maxWidth: '1280px',
           margin: '0 auto',
           padding: '40px 24px 80px',
+          position: 'relative'
         }}
       >
+        {/* Ambient background glow */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '100%',
+          maxWidth: '1280px',
+          height: '320px',
+          background: 'radial-gradient(ellipse 60% 50% at 50% 0%, var(--accent-light) 0%, transparent 70%)',
+          opacity: 0.4,
+          zIndex: 0,
+          pointerEvents: 'none'
+        }} />
+
         {/* Header: breadcrumb, badges, H1, org, Apply button */}
         <ProgramHeader program={program as Program} />
 

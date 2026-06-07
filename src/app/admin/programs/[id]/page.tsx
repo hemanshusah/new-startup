@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { createServiceClient } from '@/lib/supabase/server'
-import { ProgramForm } from '@/components/admin/ProgramForm'
+import { ProgramForm } from '@/components/organisms/admin/ProgramForm'
 import type { Program } from '@/types/program'
 import { getProgramFormSiteConfig } from '@/lib/site-config'
 

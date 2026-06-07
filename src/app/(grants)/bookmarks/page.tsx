@@ -1,5 +1,5 @@
 import { getBookmarkedPrograms, getBookmarkedProgramIds, getBookmarkedMentors } from '@/lib/bookmarks/actions'
-import { GrantsGrid } from '@/components/listing/GrantsGrid'
+import { GrantsGrid } from '@/components/organisms/GrantsGrid'
 import { getCurrentProfile } from '@/components/auth/auth-actions'
 import { redirect } from 'next/navigation'
 import type { ProgramListItem } from '@/types/program'

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { createServiceClient } from '@/lib/supabase/server'
-import { SIForm } from '@/components/admin/SIForm'
+import { SIForm } from '@/components/organisms/admin/SIForm'
 import type { SoftInfra } from '@/types/softinfra'
 
 export default async function EditSIPage({ params }: { params: Promise<{ id: string }> }) {

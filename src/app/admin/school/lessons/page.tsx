@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/server'
-import { LessonsTable } from '@/components/admin/school/LessonsTable'
+import { LessonsTable } from '@/components/organisms/admin/school/LessonsTable'
 
 export default async function AdminLessonsPage() {
   const supabase = createServiceClient()

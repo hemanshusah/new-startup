@@ -2,14 +2,14 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import './globals.css'
 import { getSiteUrl } from '@/lib/site-url'
-import { NavWrapper } from '@/components/nav/NavWrapper'
-import { NavProgress } from '@/components/nav/NavProgress'
-import { PageTransition } from '@/components/ui/PageTransition'
+import { NavWrapper } from '@/components/templates/nav/NavWrapper'
+import { NavProgress } from '@/components/templates/nav/NavProgress'
+import { PageTransition } from '@/components/atoms/PageTransition'
 import { AuthProvider } from '@/components/auth/AuthProvider'
 import { DM_Sans, DM_Serif_Display } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
-import { AuthModalLazy } from '@/components/auth/AuthModalLazy'
-import { ThemeInjection } from '@/components/theme/ThemeInjection'
+import { AuthModalLazy } from '@/components/organisms/AuthModalLazy'
+import { ThemeInjection } from '@/components/atoms/ThemeInjection'
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   description: 'Shared platform for startup resources.',
 }
 
-import { FooterWrapper } from '@/components/nav/FooterWrapper'
+import { FooterWrapper } from '@/components/templates/nav/FooterWrapper'
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
